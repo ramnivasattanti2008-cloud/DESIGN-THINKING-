@@ -41,7 +41,8 @@ the whole framework collapses.
 | Adversarial playground | **done** | "Fool it" tab, logs successful edits |
 | Confidence surfacing | **done** | flags fields below 0.55 |
 | Real-data integration | **partial** | see "Data" |
-| Transformer baseline | **not started** | highest-value next task |
+| Transformer baseline | **done** | MuRIL frozen + standardised, `src/evaluate_muril.py` |
+| Live published app | **done** | browser app published as a hosted page |
 
 ## How to run it
 
@@ -116,6 +117,46 @@ which is the corpus's weakest point.
 
 **Confidence surfacing.** Fields below 0.55 confidence are named in the UI.
 
+## MuRIL result (2026-10-03)
+
+Frozen `google/muril-base-cased`, mean-pooled, **standardised**, logistic heads
+on top. Same corpus, same held-out splits, same metrics as `src/evaluate.py`.
+
+One trap, recorded because it cost an hour and will cost the next person the
+same: raw mean-pooled BERT output is anisotropic. On this corpus mean pairwise
+cosine is **0.993 with std 0.003** — every message looks like every other, the
+classifiers collapse to one class, and every number reads as near-zero. It looks
+exactly like "MuRIL is terrible". Standardising (scaler fit on train only) takes
+binary macro-F1 from 0.417 to 0.902. Never report BERT-embedding results without
+checking the cosine spread first.
+
+| Attack Signature recovery (exact core) | char n-gram | MuRIL | change |
+|---|---|---|---|
+| in-distribution | 1.000 | 1.000 | — |
+| **cross-lingual** | 0.642 | **0.891** | **+0.249** |
+| **compositional** | 0.056 | **0.139** | **+0.083** |
+| open-set | 0.000 | 0.000 | — |
+
+| Per-variety agreement | char n-gram | MuRIL |
+|---|---|---|
+| Telugu | 0.450 | **0.738** |
+| Telugu romanised | 0.475 | **0.713** |
+| Tamil | 0.613 | 0.738 |
+| Kannada | 0.625 | 0.725 |
+
+Cross-lingual consistency on unseen varieties: 0.787 → **0.972**.
+Flip-success: 0.559 → **0.685**.
+
+**What this settles.** MuRIL fixes cross-lingual transfer, as expected. It does
+not fix compositional generalisation: exact signature recovery on recombined
+attacks goes from 0.056 to 0.139 and stays catastrophic. The paper's central
+finding survives a far better encoder, which makes the claim *stronger*, not
+weaker. This is not a representation problem that a bigger model solves.
+
+**Where MuRIL is worse.** False positives on hard negatives go from 0.000 to
+0.400, and open-set F1 from 0.920 to 0.903. It is a trade, not a free win, and
+the paper should say so.
+
 ## Current numbers
 
 App model, 5-fold cross-validation per signature field:
@@ -184,8 +225,9 @@ claim is technically true and practically empty.
 
 ## Next tasks, in priority order
 
-1. **Add a MuRIL or LaBSE baseline.** Run it through `src/evaluate.py` unchanged
-   so the numbers are comparable. Colab with a GPU, roughly a day.
+1. ~~Add a MuRIL baseline.~~ **Done.** See the MuRIL section above. Next
+   encoder worth trying is LaBSE, which is trained for sentence similarity and
+   should not need the standardisation fix.
 2. **Email the Dravidian dataset authors** (Elangovan, NIT Silchar; Abirami,
    Thiagarajar College) and ask for research access. Real Telugu/Tamil/Kannada
    messages would remove the project's biggest stated limitation.
@@ -205,6 +247,9 @@ claim is technically true and practically empty.
 
 ## Changelog
 
+- **2026-10-03 (latest)** — MuRIL baseline evaluated on the paper's splits.
+  Cross-lingual signature recovery 0.642 → 0.891, Telugu 0.450 → 0.738,
+  compositional still 0.139. Browser app published as a live hosted page.
 - **2026-10-03 (later)** — Six features: evidence extraction, nearest-family
   distance, minimal counterfactual, action advice, adversarial playground,
   confidence surfacing. All ported to JS with output verified identical to

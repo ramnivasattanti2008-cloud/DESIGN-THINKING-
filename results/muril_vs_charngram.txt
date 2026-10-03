@@ -1,0 +1,37 @@
+MuRIL (frozen, standardised) vs the paper's character n-gram models
+Same corpus, same held-out splits, same metrics, seed 20260920.
+
+condition          TFIDF-Char  Struct-Sig     MuRIL     change
+IID                     0.942       1.000     0.942     -0.058
+Cross-ling              0.936       0.888     0.962     +0.026
+Semantic-flip           0.700       0.781     0.773     -0.008
+Compositional           0.920       0.918     0.898     -0.023
+Open-set                0.965       0.920     0.903     -0.062
+
+flip-success            0.175       0.559     0.685     +0.126
+FPR hard-neg            0.273       0.000     0.400     +0.400   (lower better)
+FPR advisories          0.507       0.293     0.427     +0.133   (lower better)
+
+
+ATTACK SIGNATURE RECOVERY (exact core)
+suite              char n-gram     MuRIL     change
+iid                      1.000     1.000     +0.000
+xling                    0.642     0.891     +0.249
+compositional            0.056     0.139     +0.083
+osr                      0.000     0.000     +0.000
+
+
+CROSS-LINGUAL CONSISTENCY
+  all varieties   0.837  ->  0.981
+  unseen only     0.787  ->  0.972
+
+  per variety (agreement with gold):
+    te        0.450  ->  0.738   +0.288
+    te_Latn   0.475  ->  0.713   +0.238
+    ta        0.613  ->  0.738   +0.125
+    kn        0.625  ->  0.725   +0.100
+    cm_te     0.738  ->  0.750   +0.012
+    cm_hi     0.750  ->  0.750   +0.000
+    en        0.750  ->  0.750   +0.000
+    hi        0.750  ->  0.750   +0.000
+    hi_Latn   0.750  ->  0.750   +0.000

@@ -1,0 +1,75 @@
+{
+  "model": "google/muril-base-cased",
+  "frozen": true,
+  "seed": 20260920,
+  "binary": {
+    "IID": {
+      "n": 104,
+      "f1": 0.942
+    },
+    "Cross-ling": {
+      "n": 740,
+      "f1": 0.9617
+    },
+    "Semantic-flip": {
+      "n": 293,
+      "f1": 0.773
+    },
+    "Compositional": {
+      "n": 339,
+      "f1": 0.8979
+    },
+    "Open-set": {
+      "n": 438,
+      "f1": 0.9027
+    }
+  },
+  "sfs": {
+    "n": 143,
+    "flip_success": 0.6853,
+    "mean_delta": 0.6207
+  },
+  "fpr": {
+    "hard_negative": 0.4,
+    "sfs_flip": 0.4267,
+    "benign_generic": 0.0189
+  },
+  "signature": {
+    "iid": {
+      "n": 71,
+      "exact_core": 1.0,
+      "mean_sigma": 0.75
+    },
+    "xling": {
+      "n": 506,
+      "exact_core": 0.8913,
+      "mean_sigma": 0.7194
+    },
+    "compositional": {
+      "n": 72,
+      "exact_core": 0.1389,
+      "mean_sigma": 0.5434
+    },
+    "osr": {
+      "n": 171,
+      "exact_core": 0.0,
+      "mean_sigma": 0.4028
+    }
+  },
+  "clsc": {
+    "all": 0.9809,
+    "seen": 1.0,
+    "unseen": 0.9717,
+    "per_language": {
+      "cm_hi": 0.75,
+      "cm_te": 0.75,
+      "en": 0.75,
+      "hi": 0.75,
+      "hi_Latn": 0.75,
+      "kn": 0.725,
+      "ta": 0.7375,
+      "te": 0.7375,
+      "te_Latn": 0.7125
+    }
+  }
+}
