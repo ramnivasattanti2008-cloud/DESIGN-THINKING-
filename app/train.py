@@ -40,7 +40,7 @@ OUT = os.path.join(HERE, "artifacts")
 
 N_REAL = 24000          # subsample of the real corpus, balanced
 MAX_FEATURES = 24000    # binary detector
-SIG_FEATURES = 7000     # signature heads; keeps the browser export small
+SIG_FEATURES = 20000    # signature heads. 7000 loses 5 of 180 flips; flips are the product.
 
 
 def load_synthetic():

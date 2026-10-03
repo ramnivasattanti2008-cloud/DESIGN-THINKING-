@@ -56,8 +56,9 @@ Python model on all 1,823 corpus messages. Do not weaken that check.
 
 Two vectorizers, deliberately:
 
-- `vec_sig` (7,000 char n-gram features) fits the synthetic corpus only, and
-  feeds the six signature heads.
+- `vec_sig` (20,000 char n-gram features) fits the synthetic corpus only, and
+  feeds the six signature heads. 7,000 was tried to shrink the browser export and
+  cost 5 of 180 flip predictions; the size was accepted instead.
 - `vec_bin` (24,000 features) fits synthetic plus 24,000 real English messages,
   and feeds the binary detector.
 
@@ -80,12 +81,17 @@ App model, 5-fold cross-validation per signature field:
 
 | field | CV accuracy |
 |---|---|
-| actor | 0.912 |
-| pretext | 0.863 |
-| target | 0.963 |
-| intent | 0.924 |
-| action | 0.928 |
-| stage | 0.902 |
+| actor | 0.947 |
+| pretext | 0.897 |
+| target | 0.968 |
+| intent | 0.931 |
+| action | 0.945 |
+| stage | 0.925 |
+
+On the corpus's own contrast pairs the app model gets **180/180 flips** correct
+(advisory read as safe) and **173/173 attacks** correct. That is in-sample, so it
+is a sanity check, not a generalisation claim. The held-out number that matters is
+flip-success 0.559 on unseen attack families, from `src/evaluate.py`.
 
 Binary detector: 0.857 macro-F1 on held-out real English, 0.786 on synthetic.
 
@@ -128,10 +134,10 @@ claim is technically true and practically empty.
 4. **The model misses unknown attack families.** "Congratulations, you won a free
    iPhone, click here" reads as *uncertain*, not *attack*, because that
    combination is not in the 12-family taxonomy. Expected, documented, not fixed.
-5. **One known model error in training data**: `"Bank notice: Your KYC has
-   expired. Never share the OTP..."` is predicted `share_code` rather than
-   `refrain`, despite being a training example. Other flip pairs in the same
-   family are correct.
+5. **The browser export is 12.6 MB.** That is the cost of 20,000 signature
+   features. Dropping to 7,000 gives a 4.5 MB export and loses 5 of 180 flips;
+   12,000 gives ~7.7 MB and loses 1. Flip behaviour is the product, so the size
+   was accepted. Measured, not guessed — rerun the sweep before changing it.
 6. **API is untested under concurrency.** Single `Analyzer` instance, no locking.
    Occlusion attribution is O(tokens) model calls per request.
 
@@ -150,7 +156,8 @@ claim is technically true and practically empty.
 
 ## Changelog
 
-- **2026-10-03** — App built. Two-vectorizer architecture after a shared one
+- **2026-10-03** — App built. Signature vectorizer sized at 20,000 features after
+  measuring flip accuracy against feature count (7k: 0.972, 12k: 0.994, 20k: 1.000). Two-vectorizer architecture after a shared one
   destroyed signature recovery. Browser port with enforced parity (all 1,823
   messages). FastAPI backend. Real dataset cloned and measured; found to contain
   no Dravidian-language content.

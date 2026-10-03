@@ -14,7 +14,7 @@
         "tech_support",
         "utility_provider"
       ],
-      "cv_accuracy": 0.9116
+      "cv_accuracy": 0.9468
     },
     "pretext": {
       "kind": "clf",
@@ -32,7 +32,7 @@
         "routine_notice",
         "safety_advisory"
       ],
-      "cv_accuracy": 0.8634
+      "cv_accuracy": 0.8968
     },
     "target": {
       "kind": "clf",
@@ -44,7 +44,7 @@
         "otp",
         "upi_pin"
       ],
-      "cv_accuracy": 0.9627
+      "cv_accuracy": 0.9682
     },
     "intent": {
       "kind": "clf",
@@ -56,7 +56,7 @@
         "funds_transfer",
         "malware_install"
       ],
-      "cv_accuracy": 0.9243
+      "cv_accuracy": 0.9309
     },
     "action": {
       "kind": "clf",
@@ -70,7 +70,7 @@
         "scan_qr",
         "share_code"
       ],
-      "cv_accuracy": 0.9276
+      "cv_accuracy": 0.9451
     },
     "stage": {
       "kind": "clf",
@@ -80,7 +80,7 @@
         "lure",
         "not_applicable"
       ],
-      "cv_accuracy": 0.9018
+      "cv_accuracy": 0.9254
     }
   },
   "signature_recovery": {
@@ -101,7 +101,7 @@
       "exact_core": 1.0
     }
   },
-  "n_features_sig": 7000,
+  "n_features_sig": 20000,
   "n_features_bin": 24000,
   "n_synth_train": 356,
   "n_real": 24000
