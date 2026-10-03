@@ -1,0 +1,424 @@
+<title>Bharat-Scam-X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+Telugu:wght@400;500&family=Noto+Sans+Tamil:wght@400;500&family=Noto+Sans+Kannada:wght@400;500&display=swap">
+
+<style>
+:root{
+  --ground:#f4f6f8;
+  --surface:#ffffff;
+  --surface-2:#eef1f5;
+  --ink:#151a22;
+  --ink-2:#5b6576;
+  --ink-3:#8a94a5;
+  --rule:#dde2ea;
+  --rule-strong:#c3ccd9;
+  --attack:#b02a1c;
+  --attack-bg:#fbeeec;
+  --advisory:#0a6b60;
+  --advisory-bg:#e9f4f2;
+  --accent:#27417a;
+  --accent-soft:#e8ecf6;
+  --serif:'Spectral',Georgia,'Noto Serif Devanagari','Noto Serif Telugu',serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Noto Sans Devanagari','Noto Sans Telugu','Noto Sans Tamil','Noto Sans Kannada',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'Noto Sans Devanagari','Noto Sans Telugu','Noto Sans Tamil','Noto Sans Kannada',monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0e1117;
+    --surface:#161a22;
+    --surface-2:#1d222c;
+    --ink:#e7ebf2;
+    --ink-2:#9aa5b6;
+    --ink-3:#6f7a8b;
+    --rule:#252b36;
+    --rule-strong:#343c4a;
+    --attack:#f07a68;
+    --attack-bg:#2a1815;
+    --advisory:#4fc2b1;
+    --advisory-bg:#0f2523;
+    --accent:#93abe2;
+    --accent-soft:#1a2136;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0e1117;
+  --surface:#161a22;
+  --surface-2:#1d222c;
+  --ink:#e7ebf2;
+  --ink-2:#9aa5b6;
+  --ink-3:#6f7a8b;
+  --rule:#252b36;
+  --rule-strong:#343c4a;
+  --attack:#f07a68;
+  --attack-bg:#2a1815;
+  --advisory:#4fc2b1;
+  --advisory-bg:#0f2523;
+  --accent:#93abe2;
+  --accent-soft:#1a2136;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--serif);
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:760px;margin:0 auto;padding-inline:20px;padding-block:0 72px}
+
+/* ---- status strip ---- */
+.status{
+  background:var(--surface-2);
+  border-bottom:1px solid var(--rule);
+  font-family:var(--sans);
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ink-2);
+  padding:9px 20px;
+  text-align:center;
+}
+.status b{color:var(--attack);font-weight:600;letter-spacing:.06em}
+
+/* ---- masthead ---- */
+header.mast{padding-block:52px 34px;border-bottom:1px solid var(--rule)}
+h1{
+  font-family:var(--serif);
+  font-weight:700;
+  font-size:clamp(30px,5.4vw,44px);
+  line-height:1.14;
+  letter-spacing:-.018em;
+  margin:0 0 14px;
+  text-wrap:balance;
+}
+.sub{
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:clamp(17px,2.4vw,20px);
+  color:var(--ink-2);
+  margin:0 0 26px;
+  line-height:1.45;
+  text-wrap:balance;
+}
+.byline{font-family:var(--sans);font-size:14px;color:var(--ink-2);line-height:1.7}
+.byline strong{color:var(--ink);font-weight:600}
+
+/* ---- typography ---- */
+h2{
+  font-family:var(--sans);
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin:52px 0 6px;
+}
+h2 + .lede{margin-top:0}
+h3{
+  font-family:var(--serif);
+  font-size:23px;
+  font-weight:600;
+  letter-spacing:-.01em;
+  margin:34px 0 10px;
+  text-wrap:balance;
+}
+p{margin:0 0 17px}
+.lede{font-size:19px;line-height:1.58;color:var(--ink);margin-bottom:22px}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:600}
+em{font-style:italic}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---- specimen pairs: the core device ---- */
+.specimen{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2px;
+  background:var(--rule);
+  border:1px solid var(--rule);
+  border-radius:3px;
+  overflow:hidden;
+  margin:0 0 14px;
+}
+@media (max-width:620px){.specimen{grid-template-columns:1fr}}
+.cell{background:var(--surface);padding:15px 17px 17px}
+.cell.attack{border-left:3px solid var(--attack)}
+.cell.advisory{border-left:3px solid var(--advisory)}
+.verdict{
+  font-family:var(--sans);
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:10px;
+  margin-bottom:9px;
+}
+.cell.attack .verdict{color:var(--attack)}
+.cell.advisory .verdict{color:var(--advisory)}
+.verdict .rho{font-variant-numeric:tabular-nums;font-weight:500;opacity:.8;text-transform:none;font-family:var(--serif);font-size:12px;letter-spacing:0}
+.msg{
+  font-family:var(--mono);
+  font-size:13.5px;
+  line-height:1.65;
+  color:var(--ink);
+  margin:0;
+  word-break:break-word;
+}
+.msg mark{
+  background:transparent;
+  color:inherit;
+  font-weight:500;
+  border-bottom:2px solid currentColor;
+  padding-bottom:1px;
+}
+.cell.attack .msg mark{border-color:var(--attack)}
+.cell.advisory .msg mark{border-color:var(--advisory)}
+.speclabel{
+  font-family:var(--sans);
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  margin:26px 0 7px;
+}
+
+/* ---- figure ---- */
+figure{margin:26px 0 8px;padding:0}
+figure img{
+  width:100%;
+  display:block;
+  border:1px solid var(--rule);
+  border-radius:3px;
+  background:#fcfcfb;
+}
+figcaption{
+  font-family:var(--sans);
+  font-size:13px;
+  line-height:1.55;
+  color:var(--ink-2);
+  margin-top:11px;
+}
+
+/* ---- tables ---- */
+.tablewrap{overflow-x:auto;margin:22px 0 10px;border:1px solid var(--rule);border-radius:3px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-family:var(--sans);font-size:14px}
+th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--rule)}
+thead th{
+  font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:600;background:var(--surface-2);
+  border-bottom:1px solid var(--rule-strong);
+}
+tbody tr:last-child td{border-bottom:none}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+td.best{color:var(--advisory);font-weight:600}
+td.bad{color:var(--attack);font-weight:600}
+caption{caption-side:bottom;font-family:var(--sans);font-size:12.5px;color:var(--ink-2);padding:10px 14px;text-align:left;line-height:1.5}
+
+/* ---- callout ---- */
+.note{
+  background:var(--accent-soft);
+  border-left:3px solid var(--accent);
+  padding:15px 18px;
+  margin:24px 0;
+  font-size:16px;
+  line-height:1.55;
+  border-radius:0 3px 3px 0;
+}
+.note p:last-child{margin-bottom:0}
+.note .k{
+  font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--accent);display:block;margin-bottom:5px;
+}
+
+.warn{
+  background:var(--attack-bg);
+  border-left:3px solid var(--attack);
+  padding:15px 18px;
+  margin:24px 0;
+  font-size:16px;
+  line-height:1.55;
+  border-radius:0 3px 3px 0;
+}
+.warn p:last-child{margin-bottom:0}
+.warn .k{
+  font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--attack);display:block;margin-bottom:5px;
+}
+
+/* ---- schema chips ---- */
+.schema{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0 6px}
+.chip{
+  font-family:var(--sans);font-size:12.5px;
+  background:var(--surface);border:1px solid var(--rule-strong);
+  border-radius:2px;padding:6px 10px;color:var(--ink-2);
+}
+.chip b{color:var(--ink);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+
+ul{margin:0 0 18px;padding-left:22px}
+li{margin-bottom:8px}
+
+footer{
+  margin-top:56px;padding-top:24px;border-top:1px solid var(--rule);
+  font-family:var(--sans);font-size:13.5px;color:var(--ink-2);line-height:1.7;
+}
+footer code{
+  font-family:var(--mono);font-size:12.5px;background:var(--surface-2);
+  padding:1.5px 5px;border-radius:2px;color:var(--ink);
+}
+</style>
+
+<div class="status">Preprint &middot; <b>not peer reviewed</b> &middot; September 2026</div>
+
+<div class="wrap">
+
+<header class="mast">
+  <h1>Beyond Keywords: Attack Signatures for Multilingual Scam Detection</h1>
+  <p class="sub">A scam detector can score 94&#37; and still have no idea what the attack is. Here is how to measure that.</p>
+  <p class="byline">
+    <strong>Ram Nivas Attanti</strong><br>
+    Computer Science and Business Systems<br>
+    JAIN (Deemed-to-be University), Bengaluru
+  </p>
+</header>
+
+<h2>Abstract</h2>
+<p class="lede">Scam classifiers are evaluated on held-out samples from the same distribution they were trained on, where high scores are easy and reveal little about whether a model learned the structure of an attack or merely its vocabulary.</p>
+
+<p>This work proposes the <strong>Attack Signature</strong> — a typed tuple recording who the sender impersonates, what pretext is used, which asset is sought, what the recipient is told to do, and which persuasion levers are pulled. A signature should stay the same when the message is rewritten in another language, and change when the security meaning changes.</p>
+
+<p>We release <strong>Bharat-Scam-X</strong>: 1,823 labelled messages across nine Indian language varieties and twelve attack families, including 143 minimal-edit contrast pairs whose members share <span class="num">55.2&#37;</span> of their tokens but carry opposite security meaning. Four baselines are evaluated against five diagnostic conditions.</p>
+
+<h2>The one-clause problem</h2>
+<p class="lede">Every pair below shares its sender, its pretext, and most of its words. One is credential theft. The other is the advisory a bank sends to prevent it. The underlined clause is the entire difference.</p>
+
+<p class="speclabel">English &middot; bank KYC pretext</p>
+<div class="specimen">
+  <div class="cell attack">
+    <div class="verdict"><span>Attack</span><span class="rho">&rho; = 1.0</span></div>
+    <p class="msg">Bank notice: Your KYC has expired. <mark>Share the OTP sent to your phone.</mark></p>
+  </div>
+  <div class="cell advisory">
+    <div class="verdict"><span>Advisory</span><span class="rho">&rho; = 0.0</span></div>
+    <p class="msg">Bank notice: Your KYC has expired. <mark>Never share the OTP sent to your phone with anyone.</mark></p>
+  </div>
+</div>
+
+<p class="speclabel">Telugu &middot; Telugu script</p>
+<div class="specimen">
+  <div class="cell attack">
+    <div class="verdict"><span>Attack</span><span class="rho">&rho; = 1.0</span></div>
+    <p class="msg">ఎస్‌బిఐ సమాచారం: మీ కేవైసీ పత్రం మళ్లీ సమర్పించాలి. <mark>ఓటీపీ చెబితే ధృవీకరణ పూర్తవుతుంది.</mark></p>
+  </div>
+  <div class="cell advisory">
+    <div class="verdict"><span>Advisory</span><span class="rho">&rho; = 0.0</span></div>
+    <p class="msg">ఎస్‌బిఐ సమాచారం: మీ కేవైసీ పత్రం మళ్లీ సమర్పించాలి. <mark>మీ ఫోన్‌కు వచ్చిన ఓటీపీ ఎవరికీ చెప్పవద్దు.</mark></p>
+  </div>
+</div>
+
+<p class="speclabel">Telugu &middot; English code-mixed &mdash; a one-word inversion</p>
+<div class="specimen">
+  <div class="cell attack">
+    <div class="verdict"><span>Attack</span><span class="rho">&rho; = 1.0</span></div>
+    <p class="msg">Dear customer, Mee KYC expire ayindi. <mark>Phone ki vachina OTP share cheyandi.</mark></p>
+  </div>
+  <div class="cell advisory">
+    <div class="verdict"><span>Advisory</span><span class="rho">&rho; = 0.0</span></div>
+    <p class="msg">Dear customer, Mee KYC expire ayindi. <mark>Phone ki vachina OTP evariki share cheyakandi.</mark></p>
+  </div>
+</div>
+
+<p class="speclabel">Tamil &middot; Tamil script</p>
+<div class="specimen">
+  <div class="cell attack">
+    <div class="verdict"><span>Attack</span><span class="rho">&rho; = 1.0</span></div>
+    <p class="msg">அன்புள்ள வாடிக்கையாளரே, உங்கள் கேஒய்சி ஆவணத்தை மீண்டும் சமர்ப்பிக்க வேண்டும். <mark>OTP சொன்னால் சரிபார்ப்பு முடியும்.</mark></p>
+  </div>
+  <div class="cell advisory">
+    <div class="verdict"><span>Advisory</span><span class="rho">&rho; = 0.0</span></div>
+    <p class="msg">அன்புள்ள வாடிக்கையாளரே, உங்கள் கேஒய்சி ஆவணத்தை மீண்டும் சமர்ப்பிக்க வேண்டும். <mark>உங்கள் தொலைபேசிக்கு வந்த OTP ஐ யாரிடமும் சொல்ல வேண்டாம்.</mark></p>
+  </div>
+</div>
+
+<div class="warn">
+  <span class="k">The operational consequence</span>
+  <p>A word-level TF-IDF classifier flags <strong class="num">56.0&#37;</strong> of genuine &ldquo;never share your OTP&rdquo; advisories as attacks. Anti-fraud advisories are a primary defence channel. A filter with that property suppresses exactly the messages that reduce fraud.</p>
+</div>
+
+<h2>Results</h2>
+
+<figure>
+  <img src="__FIG__" alt="Two bar charts. Left panel: in-distribution F1 is high for all four baselines while flip-success is far lower for every model. Right panel: all four baselines produce false positives on hard negatives and semantic flips, with the structured model lowest.">
+  <figcaption><strong>The evaluation gap.</strong> In-distribution scores rank models almost identically. Flip sensitivity separates them by a factor of three. The column a leaderboard would report is the column that carries the least information.</figcaption>
+</figure>
+
+<div class="tablewrap">
+<table>
+  <caption>Macro-F&#8321; by condition, plus flip-success and false-positive rate on genuine advisories. Every condition mixes attack and benign items.</caption>
+  <thead>
+    <tr><th>Model</th><th class="n">IID</th><th class="n">Cross-ling</th><th class="n">Flip-success</th><th class="n">Advisory FPR</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Keyword rule</td><td class="n">0.706</td><td class="n">0.686</td><td class="n bad">0.028</td><td class="n">0.420</td></tr>
+    <tr><td>TF-IDF word + LR</td><td class="n">0.917</td><td class="n best">0.943</td><td class="n bad">0.189</td><td class="n bad">0.560</td></tr>
+    <tr><td>TF-IDF char + LR</td><td class="n">0.942</td><td class="n">0.936</td><td class="n bad">0.175</td><td class="n">0.507</td></tr>
+    <tr><td>Struct-Sig (ours)</td><td class="n best">1.000</td><td class="n">0.888</td><td class="n best">0.559</td><td class="n best">0.293</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Recombination is where it breaks</h3>
+<p>The sharpest result is not in the table above. On compositional probes — attacks built <em>entirely</em> from components the model saw in training, merely combined differently — exact signature recovery falls from <span class="num">1.000</span> to <strong class="num">0.056</strong>.</p>
+
+<div class="note">
+  <span class="k">What that means</span>
+  <p>Binary detection on those same messages stays at <span class="num">0.918</span>. The model still says &ldquo;attack&rdquo; while being wrong about essentially every particular of <em>what the attack is</em>. Real novel scams are overwhelmingly recombinations of familiar actors, pretexts and asks — so this is the failure with the most direct cost, and it is invisible to binary evaluation.</p>
+</div>
+
+<h3>Cross-lingual consistency tracks script distance</h3>
+<p>Signature agreement is <span class="num">1.000</span> on the three training varieties and <span class="num">0.787</span> on the six held out. By variety: code-mixed romanised Hindi <span class="num">0.750</span>, code-mixed Telugu <span class="num">0.738</span>, Kannada <span class="num">0.625</span>, Tamil <span class="num">0.613</span>, romanised Telugu <span class="num">0.475</span>, Telugu in native script <span class="num">0.450</span>. Code-mixed text transfers best because it shares English tokens; native-script Telugu transfers worst.</p>
+
+<h2>The signature schema</h2>
+<p>Eight fields, each from a closed vocabulary. The six single-valued fields carry <span class="num">6/8</span> of the agreement weight; the two set-valued fields carry <span class="num">2/8</span>.</p>
+
+<div class="schema">
+  <span class="chip"><b>actor</b> &nbsp;who is being impersonated</span>
+  <span class="chip"><b>pretext</b> &nbsp;the story</span>
+  <span class="chip"><b>target</b> &nbsp;asset sought</span>
+  <span class="chip"><b>intent</b> &nbsp;terminal goal</span>
+  <span class="chip"><b>action</b> &nbsp;what you must do</span>
+  <span class="chip"><b>stage</b> &nbsp;kill-chain position</span>
+  <span class="chip"><b>tactic</b> &nbsp;persuasion levers</span>
+  <span class="chip"><b>evidence</b> &nbsp;surface cues</span>
+</div>
+
+<p style="margin-top:18px">The <strong>action</strong> vocabulary contains the value <code style="font-family:var(--mono);font-size:14px">refrain</code> — an instruction <em>not</em> to perform an act. That single value is what separates an attack from the advisory warning against it, and removing it collapses the framework.</p>
+
+<h2>What this does not show</h2>
+
+<div class="warn">
+  <span class="k">Read this before citing anything above</span>
+  <p>Bharat-Scam-X is a <strong>constructed probe corpus</strong>, not field data. Every message is template-composed, in the tradition of SCAN, COGS and CheckList. The numbers characterise model behaviour under controlled contrast — they are <strong>not</strong> estimates of deployment performance, and a model that scores well here is not thereby shown to be deployable.</p>
+</div>
+
+<ul>
+  <li><strong>No neural baselines.</strong> Feature-based models only. Multilingual encoders such as MuRIL or LaBSE would likely improve the cross-lingual column substantially; establishing that is the obvious next step.</li>
+  <li><strong>Template artifacts may be partly learnable.</strong> Attacks and benign items come from different generators, so a model could exploit generation quirks rather than meaning. Mitigated, not eliminated.</li>
+  <li><strong>Non-English text is unreviewed.</strong> The Telugu, Tamil and Kannada realisations were authored without independent native-speaker review.</li>
+  <li><strong>Small scale.</strong> Twelve families, nine varieties, 1,823 items. Bengali, Marathi, Gujarati, Malayalam, Odia and Punjabi are absent.</li>
+  <li><strong>The risk function is stipulated</strong>, not calibrated against harm data — only relative comparisons are interpretable.</li>
+</ul>
+
+<footer>
+  <p><strong>Reproducibility.</strong> All numbers regenerate from a single fixed seed (<code>20260920</code>) in about fifteen seconds on CPU: <code>python3 src/generate.py</code> builds the corpus, <code>python3 src/evaluate.py</code> prints every table.</p>
+  <p><strong>Ethics.</strong> All messages are synthetic instances of publicly documented fraud patterns. No real institution branding, no resolving URLs, no real phone numbers, no personal data.</p>
+  <p style="margin-top:14px;color:var(--ink-3)">This page is a web version of a preprint. It has not been peer reviewed and carries no DOI.</p>
+</footer>
+
+</div>

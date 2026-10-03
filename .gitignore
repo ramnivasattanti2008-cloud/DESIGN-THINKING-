@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+app/web/_pycheck.json
+paper/*.aux
+paper/*.log
+paper/*.blg
+paper/*.out
+paper/*.bbl
+external/
+.venv/

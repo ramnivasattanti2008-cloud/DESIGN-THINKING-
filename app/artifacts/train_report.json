@@ -1,0 +1,108 @@
+{
+  "head_meta": {
+    "actor": {
+      "kind": "clf",
+      "classes": [
+        "bank",
+        "courier_logistics",
+        "ecommerce_platform",
+        "employer_recruiter",
+        "government_police",
+        "investment_platform",
+        "known_person",
+        "none",
+        "tech_support",
+        "utility_provider"
+      ],
+      "cv_accuracy": 0.9116
+    },
+    "pretext": {
+      "kind": "clf",
+      "classes": [
+        "account_suspension",
+        "bill_overdue",
+        "emergency_help",
+        "investment_return",
+        "job_offer",
+        "kyc_expiry",
+        "legal_action",
+        "parcel_held",
+        "prize_win",
+        "refund_due",
+        "routine_notice",
+        "safety_advisory"
+      ],
+      "cv_accuracy": 0.8634
+    },
+    "target": {
+      "kind": "clf",
+      "classes": [
+        "account_credentials",
+        "device_control",
+        "funds",
+        "none",
+        "otp",
+        "upi_pin"
+      ],
+      "cv_accuracy": 0.9627
+    },
+    "intent": {
+      "kind": "clf",
+      "classes": [
+        "advance_fee",
+        "benign",
+        "credential_theft",
+        "data_harvest",
+        "funds_transfer",
+        "malware_install"
+      ],
+      "cv_accuracy": 0.9243
+    },
+    "action": {
+      "kind": "clf",
+      "classes": [
+        "call_number",
+        "click_link",
+        "install_app",
+        "make_payment",
+        "no_action",
+        "refrain",
+        "scan_qr",
+        "share_code"
+      ],
+      "cv_accuracy": 0.9276
+    },
+    "stage": {
+      "kind": "clf",
+      "classes": [
+        "engage",
+        "extract",
+        "lure",
+        "not_applicable"
+      ],
+      "cv_accuracy": 0.9018
+    }
+  },
+  "signature_recovery": {
+    "iid": {
+      "n": 71,
+      "exact_core": 1.0
+    },
+    "xling": {
+      "n": 506,
+      "exact_core": 1.0
+    },
+    "compositional": {
+      "n": 72,
+      "exact_core": 1.0
+    },
+    "osr": {
+      "n": 171,
+      "exact_core": 1.0
+    }
+  },
+  "n_features_sig": 7000,
+  "n_features_bin": 24000,
+  "n_synth_train": 356,
+  "n_real": 24000
+}

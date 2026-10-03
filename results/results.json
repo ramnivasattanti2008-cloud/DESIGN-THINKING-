@@ -1,0 +1,283 @@
+{
+  "config": {
+    "seed": 20260920,
+    "n_train": 356,
+    "n_test": 1467
+  },
+  "conditions": {
+    "IID": {
+      "n": 104,
+      "n_pos": 71,
+      "n_neg": 33
+    },
+    "Cross-ling": {
+      "n": 740,
+      "n_pos": 506,
+      "n_neg": 234
+    },
+    "Semantic-flip": {
+      "n": 293,
+      "n_pos": 143,
+      "n_neg": 150
+    },
+    "Compositional": {
+      "n": 339,
+      "n_pos": 72,
+      "n_neg": 267
+    },
+    "Open-set": {
+      "n": 438,
+      "n_pos": 171,
+      "n_neg": 267
+    }
+  },
+  "binary": {
+    "Keyword-Rule": {
+      "IID": {
+        "n": 104,
+        "acc": 0.7115,
+        "f1": 0.7062,
+        "fpr": null
+      },
+      "Cross-ling": {
+        "n": 740,
+        "acc": 0.6878,
+        "f1": 0.686,
+        "fpr": null
+      },
+      "Semantic-flip": {
+        "n": 293,
+        "acc": 0.57,
+        "f1": 0.5697,
+        "fpr": null
+      },
+      "Compositional": {
+        "n": 339,
+        "acc": 0.8555,
+        "f1": 0.7469,
+        "fpr": null
+      },
+      "Open-set": {
+        "n": 438,
+        "acc": 0.7146,
+        "f1": 0.6404,
+        "fpr": null
+      }
+    },
+    "TFIDF-Word-LR": {
+      "IID": {
+        "n": 104,
+        "acc": 0.9327,
+        "f1": 0.9172,
+        "fpr": null
+      },
+      "Cross-ling": {
+        "n": 740,
+        "acc": 0.95,
+        "f1": 0.9425,
+        "fpr": null
+      },
+      "Semantic-flip": {
+        "n": 293,
+        "acc": 0.6962,
+        "f1": 0.6767,
+        "fpr": null
+      },
+      "Compositional": {
+        "n": 339,
+        "acc": 0.9204,
+        "f1": 0.891,
+        "fpr": null
+      },
+      "Open-set": {
+        "n": 438,
+        "acc": 0.9475,
+        "f1": 0.946,
+        "fpr": null
+      }
+    },
+    "TFIDF-Char-LR": {
+      "IID": {
+        "n": 104,
+        "acc": 0.9519,
+        "f1": 0.942,
+        "fpr": null
+      },
+      "Cross-ling": {
+        "n": 740,
+        "acc": 0.9432,
+        "f1": 0.9359,
+        "fpr": null
+      },
+      "Semantic-flip": {
+        "n": 293,
+        "acc": 0.7133,
+        "f1": 0.7003,
+        "fpr": null
+      },
+      "Compositional": {
+        "n": 339,
+        "acc": 0.944,
+        "f1": 0.9205,
+        "fpr": null
+      },
+      "Open-set": {
+        "n": 438,
+        "acc": 0.9658,
+        "f1": 0.9645,
+        "fpr": null
+      }
+    },
+    "Struct-Sig-Char": {
+      "IID": {
+        "n": 104,
+        "acc": 1.0,
+        "f1": 1.0,
+        "fpr": null
+      },
+      "Cross-ling": {
+        "n": 740,
+        "acc": 0.8959,
+        "f1": 0.8882,
+        "fpr": null
+      },
+      "Semantic-flip": {
+        "n": 293,
+        "acc": 0.7816,
+        "f1": 0.7808,
+        "fpr": null
+      },
+      "Compositional": {
+        "n": 339,
+        "acc": 0.9499,
+        "f1": 0.9176,
+        "fpr": null
+      },
+      "Open-set": {
+        "n": 438,
+        "acc": 0.9269,
+        "f1": 0.9201,
+        "fpr": null
+      }
+    }
+  },
+  "fpr": {
+    "Keyword-Rule": {
+      "hard_negative": 0.2,
+      "sfs_flip": 0.42,
+      "benign_generic": 0.0
+    },
+    "TFIDF-Word-LR": {
+      "hard_negative": 0.3818,
+      "sfs_flip": 0.56,
+      "benign_generic": 0.0094
+    },
+    "TFIDF-Char-LR": {
+      "hard_negative": 0.2727,
+      "sfs_flip": 0.5067,
+      "benign_generic": 0.0
+    },
+    "Struct-Sig-Char": {
+      "hard_negative": 0.0,
+      "sfs_flip": 0.2933,
+      "benign_generic": 0.0
+    }
+  },
+  "sfs": {
+    "Keyword-Rule": {
+      "n": 143,
+      "flip_success": 0.028,
+      "mean_delta": 0.0629,
+      "mean_jaccard": 0.5522
+    },
+    "TFIDF-Word-LR": {
+      "n": 143,
+      "flip_success": 0.1888,
+      "mean_delta": 0.2563,
+      "mean_jaccard": 0.5522
+    },
+    "TFIDF-Char-LR": {
+      "n": 143,
+      "flip_success": 0.1748,
+      "mean_delta": 0.2772,
+      "mean_jaccard": 0.5522
+    },
+    "Struct-Sig-Char": {
+      "n": 143,
+      "flip_success": 0.5594,
+      "mean_delta": 0.4945,
+      "mean_jaccard": 0.5522
+    }
+  },
+  "clsc": {
+    "all": 0.8371,
+    "seen_langs": 1.0,
+    "unseen_langs": 0.7867,
+    "per_language_vs_gold": {
+      "cm_hi": 0.75,
+      "cm_te": 0.7375,
+      "en": 0.75,
+      "hi": 0.75,
+      "hi_Latn": 0.75,
+      "kn": 0.625,
+      "ta": 0.6125,
+      "te": 0.45,
+      "te_Latn": 0.475
+    }
+  },
+  "signature": {
+    "iid": {
+      "exact_core": 1.0,
+      "mean_sigma": 0.75,
+      "per_field": {
+        "actor": 1.0,
+        "pretext": 1.0,
+        "target": 1.0,
+        "intent": 1.0,
+        "action": 1.0,
+        "stage": 1.0
+      }
+    },
+    "xling": {
+      "exact_core": 0.6423,
+      "mean_sigma": 0.6,
+      "per_field": {
+        "actor": 0.7925,
+        "pretext": 0.7075,
+        "target": 0.8439,
+        "intent": 0.7648,
+        "action": 0.919,
+        "stage": 0.7727
+      }
+    },
+    "compositional": {
+      "exact_core": 0.0556,
+      "mean_sigma": 0.441,
+      "per_field": {
+        "actor": 0.4306,
+        "pretext": 0.3194,
+        "target": 0.6667,
+        "intent": 0.6111,
+        "action": 0.6806,
+        "stage": 0.8194
+      }
+    },
+    "osr": {
+      "exact_core": 0.0,
+      "mean_sigma": 0.3421,
+      "per_field": {
+        "actor": 0.0,
+        "pretext": 0.0,
+        "target": 0.8889,
+        "intent": 0.4678,
+        "action": 0.9591,
+        "stage": 0.4211
+      }
+    }
+  },
+  "osr": {
+    "msp_auroc": 0.9054,
+    "n_known": 577,
+    "n_unknown": 171
+  }
+}

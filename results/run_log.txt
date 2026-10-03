@@ -1,0 +1,71 @@
+train n=356  test n=1467
+
+==============================================================================
+TABLE 1  Binary detection, macro-F1 (each condition mixes attack + benign)
+==============================================================================
+model                       IID    Cross-ling Semantic-flip Compositional      Open-set
+Keyword-Rule              0.706         0.686         0.570         0.747         0.640
+TFIDF-Word-LR             0.917         0.943         0.677         0.891         0.946
+TFIDF-Char-LR             0.942         0.936         0.700         0.920         0.965
+Struct-Sig-Char           1.000         0.888         0.781         0.918         0.920
+
+  condition sizes: IID n=104 (+71/-33)  Cross-ling n=740 (+506/-234)  Semantic-flip n=293 (+143/-150)  Compositional n=339 (+72/-267)  Open-set n=438 (+171/-267)
+
+==============================================================================
+TABLE 1b  False-positive rate on benign text (lower is better)
+==============================================================================
+model                hard negatives    semantic flips    generic benign
+Keyword-Rule                  0.200             0.420             0.000
+TFIDF-Word-LR                 0.382             0.560             0.009
+TFIDF-Char-LR                 0.273             0.507             0.000
+Struct-Sig-Char               0.000             0.293             0.000
+
+==========================================================================
+TABLE 2  Semantic Flip Sensitivity
+==========================================================================
+model                 n   flip-success   mean risk drop   token overlap
+Keyword-Rule        143          0.028            0.063           0.552
+TFIDF-Word-LR       143          0.189            0.256           0.552
+TFIDF-Char-LR       143          0.175            0.277           0.552
+Struct-Sig-Char     143          0.559            0.494           0.552
+
+==========================================================================
+TABLE 3  Cross-Lingual Signature Consistency (Struct-Sig-Char)
+==========================================================================
+  all 9 varieties        CLSC = 0.837
+  seen varieties only    CLSC = 1.000
+  unseen varieties only  CLSC = 0.787
+
+==========================================================================
+TABLE 4  Attack Signature recovery (Struct-Sig-Char)
+==========================================================================
+suite                n   exact core   mean sigma    actor   intent   action
+iid                 71        1.000        0.750    1.000    1.000    1.000
+xling              506        0.642        0.600    0.792    0.765    0.919
+compositional       72        0.056        0.441    0.431    0.611    0.681
+osr                171        0.000        0.342    0.000    0.468    0.959
+
+==========================================================================
+TABLE 5  Open-set detection of unseen attack families (AUROC)
+==========================================================================
+  Maximum-Softmax-Probability over family head
+  known n=577  unknown n=171   AUROC = 0.905
+  (0.5 = chance. Note this suite is comparatively EASY: the two
+   held-out families introduce actor and pretext vocabulary absent
+   from training, so novelty is lexically visible. It should not be
+   read as evidence that open-set scam detection is solved.)
+
+==========================================================================
+TABLE 6  Per-variety signature agreement with gold (Struct-Sig-Char)
+==========================================================================
+  cm_hi     sigma = 0.750
+  cm_te     sigma = 0.738
+  en        sigma = 0.750
+  hi        sigma = 0.750
+  hi_Latn   sigma = 0.750
+  kn        sigma = 0.625
+  ta        sigma = 0.613
+  te        sigma = 0.450
+  te_Latn   sigma = 0.475
+
+wrote /home/claude/bharat-scam-x/src/../results/results.json

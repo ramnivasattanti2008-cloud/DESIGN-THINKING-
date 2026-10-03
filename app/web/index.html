@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bharat-Scam-X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+Telugu:wght@400;500&family=Noto+Sans+Tamil:wght@400;500&family=Noto+Sans+Kannada:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#f4f6f8; --surface:#fff; --surface-2:#eef1f5;
+  --ink:#151a22; --ink-2:#5b6576; --ink-3:#8a94a5;
+  --rule:#dde2ea; --rule-strong:#c3ccd9;
+  --attack:#b02a1c; --attack-bg:#fbeeec;
+  --safe:#0a6b60; --safe-bg:#e9f4f2;
+  --warn:#9a6508; --warn-bg:#fdf3e2;
+  --accent:#27417a; --accent-soft:#e8ecf6;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Noto Sans Devanagari','Noto Sans Telugu','Noto Sans Tamil','Noto Sans Kannada',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'Noto Sans Devanagari','Noto Sans Telugu','Noto Sans Tamil','Noto Sans Kannada',monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0e1117; --surface:#161a22; --surface-2:#1d222c;
+  --ink:#e7ebf2; --ink-2:#9aa5b6; --ink-3:#6f7a8b;
+  --rule:#252b36; --rule-strong:#343c4a;
+  --attack:#f07a68; --attack-bg:#2a1815;
+  --safe:#4fc2b1; --safe-bg:#0f2523;
+  --warn:#e0a84a; --warn-bg:#2a2214;
+  --accent:#93abe2; --accent-soft:#1a2136;
+}}
+:root[data-theme="dark"]{
+  --ground:#0e1117; --surface:#161a22; --surface-2:#1d222c;
+  --ink:#e7ebf2; --ink-2:#9aa5b6; --ink-3:#6f7a8b;
+  --rule:#252b36; --rule-strong:#343c4a;
+  --attack:#f07a68; --attack-bg:#2a1815;
+  --safe:#4fc2b1; --safe-bg:#0f2523;
+  --warn:#e0a84a; --warn-bg:#2a2214;
+  --accent:#93abe2; --accent-soft:#1a2136;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding-inline:18px;padding-block:0 60px}
+header{padding-block:30px 20px;border-bottom:1px solid var(--rule);margin-bottom:22px}
+h1{font-size:25px;font-weight:600;margin:0 0 4px;letter-spacing:-.015em}
+.tag{font-size:13.5px;color:var(--ink-2);margin:0}
+.status{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-top:9px}
+.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--rule)}
+.tab{background:none;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-family:var(--sans);font-size:14px;color:var(--ink-2);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+textarea{width:100%;min-height:92px;padding:12px 14px;border:1px solid var(--rule-strong);border-radius:4px;background:var(--surface);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.6;resize:vertical}
+textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+button.go{background:var(--accent);color:#fff;border:none;border-radius:4px;padding:9px 20px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer}
+button.go:disabled{opacity:.5;cursor:default}
+.chip{background:var(--surface);border:1px solid var(--rule-strong);border-radius:3px;padding:5px 10px;font-size:12.5px;color:var(--ink-2);cursor:pointer;font-family:var(--sans)}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:20px 0 7px}
+.verdict{display:flex;align-items:baseline;gap:12px;padding:14px 16px;border-radius:4px;border-left:4px solid;margin-bottom:14px;flex-wrap:wrap}
+.verdict.attack{background:var(--attack-bg);border-color:var(--attack)}
+.verdict.safe{background:var(--safe-bg);border-color:var(--safe)}
+.verdict.uncertain{background:var(--warn-bg);border-color:var(--warn)}
+.vword{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.verdict.attack .vword{color:var(--attack)}
+.verdict.safe .vword{color:var(--safe)}
+.verdict.uncertain .vword{color:var(--warn)}
+.vrisk{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
+.explain{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:13px 15px;font-size:15px;line-height:1.55}
+.sig{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px;margin-top:8px}
+.f{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:9px 11px}
+.f .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.f .v{font-family:var(--mono);font-size:13px;color:var(--ink);margin-top:2px;word-break:break-word}
+.f .c{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:3px}
+.attr{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:13px 15px;font-family:var(--mono);font-size:14px;line-height:2.1}
+.tk{padding:2px 3px;border-radius:2px}
+.note{background:var(--accent-soft);border-left:3px solid var(--accent);padding:11px 14px;border-radius:0 3px 3px 0;font-size:14px;margin-top:12px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+@media(max-width:620px){.cmp{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--surface);margin-top:10px}
+th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--rule)}
+thead th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:none}
+td.r{font-family:var(--mono);text-align:right}
+.hid{display:none}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-2);line-height:1.65}
+code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 5px;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Bharat-Scam-X</h1>
+  <p class="tag">Reads a message, works out what the attack actually is, and tells you why.</p>
+  <p class="status" id="status">loading model…</p>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-tab="one">Analyse</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="flip">Flip test</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="batch">Batch</button>
+</div>
+
+<!-- ANALYSE -->
+<section id="tab-one">
+  <textarea id="msg" spellcheck="false" placeholder="Paste a message. Any of nine language varieties."></textarea>
+  <div class="row">
+    <button class="go" id="run" disabled>Analyse</button>
+    <span style="font-size:12.5px;color:var(--ink-3)">or try one:</span>
+  </div>
+  <div class="row" id="examples"></div>
+  <div id="out" class="hid"></div>
+</section>
+
+<!-- FLIP -->
+<section id="tab-flip" class="hid">
+  <p style="font-size:14.5px;color:var(--ink-2);margin:0 0 12px">
+    Two messages, same sender, same story. One clause differs. A keyword filter sees
+    almost the same text; the risk should not be almost the same.
+  </p>
+  <div class="note" style="margin:0 0 14px">
+    These are real pairs from the test set, and the model handles them. It does not
+    handle all of them: on held-out attack families its flip-success rate is
+    <strong>0.559</strong>, against 0.175 for a TF-IDF character model and 0.028 for a
+    keyword rule. So it is roughly three times better than the alternatives and still
+    wrong about four times in ten.
+  </div>
+  <div class="row" id="flipex"></div>
+  <div class="cmp" id="flipout"></div>
+</section>
+
+<!-- BATCH -->
+<section id="tab-batch" class="hid">
+  <p style="font-size:14.5px;color:var(--ink-2);margin:0 0 10px">One message per line.</p>
+  <textarea id="batchin" style="min-height:140px" spellcheck="false"></textarea>
+  <div class="row">
+    <button class="go" id="runbatch" disabled>Scan all</button>
+    <button class="chip" id="loadsample">Load 9-language sample</button>
+    <button class="chip" id="dlcsv">Copy as CSV</button>
+  </div>
+  <div id="batchout"></div>
+</section>
+
+<footer>
+  <p>Runs entirely in your browser. Nothing you paste is uploaded anywhere.</p>
+  <p>The signature model is trained on a constructed corpus of 1,823 messages across
+  nine Indian language varieties, and knows 12 attack families. A real scam built from
+  an unfamiliar combination will often read as <em>uncertain</em> rather than
+  <em>attack</em> — that limit is measured, not hidden: exact signature recovery on
+  recombined attacks is <code>0.056</code>. Verify the port with
+  <code>python3 app/export_js.py</code>, which refuses to ship unless all 1,823
+  predictions match the Python model.</p>
+</footer>
+</div>
+
+<script>
+const EX = [
+  ["English","Dear customer, Your KYC has expired. Share the OTP sent to your phone."],
+  ["हिन्दी","एसबीआई सूचना: आपका खाता आज ब्लॉक कर दिया जाएगा। आपके फ़ोन पर भेजा गया ओटीपी साझा करें।"],
+  ["Hinglish","Bank notice: Aapka KYC samapt ho gaya hai. Phone par aaya OTP share karein."],
+  ["తెలుగు","ఎస్‌బిఐ సమాచారం: మీ కేవైసీ పత్రం మళ్లీ సమర్పించాలి. ఓటీపీ చెబితే ధృవీకరణ పూర్తవుతుంది."],
+  ["Telugu (Roman)","Dear customer, Mee KYC expire ayindi. Phone ki vachina OTP share cheyandi."],
+  ["தமிழ்","அன்புள்ள வாடிக்கையாளரே, உங்கள் கேஒய்சி ஆவணத்தை மீண்டும் சமர்ப்பிக்க வேண்டும். OTP சொன்னால் சரிபார்ப்பு முடியும்."],
+  ["ಕನ್ನಡ","ಎಸ್‌ಬಿಐ ಸೂಚನೆ: ನಿಮ್ಮ ಕೆವೈಸಿ ದಾಖಲೆಯನ್ನು ಮತ್ತೆ ಸಲ್ಲಿಸಬೇಕು. OTP ಹೇಳಿದರೆ ಪರಿಶೀಲನೆ ಪೂರ್ಣವಾಗುತ್ತದೆ."],
+  ["Digital arrest","Cyber Cell: An arrest warrant has been issued in your name. Deposit Rs 4,500 immediately to avoid further action."],
+  ["Benign","Your order has been shipped and will arrive by Friday."]
+];
+const FLIPS = [
+  ["English","Power dept: Your electricity bill is unpaid. Call 9876543210 now. Immediately.",
+   "Power dept: Your electricity bill is unpaid. Do not call numbers received in such messages."],
+  ["తెలుగు","ఎస్‌బిఐ సమాచారం: మీ కేవైసీ పత్రం మళ్లీ సమర్పించాలి. ఓటీపీ చెబితే ధృవీకరణ పూర్తవుతుంది.",
+   "ఎస్‌బిఐ సమాచారం: మీ కేవైసీ పత్రం మళ్లీ సమర్పించాలి. మీ ఫోన్‌కు వచ్చిన ఓటీపీ ఎవరికీ చెప్పవద్దు."],
+  ["Telugu code-mixed","Dear customer, Mee KYC expire ayindi. Phone ki vachina OTP share cheyandi.",
+   "Dear customer, Mee KYC expire ayindi. Phone ki vachina OTP evariki share cheyakandi."],
+  ["தமிழ்","அன்புள்ள வாடிக்கையாளரே, உங்கள் கேஒய்சி ஆவணத்தை மீண்டும் சமர்ப்பிக்க வேண்டும். OTP சொன்னால் சரிபார்ப்பு முடியும்.",
+   "அன்புள்ள வாடிக்கையாளரே, உங்கள் கேஒய்சி ஆவணத்தை மீண்டும் சமர்ப்பிக்க வேண்டும். உங்கள் தொலைபேசிக்கு வந்த OTP ஐ யாரிடமும் சொல்ல வேண்டாம்."],
+  ["हिन्दी","भर्ती विभाग: आप घर से काम करने वाली नौकरी के लिए चुने गए हैं। कार्रवाई से बचने के लिए तुरंत 4,500 रुपये जमा करें।",
+   "भर्ती विभाग: आप घर से काम करने वाली नौकरी के लिए चुने गए हैं। हमारे नाम पर मांगने वाले को 4,500 रुपये न भेजें।"],
+];
+const FIELDS=["actor","pretext","target","intent","action","stage"];
+const INTENT_RISK={credential_theft:1.0,funds_transfer:1.0,malware_install:.95,advance_fee:.85,data_harvest:.70,benign:0};
+const TARGET_BOOST={otp:.10,upi_pin:.10,card_pan:.10,account_credentials:.08,device_control:.08,funds:.05,identity_document:.04,none:0};
+const ACTOR_EN={bank:"a bank",telecom:"a mobile operator",government_police:"the police or a government department",courier_logistics:"a courier service",employer_recruiter:"an employer",ecommerce_platform:"an online shopping platform",known_person:"someone you know",utility_provider:"a utility provider",tech_support:"technical support",investment_platform:"an investment platform",none:"nobody in particular"};
+const PRETEXT_EN={account_suspension:"claims your account is about to be blocked",kyc_expiry:"claims your KYC has expired",parcel_held:"claims a parcel is stuck",refund_due:"claims a refund is waiting",job_offer:"offers you work",prize_win:"says you have won something",legal_action:"threatens legal trouble",bill_overdue:"says a bill is unpaid",investment_return:"promises investment returns",emergency_help:"claims an emergency",routine_notice:"reads as a routine notice",safety_advisory:"reads as a safety warning"};
+const ACTION_EN={share_code:"share a one-time password",click_link:"open a link and log in",call_number:"call a number",install_app:"install an app and hand over access",make_payment:"send money",reply_message:"reply",scan_qr:"scan a QR code and enter your UPI PIN",no_action:"do nothing",refrain:"NOT do something"};
+const INTENT_EN={credential_theft:"steal a credential",funds_transfer:"take money directly",malware_install:"take control of your device",data_harvest:"collect personal information",advance_fee:"collect a fee for something that does not exist",benign:"nothing harmful"};
+
+let M=null;
+
+function ngrams(text){
+  text=text.toLowerCase().replace(/\s\s+/g," ");
+  const out=[];
+  for(const word of text.split(/\s+/)){
+    if(!word) continue;
+    const w=" "+word+" ", L=w.length;
+    for(let n=M.ngram_min;n<=M.ngram_max;n++){
+      let off=0; out.push(w.slice(off,off+n));
+      while(off+n<L){ off++; out.push(w.slice(off,off+n)); }
+      if(off===0) break;
+    }
+  }
+  return out;
+}
+function vectorize(text){
+  const c=new Map();
+  for(const g of ngrams(text)){ const j=M.vocab[g]; if(j!==undefined) c.set(j,(c.get(j)||0)+1); }
+  if(!c.size) return c;
+  let ss=0; const v=new Map();
+  for(const [j,n] of c){ const x=(1+Math.log(n))*M.idf[j]; v.set(j,x); ss+=x*x; }
+  const nrm=Math.sqrt(ss)||1;
+  for(const [j,x] of v) v.set(j,x/nrm);
+  return v;
+}
+function predictField(f,vec){
+  const h=M.heads[f];
+  if(h.kind==="const") return {label:h.value,conf:1};
+  const sc=h.intercept.slice();
+  for(let k=0;k<h.ci.length;k++){
+    const I=h.ci[k],V=h.cv[k]; let s=0;
+    for(let q=0;q<I.length;q++){ const x=vec.get(I[q]); if(x!==undefined) s+=V[q]*x; }
+    sc[k]+=s;
+  }
+  let best=0; for(let k=1;k<sc.length;k++) if(sc[k]>sc[best]) best=k;
+  const mx=Math.max(...sc); let z=0; for(const s of sc) z+=Math.exp(s-mx);
+  return {label:h.classes[best],conf:Math.exp(sc[best]-mx)/z};
+}
+function signature(text){
+  const v=vectorize(text),o={},cf={};
+  for(const f of FIELDS){ const r=predictField(f,v); o[f]=r.label; cf[f]=r.conf; }
+  return {sig:o,conf:cf};
+}
+function risk(sig){
+  if(sig.action==="refrain") return 0;
+  const r=INTENT_RISK[sig.intent]??0;
+  if(r===0) return 0;
+  return Math.min(1,r*0.9+(TARGET_BOOST[sig.target]??0));
+}
+function verdict(sig,r){ if(sig.action==="refrain") return "safe"; return r>=0.5?"attack":"safe"; }
+function explain(sig){
+  if(sig.action==="refrain") return "This reads as a safety warning, not an attack. It tells you NOT to do something, which is the opposite of what a scam asks for.";
+  if(sig.intent==="benign") return "Nothing here matches one of the 12 attack families this model knows. That is not proof it is safe.";
+  return `The sender is pretending to be ${ACTOR_EN[sig.actor]||sig.actor}. The message ${PRETEXT_EN[sig.pretext]||sig.pretext}, and wants you to ${ACTION_EN[sig.action]||sig.action}. The goal is to ${INTENT_EN[sig.intent]||sig.intent}.`;
+}
+function attribution(text){
+  const toks=text.split(/\s+/).filter(Boolean);
+  const base=risk(signature(text).sig);
+  return toks.map((t,i)=>{
+    const ab=toks.slice(0,i).concat(toks.slice(i+1)).join(" ");
+    return {token:t,delta:+(base-risk(signature(ab).sig)).toFixed(4)};
+  });
+}
+function analyse(text){
+  const {sig,conf}=signature(text), r=risk(sig);
+  return {sig,conf,risk:r,verdict:verdict(sig,r),explanation:explain(sig),attribution:attribution(text)};
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(res){
+  const vcls=res.verdict, vtxt={attack:"Attack",safe:"Looks safe",uncertain:"Uncertain"}[vcls];
+  let h=`<div class="verdict ${vcls}"><span class="vword">${vtxt}</span>
+    <span class="vrisk">risk ${res.risk.toFixed(2)}</span></div>
+    <div class="explain">${esc(res.explanation)}</div>
+    <div class="lbl">Attack signature</div><div class="sig">`;
+  for(const f of FIELDS){
+    h+=`<div class="f"><div class="k">${f}</div><div class="v">${esc(res.sig[f])}</div>
+        <div class="c">confidence ${(res.conf[f]*100).toFixed(0)}%</div></div>`;
+  }
+  h+=`</div><div class="lbl">Which words carried the decision</div><div class="attr">`;
+  const mx=Math.max(0.0001,...res.attribution.map(a=>Math.abs(a.delta)));
+  for(const a of res.attribution){
+    const s=Math.abs(a.delta)/mx;
+    const bg=a.delta>0.0001?`background:color-mix(in srgb,var(--attack) ${(s*32).toFixed(0)}%,transparent)`
+            :a.delta<-0.0001?`background:color-mix(in srgb,var(--safe) ${(s*32).toFixed(0)}%,transparent)`:"";
+    h+=`<span class="tk" style="${bg}" title="${a.delta>0?"+":""}${a.delta}">${esc(a.token)}</span> `;
+  }
+  h+=`</div><div class="note">Attribution is measured by removing each word and re-scoring, so it reflects what the model actually used, not a guess from coefficients.</div>`;
+  return h;
+}
+
+function boot(){
+  document.getElementById("run").disabled=false;
+  document.getElementById("runbatch").disabled=false;
+  const n=Object.keys(M.vocab).length;
+  document.getElementById("status").textContent=
+    `model loaded · ${n.toLocaleString()} character n-gram features · 6 signature heads · runs locally`;
+  const ex=document.getElementById("examples");
+  EX.forEach(([lab,txt])=>{
+    const b=document.createElement("button"); b.className="chip"; b.textContent=lab;
+    b.onclick=()=>{document.getElementById("msg").value=txt;go();};
+    ex.appendChild(b);
+  });
+  const fe=document.getElementById("flipex");
+  FLIPS.forEach(([lab,a,bq],i)=>{
+    const b=document.createElement("button"); b.className="chip"; b.textContent=lab;
+    b.onclick=()=>showFlip(i); fe.appendChild(b);
+  });
+  showFlip(0);
+}
+function go(){
+  const t=document.getElementById("msg").value.trim();
+  const o=document.getElementById("out");
+  if(!t){o.classList.add("hid");return;}
+  o.classList.remove("hid"); o.innerHTML=render(analyse(t));
+}
+function showFlip(i){
+  const [lab,a,b]=FLIPS[i];
+  const ra=analyse(a), rb=analyse(b);
+  const card=(txt,r)=>`<div style="border:1px solid var(--rule);border-radius:4px;overflow:hidden">
+    <div style="padding:11px 13px;font-family:var(--mono);font-size:13px;background:var(--surface);border-bottom:1px solid var(--rule)">${esc(txt)}</div>
+    <div class="verdict ${r.verdict}" style="margin:0;border-radius:0;border-left-width:4px">
+      <span class="vword">${{attack:"Attack",safe:"Looks safe",uncertain:"Uncertain"}[r.verdict]}</span>
+      <span class="vrisk">risk ${r.risk.toFixed(2)} · action = ${r.sig.action}</span></div></div>`;
+  document.getElementById("flipout").innerHTML=card(a,ra)+card(b,rb);
+}
+function runBatch(){
+  const lines=document.getElementById("batchin").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  if(!lines.length){document.getElementById("batchout").innerHTML="";return;}
+  let h=`<div class="tw"><table><thead><tr><th>Message</th><th>Verdict</th><th>Risk</th><th>Intent</th><th>Action</th></tr></thead><tbody>`;
+  window.__rows=[["message","verdict","risk","intent","action"]];
+  for(const l of lines){
+    const r=analyse(l);
+    const col=r.verdict==="attack"?"var(--attack)":r.verdict==="safe"?"var(--safe)":"var(--warn)";
+    h+=`<tr><td style="font-family:var(--mono);font-size:12.5px">${esc(l.slice(0,90))}</td>
+        <td style="color:${col};font-weight:600">${r.verdict}</td>
+        <td class="r">${r.risk.toFixed(2)}</td><td>${esc(r.sig.intent)}</td><td>${esc(r.sig.action)}</td></tr>`;
+    window.__rows.push([l,r.verdict,r.risk.toFixed(2),r.sig.intent,r.sig.action]);
+  }
+  document.getElementById("batchout").innerHTML=h+"</tbody></table></div>";
+}
+
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t));
+    ["one","flip","batch"].forEach(n=>document.getElementById("tab-"+n).classList.toggle("hid",n!==t.dataset.tab));
+  };
+});
+document.getElementById("run").onclick=go;
+document.getElementById("msg").addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key==="Enter")go();});
+document.getElementById("runbatch").onclick=runBatch;
+document.getElementById("loadsample").onclick=()=>{
+  document.getElementById("batchin").value=EX.map(e=>e[1]).join("\n"); runBatch();
+};
+document.getElementById("dlcsv").onclick=()=>{
+  if(!window.__rows) return;
+  const csv=window.__rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  navigator.clipboard?.writeText(csv);
+  document.getElementById("dlcsv").textContent="copied";
+  setTimeout(()=>document.getElementById("dlcsv").textContent="Copy as CSV",1400);
+};
+
+fetch("model.json").then(r=>r.json()).then(j=>{M=j;boot();})
+  .catch(e=>{document.getElementById("status").textContent="could not load model.json — serve this folder over http, not file://";});
+</script>
+</body>
+</html>
