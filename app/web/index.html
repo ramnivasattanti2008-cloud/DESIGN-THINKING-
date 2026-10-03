@@ -97,6 +97,7 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);paddin
 <div class="tabs" role="tablist">
   <button class="tab" role="tab" aria-selected="true" data-tab="one">Analyse</button>
   <button class="tab" role="tab" aria-selected="false" data-tab="flip">Flip test</button>
+  <button class="tab" role="tab" aria-selected="false" data-tab="adv">Fool it</button>
   <button class="tab" role="tab" aria-selected="false" data-tab="batch">Batch</button>
 </div>
 
@@ -126,6 +127,19 @@ code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);paddin
   </div>
   <div class="row" id="flipex"></div>
   <div class="cmp" id="flipout"></div>
+</section>
+
+<!-- ADVERSARIAL -->
+<section id="tab-adv" class="hid">
+  <p style="font-size:14.5px;color:var(--ink-2);margin:0 0 10px">
+    Try to make a real scam read as safe. Every edit is scored live. What works
+    here is a defect worth writing down, not a trick.
+  </p>
+  <div class="row" id="advseed"></div>
+  <textarea id="advin" spellcheck="false" style="min-height:84px"></textarea>
+  <div id="advverdict"></div>
+  <div class="lbl">Attempts that changed the verdict</div>
+  <div id="advlog" style="font-family:var(--mono);font-size:12.5px;color:var(--ink-2)">none yet</div>
 </section>
 
 <!-- BATCH -->
@@ -185,6 +199,120 @@ const ACTION_EN={share_code:"share a one-time password",click_link:"open a link 
 const INTENT_EN={credential_theft:"steal a credential",funds_transfer:"take money directly",malware_install:"take control of your device",data_harvest:"collect personal information",advance_fee:"collect a fee for something that does not exist",benign:"nothing harmful"};
 
 let M=null;
+
+// ---- evidence detection (regex, not learned) -----------------------------
+const SHORTENERS=/(bit\.ly|tinyurl\.com|t\.co|goo\.gl|is\.gd|cutt\.ly|rb\.gy|ow\.ly|rebrand\.ly|shorturl\.at|tiny\.cc)/i;
+const RE_ANYURL=/(https?:\/\/\S+|www\.\S+)/ig;
+// no lookbehind: Safari support is patchy, so bound with non-digit groups
+const RE_PHONE=/(^|[^\d])((?:\+?91[\s-]?)?[6-9]\d{9}|1930|1800[\s-]?\d{3}[\s-]?\d{3,4})(?!\d)/g;
+const RE_MONEY=/((?:₹|Rs\.?|INR)\s?\d[\d,]*|\d[\d,]*\s?(?:रुपये|रुपए|రూపాయ\S*|ரூபாய்|ರೂಪಾಯಿ|rupay\w*|rupee\w*))/ig;
+const RE_DEADLINE=/(within\s+\d+\s*(?:hour|hrs?|minute|min)s?|in\s+\d+\s*(?:hour|hrs?)s?|today|tonight|immediately|urgent(?:ly)?|right\s+now|तुरंत|आज|घंटे|వెంటనే|ఈరోజు|గంటల్లో|உடனடியாக|இன்று|ತಕ್ಷಣ|ಇಂದು|turant|ventane)/ig;
+const RE_REF=/\b([A-Z]{2,4}\d{4,}|A\/c\s?[Xx*]{2,}\d+|(?:ref|case|order|txn|id)[\s.:#-]*[A-Z0-9]{5,})\b/g;
+const RE_UPI=/\b[\w.\-]{2,}@(ok\w+|paytm|ybl|upi|axl|ibl|apl|sbi)\b/ig;
+
+function orthoNoise(t){
+  if(/[!?]{2,}/.test(t)) return true;
+  const L=t.split("").filter(c=>/[A-Za-z]/.test(c));
+  if(L.length>=12 && L.filter(c=>c===c.toUpperCase()).length/L.length>0.55) return true;
+  return /\b[A-Z]{5,}\b.*\b[A-Z]{5,}\b/.test(t);
+}
+function evidenceSpans(t){
+  const out=[];
+  const push=(kind,re,grp)=>{ re.lastIndex=0; let m;
+    while((m=re.exec(t))!==null){
+      const v=grp?m[grp]:m[0]; if(!v) continue;
+      out.push({kind,text:v,start:m.index+(m[0].length-v.length)});
+      if(m.index===re.lastIndex) re.lastIndex++;
+    }};
+  if(SHORTENERS.test(t)){ const m=t.match(SHORTENERS); out.push({kind:"shortened_url",text:m[0],start:t.indexOf(m[0])}); }
+  push("phone_number",RE_PHONE,2);
+  push("monetary_amount",RE_MONEY,1);
+  push("deadline",RE_DEADLINE,1);
+  push("reference_id",RE_REF,1);
+  push("upi_id",RE_UPI,0);
+  RE_ANYURL.lastIndex=0; let m;
+  while((m=RE_ANYURL.exec(t))!==null){ if(!SHORTENERS.test(m[0])) out.push({kind:"url",text:m[0],start:m.index}); }
+  return out.sort((a,b)=>a.start-b.start);
+}
+function extractEvidence(t){
+  const kinds=new Set(evidenceSpans(t).map(s=>s.kind).filter(k=>k!=="upi_id"&&k!=="url"));
+  if(orthoNoise(t)) kinds.add("orthographic_noise");
+  return [...kinds];
+}
+
+// ---- nearest known family ------------------------------------------------
+function nearestFamily(sig){
+  const F=M.families||{}, flds=M.fields||FIELDS;
+  const scored=Object.entries(F).map(([n,f])=>{
+    let hit=0; for(const k of flds) if(sig[k]===f[k]) hit++;
+    return [n,hit/flds.length,flds.filter(k=>sig[k]!==f[k])];
+  }).sort((a,b)=>b[1]-a[1]);
+  const [name,sim,diffs]=scored[0], n=(M.fields||FIELDS).length;
+  let note;
+  if(!diffs.length) note=`Matches the ${name} family on every field.`;
+  else if(sim>=0.66) note=`Closest to ${name} (${n-diffs.length} of ${n} fields match), but ${diffs.join(", ")} ${diffs.length>1?"differ":"differs"}. This looks like a recombination of known parts, which is exactly where this model is weakest.`;
+  else note=`No close match among the 12 known families (best is ${name}, ${n-diffs.length} of ${n} fields). Treat this as outside what the model has seen.`;
+  return {top:scored.slice(0,3),note};
+}
+
+// ---- what to do now ------------------------------------------------------
+const GENERIC=["Do not reply. A reply confirms your number is live and reaches a person.",
+ "Do not call any number printed in the message. Look the organisation up yourself.",
+ "Report it on the national cybercrime helpline 1930, or at cybercrime.gov.in."];
+const BY_TARGET={
+ otp:["Never share an OTP. No bank, telecom or government office will ask for one.","If you already shared it, call your bank's official number now and freeze the account."],
+ upi_pin:["Entering your UPI PIN never receives money. It only sends money.","If you already entered it, raise a dispute in your UPI app and call your bank."],
+ card_pan:["Never type a card number into a link from a message.","If you already did, block the card from your bank's app."],
+ account_credentials:["Open your bank only from its official app, never from a link.","If you logged in through the link, change the password now from the app."],
+ device_control:["Uninstall any screen-sharing app you were asked to install, now.","AnyDesk, TeamViewer and QuickSupport give the caller full control of your phone."],
+ funds:["Do not transfer anything. Nobody legitimate demands payment by SMS to avoid arrest.","If you already paid, report within 24 hours. Fast reports have a real chance of recovery."],
+ identity_document:["Do not send Aadhaar, PAN or photos of documents to an unverified contact."]};
+const BY_ACTOR={
+ government_police:["Police do not arrest or fine people over a phone call or SMS. There is no such thing as a 'digital arrest'."],
+ bank:["Call the number printed on your debit card, not any number in the message."],
+ known_person:["Call the person on the number you already have saved and check it is really them."]};
+function adviceFor(sig,verdict){
+  if(verdict==="safe") return [];
+  const out=[...(BY_TARGET[sig.target]||[]),...(BY_ACTOR[sig.actor]||[]),...GENERIC];
+  return [...new Set(out)].slice(0,6);
+}
+
+// ---- minimal counterfactual ---------------------------------------------
+const SAFE_SWAPS={share:"never share",send:"never send",pay:"never pay",call:"do not call",
+ click:"do not click",install:"do not install",scan:"do not scan",enter:"never enter",
+ reply:"do not reply",transfer:"never transfer",deposit:"never deposit",tell:"never tell",
+ download:"do not download",give:"never give"};
+const TAILS=["with anyone","to anyone","with anyone; the bank never asks for it"];
+function quickVerdict(t){ const s=signature(t).sig; return verdict(s,risk(s)); }
+function counterfactual(text){
+  const toks=text.split(/\s+/).filter(Boolean);
+  if(!toks.length||toks.length>60) return null;
+  const start=quickVerdict(text);
+  const mk=(kind,edits,cand,note)=>({kind,edits,text:cand,from:start,to:quickVerdict(cand),note:note||null});
+  const verbs=toks.map((t,i)=>[i,t,t.replace(/[^\w']/g,"").toLowerCase()]).filter(([,,b])=>SAFE_SWAPS[b]);
+  for(const [i,t,b] of verbs){
+    const c=[...toks.slice(0,i),SAFE_SWAPS[b],...toks.slice(i+1)].join(" ");
+    if(quickVerdict(c)!==start) return mk("negate",1,c);
+  }
+  for(const [i,t,b] of verbs){
+    const base=[...toks.slice(0,i),SAFE_SWAPS[b],...toks.slice(i+1)].join(" ").replace(/[\s.]+$/,"");
+    for(const tail of TAILS){
+      const c=`${base} ${tail}.`;
+      if(quickVerdict(c)!==start) return mk("negate+tail",2,c,
+        `Negating the verb alone was not enough. The model also needed the phrase “${tail}”, which every refrain clause in the training corpus happens to end with. It learned the template's ending, not what “never” means.`);
+    }
+  }
+  for(let i=0;i<toks.length;i++){
+    const c=[...toks.slice(0,i),...toks.slice(i+1)].join(" ");
+    if(c&&quickVerdict(c)!==start) return mk("delete",1,c);
+  }
+  if(toks.length<=25) for(let i=0;i<toks.length;i++) for(let j=i+1;j<toks.length;j++){
+    const c=toks.filter((_,k)=>k!==i&&k!==j).join(" ");
+    if(c&&quickVerdict(c)!==start) return mk("delete",2,c);
+  }
+  return null;
+}
+
 
 function ngrams(text){
   text=text.toLowerCase().replace(/\s\s+/g," ");
@@ -249,8 +377,12 @@ function attribution(text){
   });
 }
 function analyse(text){
-  const {sig,conf}=signature(text), r=risk(sig);
-  return {sig,conf,risk:r,verdict:verdict(sig,r),explanation:explain(sig),attribution:attribution(text)};
+  const {sig,conf}=signature(text), r=risk(sig), v=verdict(sig,r);
+  return {sig,conf,risk:r,verdict:v,explanation:explain(sig),attribution:attribution(text),
+          evidence:extractEvidence(text), spans:evidenceSpans(text),
+          family:nearestFamily(sig), advice:adviceFor(sig,v),
+          counterfactual:counterfactual(text),
+          lowconf:FIELDS.filter(f=>conf[f]<0.55)};
 }
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -264,7 +396,38 @@ function render(res){
     h+=`<div class="f"><div class="k">${f}</div><div class="v">${esc(res.sig[f])}</div>
         <div class="c">confidence ${(res.conf[f]*100).toFixed(0)}%</div></div>`;
   }
-  h+=`</div><div class="lbl">Which words carried the decision</div><div class="attr">`;
+  h+=`</div>`;   // close the .sig grid before anything else is appended
+  if(res.lowconf.length){
+    h+=`<div class="note" style="background:var(--warn-bg);border-left-color:var(--warn)">
+      <strong>Low confidence on ${res.lowconf.join(", ")}.</strong> The model is
+      guessing on ${res.lowconf.length>1?"those fields":"that field"}. Treat the
+      signature above as a hypothesis, not a reading.</div>`;
+  }
+  h+=`<div class="lbl">Surface cues found</div>`;
+  if(res.evidence.length){
+    h+=`<div class="row" style="margin:0">`;
+    for(const e of res.evidence) h+=`<span class="chip" style="cursor:default">${esc(e.replace(/_/g," "))}</span>`;
+    h+=`</div><div style="font-size:12.5px;color:var(--ink-3);margin-top:6px">`;
+    h+=res.spans.map(sp=>`${esc(sp.kind)}: <code>${esc(sp.text.slice(0,40))}</code>`).join(" &nbsp;·&nbsp; ");
+    h+=`</div>`;
+  } else { h+=`<div style="font-size:13.5px;color:var(--ink-3)">none detected</div>`; }
+  h+=`<div class="lbl">Nearest known family</div>
+      <div class="explain" style="font-size:14px">${esc(res.family.note)}</div>`;
+  if(res.counterfactual){
+    const c=res.counterfactual;
+    h+=`<div class="lbl">Smallest edit that flips the verdict</div>
+      <div class="explain" style="font-size:13.5px;font-family:var(--mono)">${esc(c.text)}</div>
+      <div style="font-size:13px;color:var(--ink-2);margin-top:7px">
+        ${c.edits} edit${c.edits>1?"s":""} (${esc(c.kind)}): ${esc(c.from)} &rarr; ${esc(c.to)}</div>`;
+    if(c.note) h+=`<div class="note" style="margin-top:9px">${esc(c.note)}</div>`;
+  }
+  if(res.advice.length){
+    h+=`<div class="lbl">What to do now</div><div class="explain" style="font-size:14px">
+        <ol style="margin:0;padding-left:19px">`;
+    for(const a of res.advice) h+=`<li style="margin-bottom:5px">${esc(a)}</li>`;
+    h+=`</ol></div>`;
+  }
+  h+=`<div class="lbl">Which words carried the decision</div><div class="attr">`;
   const mx=Math.max(0.0001,...res.attribution.map(a=>Math.abs(a.delta)));
   for(const a of res.attribution){
     const s=Math.abs(a.delta)/mx;
@@ -272,7 +435,17 @@ function render(res){
             :a.delta<-0.0001?`background:color-mix(in srgb,var(--safe) ${(s*32).toFixed(0)}%,transparent)`:"";
     h+=`<span class="tk" style="${bg}" title="${a.delta>0?"+":""}${a.delta}">${esc(a.token)}</span> `;
   }
-  h+=`</div><div class="note">Attribution is measured by removing each word and re-scoring, so it reflects what the model actually used, not a guess from coefficients.</div>`;
+  h+=`</div>`;
+  if(mx<0.0005){
+    h+=`<div class="note">No single word was decisive. The signature survived the
+      removal of every individual word, which means the model is not leaning on one
+      keyword here — the reading comes from the message as a whole. Attribution only
+      lights up when one word carries the verdict.</div>`;
+  } else {
+    h+=`<div class="note">Attribution is measured by removing each word and
+      re-scoring, so it reflects what the model actually used rather than a guess
+      read off coefficients.</div>`;
+  }
   return h;
 }
 
@@ -288,6 +461,13 @@ function boot(){
     b.onclick=()=>{document.getElementById("msg").value=txt;go();};
     ex.appendChild(b);
   });
+  const as=document.getElementById("advseed");
+  EX.filter((_,i)=>i!==EX.length-1).slice(0,5).forEach(([lab,txt])=>{
+    const b=document.createElement("button"); b.className="chip"; b.textContent=lab;
+    b.onclick=()=>advSeed(txt); as.appendChild(b);
+  });
+  advSeed(EX[0][1]);
+  document.getElementById("advin").addEventListener("input",advRender);
   const fe=document.getElementById("flipex");
   FLIPS.forEach(([lab,a,bq],i)=>{
     const b=document.createElement("button"); b.className="chip"; b.textContent=lab;
@@ -327,10 +507,36 @@ function runBatch(){
   document.getElementById("batchout").innerHTML=h+"</tbody></table></div>";
 }
 
+// ---- adversarial playground ----
+let ADVLOG=[];
+function advRender(){
+  const t=document.getElementById("advin").value.trim();
+  const box=document.getElementById("advverdict");
+  if(!t){box.innerHTML="";return;}
+  const r=analyse(t);
+  const word={attack:"Attack",safe:"Looks safe",uncertain:"Uncertain"}[r.verdict];
+  box.innerHTML=`<div class="verdict ${r.verdict}" style="margin-top:10px">
+    <span class="vword">${word}</span>
+    <span class="vrisk">risk ${r.risk.toFixed(2)} · action = ${esc(r.sig.action)} · intent = ${esc(r.sig.intent)}</span></div>`;
+  if(window.__advStart && r.verdict!==window.__advStart && t!==window.__advSeed){
+    const entry=`${window.__advStart} → ${r.verdict}  |  ${t.slice(0,70)}`;
+    if(!ADVLOG.includes(entry)){
+      ADVLOG.unshift(entry);
+      document.getElementById("advlog").innerHTML=ADVLOG.slice(0,12)
+        .map(e=>`<div style="padding:3px 0;border-bottom:1px solid var(--rule)">${esc(e)}</div>`).join("");
+    }
+  }
+}
+function advSeed(txt){
+  document.getElementById("advin").value=txt;
+  window.__advSeed=txt; window.__advStart=quickVerdict(txt);
+  advRender();
+}
+
 document.querySelectorAll(".tab").forEach(t=>{
   t.onclick=()=>{
     document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t));
-    ["one","flip","batch"].forEach(n=>document.getElementById("tab-"+n).classList.toggle("hid",n!==t.dataset.tab));
+    ["one","flip","adv","batch"].forEach(n=>document.getElementById("tab-"+n).classList.toggle("hid",n!==t.dataset.tab));
   };
 });
 document.getElementById("run").onclick=go;

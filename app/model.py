@@ -20,7 +20,10 @@ import joblib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "src"))
+sys.path.insert(0, HERE)
 from schema import AttackSignature, SINGLE_FIELDS, signature_risk  # noqa: E402
+from features import (extract_evidence, evidence_spans, nearest_family,  # noqa: E402
+                      family_gap, advice, counterfactual)
 
 ARTIFACTS = os.path.join(HERE, "artifacts", "model.joblib")
 
@@ -163,6 +166,13 @@ class Analyzer:
         if not text:
             return {"error": "empty message"}
         sig = self.signature(text)
+        # evidence is detected, not predicted: the model never learned these
+        # fields, and a shortened URL either is or is not present.
+        ev = extract_evidence(text)
+        sig = AttackSignature(
+            actor=sig.actor, pretext=sig.pretext, target=sig.target,
+            intent=sig.intent, action=sig.action, stage=sig.stage,
+            tactic=sig.tactic, evidence=tuple(ev))
         srisk = float(signature_risk(sig))
         stat = self.statistical_risk(text)
         conf = self.field_confidence(text)
@@ -180,6 +190,18 @@ class Analyzer:
             "field_confidence": {k: round(v, 3) for k, v in conf.items()},
             "explanation": self.explain(sig),
             "attribution": attrib,
+            "evidence": ev,
+            "evidence_spans": evidence_spans(text),
+            "family": family_gap(sig),
+            "advice": advice(sig, self._verdict(srisk, stat, sig.action, in_dom)),
+            "counterfactual": counterfactual(text, self._quick_verdict),
+            "low_confidence_fields": [k for k, v in conf.items() if v < 0.55],
+            "attribution_note": (
+                "No single word was decisive: the signature survived removal of "
+                "every individual word, so the reading comes from the message as "
+                "a whole rather than one keyword."
+                if attrib and max(abs(a["delta"]) for a in attrib) < 5e-4 else
+                "Measured by removing each word and re-scoring."),
             "note": (
                 None if (agree or not in_dom) else
                 "The two models disagree. The structured model knows the attack "
@@ -190,6 +212,12 @@ class Analyzer:
             "trained on English only, so its score is ignored here and the "
             "verdict comes from the structured model alone.",
         }
+
+    def _quick_verdict(self, t: str) -> str:
+        """One signature pass per candidate; the search calls this a lot."""
+        s = self.signature(t)
+        return self._verdict(signature_risk(s), self.statistical_risk(t),
+                             s.action, self._stat_in_domain(t))
 
     @staticmethod
     def _verdict(srisk, stat, action, stat_in_domain):

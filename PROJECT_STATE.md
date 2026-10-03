@@ -34,6 +34,12 @@ the whole framework collapses.
 | Inference layer | **done** | `app/model.py`, occlusion attribution, explanations |
 | HTTP API | **done, untested under load** | `app/api.py` (FastAPI) |
 | Browser demo | **done, parity verified** | `app/web/`, runs with no server |
+| Evidence extraction | **done** | regex, closes the unpredicted-fields gap |
+| Nearest-family distance | **done** | says how far outside the taxonomy a message sits |
+| Minimal counterfactual | **done** | smallest edit that flips the verdict |
+| Action advice | **done** | India-specific: 1930, cybercrime.gov.in |
+| Adversarial playground | **done** | "Fool it" tab, logs successful edits |
+| Confidence surfacing | **done** | flags fields below 0.55 |
 | Real-data integration | **partial** | see "Data" |
 | Transformer baseline | **not started** | highest-value next task |
 
@@ -74,6 +80,41 @@ Two training regimes, also deliberately:
   train-split-only model gets 2 non-zero features and a verdict of "safe", which
   is worse than useless. Paper numbers live in `src/evaluate.py`; app numbers in
   `app/train.py`. They are not comparable and should never be mixed.
+
+## Features added 2026-10-03
+
+**Evidence extraction** (`app/features.py`). The schema has eight fields but the
+model only ever predicted six, which capped mean agreement near 0.75 even at
+perfect core accuracy. Half of `evidence` is not a learning problem: shortened
+URLs, phone numbers, rupee amounts, deadlines and reference IDs are regex. They
+are now detected rather than predicted, in both Python and JavaScript, with
+identical output.
+
+**Nearest known family.** Reports which of the 12 families a message is closest
+to and which fields differ. Uses core-field similarity, deliberately *not*
+`signature_agreement` — that weights `evidence` at 1/8, and since evidence is now
+detected per message while family templates carry fixed tuples, every real
+message would be penalised for cues the template never claimed.
+
+**Minimal counterfactual.** The smallest edit that flips the verdict, searched
+cheapest first: negate a verb, negate plus a refrain tail, delete one token,
+delete two. Roughly 0.07s per message.
+
+This one found something. Negating the verb is **not enough** — "Never share the
+OTP sent to your phone." still reads as an attack. The model only flips when the
+phrase "with anyone" is also present, because every refrain clause in the
+training corpus ends that way. It learned the template's ending, not what
+"never" means. The app reports this to the user rather than hiding it.
+
+**Action advice.** India-specific next steps keyed on target and actor: the 1930
+helpline, cybercrime.gov.in, and the point that police do not conduct "digital
+arrests".
+
+**Adversarial playground.** A "Fool it" tab where edits are scored live and any
+edit that changes the verdict is logged. Generates non-templated failure cases,
+which is the corpus's weakest point.
+
+**Confidence surfacing.** Fields below 0.55 confidence are named in the UI.
 
 ## Current numbers
 
@@ -153,9 +194,22 @@ claim is technically true and practically empty.
    side. That comparison is more interesting than either number alone.
 5. Expand the taxonomy beyond 12 families, driven by what real data shows.
 6. Harden the API: request limits, a model pool, caching.
+7. **Fix what the counterfactual exposed.** The refrain clauses in
+   `src/lexicon.py` all end with the same tail, so the model learned the tail
+   rather than the negation. Vary those endings and retrain; flip behaviour
+   should get meaningfully more robust, and the counterfactual becomes a 1-edit
+   result instead of 2.
+8. Predict `tactic` as well. `evidence` is now handled by regex; `tactic`
+   (authority, urgency, fear, reward) genuinely needs a model and is the last
+   unpredicted field.
 
 ## Changelog
 
+- **2026-10-03 (later)** — Six features: evidence extraction, nearest-family
+  distance, minimal counterfactual, action advice, adversarial playground,
+  confidence surfacing. All ported to JS with output verified identical to
+  Python. Counterfactual search revealed the model keys on the refrain clause's
+  trailing phrase rather than the negation; logged as task 7.
 - **2026-10-03** — App built. Signature vectorizer sized at 20,000 features after
   measuring flip accuracy against feature count (7k: 0.972, 12k: 0.994, 20k: 1.000). Two-vectorizer architecture after a shared one
   destroyed signature recovery. Browser port with enforced parity (all 1,823

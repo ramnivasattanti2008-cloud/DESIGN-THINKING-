@@ -98,7 +98,14 @@ def main():
         nnz = sum(len(r) for r in out_heads[f]["ci"])
         print(f"  {f:9s} {len(obj.classes_):2d} classes, {nnz} nonzero coefficients")
 
+    # the 12 known families, so the browser can report nearest-family distance
+    sys.path.insert(0, os.path.join(ROOT, "src"))
+    from generate import FAMILIES  # noqa: E402
+    fams = {name: {f: getattr(sig, f) for f in SINGLE_FIELDS}
+            for name, sig in FAMILIES.items()}
+
     payload = {"vocab": kept_vocab, "idf": kept_idf, "heads": out_heads,
+               "families": fams, "fields": list(SINGLE_FIELDS),
                "ngram_min": 2, "ngram_max": 5}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as fh:
