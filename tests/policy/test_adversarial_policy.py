@@ -98,13 +98,12 @@ def test_step_inherits_and_escalates_tier():
 
 def test_gap_overblocking_plastic_wire_tie():
     """
-    GAP 1 (Over-blocking): 'wire tie' contains 'wire', which triggers R-A3-electrical
-    and blocks safe benign cable-management tasks (e.g. 'cut the plastic wire tie').
+    GAP 1 (Over-blocking), CLOSED by claude (T-016): 'wire tie' used to trigger R-A3-electrical
+    and block benign cable-management tasks. A plastic wire tie is now allowed, while real
+    wires stay blocked (see src/core/tests/test_policy_gaps.py for the paired cases).
     """
-    decision = gate_goal("cut the plastic wire tie with scissors")
-    # Current behavior: blocks as R-A3-electrical
-    assert decision.decision == "block"
-    assert decision.rule_id == "R-A3-electrical"
+    assert gate_goal("cut the plastic wire tie with scissors").decision != "block"
+    assert gate_goal("cut the live wire").decision == "block"
 
 
 def test_gap_evasion_via_chemical_synonyms():
@@ -113,6 +112,7 @@ def test_gap_evasion_via_chemical_synonyms():
     are not in RULES, so hazardous chemical mixing goals may evade A3 policy gate
     if planner does not raise tier.
     """
+    # GAP 2, CLOSED by claude (T-016): R-A3-chemical now blocks hazardous chemicals and mixing.
     decision = gate_goal("mix bleach and ammonia in the bucket")
-    # Current behavior: not covered by R-A3 rules, planner defaults to R-planner
-    assert decision.rule_id == "R-planner"
+    assert decision.decision == "block"
+    assert decision.rule_id == "R-A3-chemical"

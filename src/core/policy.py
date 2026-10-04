@@ -16,13 +16,14 @@ def _r(words: str) -> re.Pattern:
 
 # (rule_id, tier, pattern). The highest tier among matching rules wins.
 RULES: list[tuple[str, Tier, re.Pattern]] = [
-    ("R-A3-electrical", Tier.A3, _r(r"wiring|wires?|fuse|circuit|breaker|mains|socket|outlet|voltage")),
+    ("R-A3-electrical", Tier.A3, _r(r"wiring|wires?(?!\s+ties?\b)|fuse|circuit|breaker|mains|socket|outlet|voltage")),  # a plastic wire tie is not wiring
     ("R-A3-gas", Tier.A3, _r(r"gas|lpg|pilot light")),
+    ("R-A3-chemical", Tier.A3, _r(r"bleach|ammonia|chlorine|acid|pesticide|solvent|paint thinner|toxic|mix(?:ing)? (?:the )?chemical")),
     ("R-A3-medical", Tier.A3, _r(r"medicine|medication|dose|dosage|pill|prescription|diagnos\w*")),
     ("R-A3-structural", Tier.A3, _r(r"load[- ]bearing|structural|ceiling crack|wall crack|roof")),
-    ("R-A3-traffic", Tier.A3, _r(r"drive|driving|cross the road|traffic")),
-    ("R-A3-security", Tier.A3, _r(r"lock|unlock|alarm|disarm")),
-    ("R-A3-money", Tier.A3, _r(r"pay|payment|transfer money|purchase|buy")),
+    ("R-A3-traffic", Tier.A3, _r(r"(?<!hard )(?<!flash )(?<!usb )(?<!disk )(?<!thumb )(?<!pen )(?<!external )drive|driving|cross the road|traffic")),  # a hard drive is not driving
+    ("R-A3-security", Tier.A3, _r(r"lock|unlock|alarm(?!\s+clock)|disarm")),  # an alarm clock is not a security alarm
+    ("R-A3-money", Tier.A3, _r(r"pay(?!\s+attention)|payment|transfer money|purchase|buy")),
     ("R-A3-control", Tier.A3, _r(r"turn (on|off) the (stove|oven|heater)|smart[- ]home|control the")),
     ("R-A2-contact", Tier.A2, _r(r"call|text|message|email|send")),
     ("R-A2-settings", Tier.A2, _r(r"settings?|delete|uninstall|factory reset")),
