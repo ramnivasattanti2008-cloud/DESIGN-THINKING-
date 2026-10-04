@@ -38,6 +38,19 @@
       "default": "ok",
       "title": "Frame Quality",
       "type": "string"
+    },
+    "confidence": {
+      "default": 0.0,
+      "description": "heuristic, calibration UNVERIFIED",
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "reason": {
+      "default": "",
+      "title": "Reason",
+      "type": "string"
     }
   },
   "required": [

@@ -61,12 +61,12 @@ def test_a2_needs_confirm_and_a1_allowed():
 def test_full_loop_verified():
     s = Session("get my desk ready to study", FakeModelClient())
     s.observe([frame("desk", "cup", "lamp", "notebook")])
-    st, d = s.plan()
+    st, d, _ = s.plan()
     assert st.instruction == "Move the cup off the surface." and d.decision == "allow"
     res = s.verify([frame("desk", "lamp", "notebook", fid="f2")])
     assert res.status == VerifyStatus.verified
     s.observe([frame("desk", "lamp", "notebook", fid="f2")])
-    assert s.plan() == (None, None)  # nothing left to do
+    assert s.plan()[2].value == "completed"  # verified once, nothing left
 
 
 def test_not_verified_when_item_still_there():
@@ -98,7 +98,7 @@ def test_poor_frames_are_cannot_tell(kw):
 def test_hazard_comes_before_goal():
     s = Session("study", FakeModelClient())
     s.observe([frame("smoke", "cup")])
-    st, _ = s.plan()
+    st, _, _ = s.plan()
     assert st.instruction.startswith("Stop.") and st.tier == Tier.A0
 
 

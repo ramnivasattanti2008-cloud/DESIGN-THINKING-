@@ -17,6 +17,7 @@ class Frame(BaseModel):
     blur: float = Field(0.0, ge=0, le=1, description="0 sharp, 1 unusable")
     brightness: float = Field(0.5, ge=0, le=1)
     data_b64: Optional[str] = None
+    media_type: str = "image/jpeg"
     # Only the fake provider reads this. Real providers ignore it. Test input, not real perception.
     fake_labels: list[str] = Field(default_factory=list)
 
@@ -58,9 +59,19 @@ class VerifyStatus(str, Enum):
     cannot_tell = "cannot_tell"
 
 
+class PlanOutcome(str, Enum):
+    step = "step"                            # a step is proposed
+    completed = "completed"                  # >= 1 verified step, nothing left, fresh observation
+    no_action_needed = "no_action_needed"    # nothing to do and nothing was verified: no success claim
+    needs_observation = "needs_observation"  # no usable observation yet
+    blocked_goal = "blocked_goal"            # goal refused by policy (A3)
+
+
 class VerifyResult(BaseModel):
     step_id: str
     status: VerifyStatus
     evidence_seen: list[str] = []
     evidence_missing: list[str] = []
     frame_quality: str = "ok"  # ok | poor
+    confidence: float = Field(0.0, ge=0, le=1, description="heuristic, calibration UNVERIFIED")
+    reason: str = ""

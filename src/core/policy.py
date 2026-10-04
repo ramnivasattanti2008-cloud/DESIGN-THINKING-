@@ -45,6 +45,14 @@ def classify(step: Step, goal: str = "") -> tuple[Tier, str]:
     return best
 
 
+def gate_goal(goal: str) -> GateDecision:
+    """Check the user's goal before anything is scanned. Blocks A3 goals up front."""
+    probe = Step(id="goal", instruction=goal, tier=Tier.A0)
+    tier, rule_id = classify(probe)
+    decision = {Tier.A0: "allow", Tier.A1: "allow", Tier.A2: "confirm", Tier.A3: "block"}[tier]
+    return GateDecision(step_id="goal", tier=tier, decision=decision, rule_id=rule_id)
+
+
 def gate(step: Step, goal: str = "") -> GateDecision:
     tier, rule_id = classify(step, goal)
     decision = {Tier.A0: "allow", Tier.A1: "allow", Tier.A2: "confirm", Tier.A3: "block"}[tier]

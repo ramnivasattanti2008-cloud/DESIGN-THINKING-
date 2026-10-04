@@ -31,6 +31,11 @@
       "default": null,
       "title": "Data B64"
     },
+    "media_type": {
+      "default": "image/jpeg",
+      "title": "Media Type",
+      "type": "string"
+    },
     "fake_labels": {
       "items": {
         "type": "string"
