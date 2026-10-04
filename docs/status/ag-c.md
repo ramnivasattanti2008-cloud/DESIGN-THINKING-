@@ -10,6 +10,8 @@ Last updated: 2026-10-04
 - Conducted duplicate checks and lane boundary audit in `docs/support/DUPLICATE_CHECK_REPORT.md` (clean, 0 collisions).
 - Created developer cheat sheet and onboarding helper in `docs/support/HELPER_CONTENT.md`.
 - Drafted embodied AI verification research summary in `docs/support/RESEARCH_SUMMARY.md`.
+- Created device physical testing checklist in `docs/support/VALIDATION_CHECKLIST.md`.
+- Created terminology glossary in `docs/support/GLOSSARY.md`.
 
 ## In progress
 - None (support tasks completed within bounded scope).
@@ -27,4 +29,6 @@ Last updated: 2026-10-04
 - `docs/support/DUPLICATE_CHECK_REPORT.md`
 - `docs/support/HELPER_CONTENT.md`
 - `docs/support/RESEARCH_SUMMARY.md`
+- `docs/support/VALIDATION_CHECKLIST.md`
+- `docs/support/GLOSSARY.md`
 - `docs/status/ag-c.md`
