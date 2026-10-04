@@ -91,8 +91,12 @@ class MissionViewModel(
                     }
                 }
             }.onFailure { err ->
-                // Graceful offline fallback
-                handleOfflineGoalFallback(cleaned)
+                _uiState.update {
+                    it.copy(
+                        errorMessage = "Cannot connect to MIRROR backend: ${err.message ?: "network error"}. Session not created.",
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -101,7 +105,12 @@ class MissionViewModel(
     fun captureSceneAndPlan(frames: List<FrameDto> = listOf(FrameDto(id = "f_initial", blur = 0.1f, brightness = 0.6f))) {
         val sid = _uiState.value.currentSessionId
         if (sid == null) {
-            handleOfflineSceneFallback()
+            _uiState.update {
+                it.copy(
+                    errorMessage = "No active mission session. Please submit a goal first.",
+                    isLoading = false
+                )
+            }
             return
         }
 
@@ -147,8 +156,13 @@ class MissionViewModel(
 
                 // Call /plan to formulate step or outcome
                 requestPlanFromBackend(sid)
-            }.onFailure {
-                handleOfflineSceneFallback()
+            }.onFailure { err ->
+                _uiState.update {
+                    it.copy(
+                        errorMessage = "Failed to send scene observation: ${err.message ?: "network error"}.",
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -243,8 +257,13 @@ class MissionViewModel(
                         }
                     }
                 }
-            }.onFailure {
-                handleOfflineSceneFallback()
+            }.onFailure { err ->
+                _uiState.update {
+                    it.copy(
+                        errorMessage = "Failed to request action plan: ${err.message ?: "network error"}.",
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -260,32 +279,58 @@ class MissionViewModel(
     fun verifyStepWithFrames(frames: List<FrameDto> = listOf(FrameDto(id = "f_after", blur = 0.05f, brightness = 0.55f))) {
         val sid = _uiState.value.currentSessionId
         if (sid == null) {
-            handleOfflineVerificationFallback()
+            _uiState.update {
+                it.copy(
+                    errorMessage = "No active mission session. Verification cannot proceed without backend.",
+                    isLoading = false
+                )
+            }
             return
         }
 
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
         scope.launch {
             val verifyRes = client.verify(sid, frames)
             verifyRes.onSuccess { v ->
                 when (v.status) {
                     "verified" -> {
-                        val result = VerificationResult(
-                            isVerified = true,
-                            confidenceScore = v.confidence,
-                            evidenceType = EvidenceType.VISUAL_CAMERA_DIFF,
-                            reasoning = v.reason.ifBlank { "All expected evidence seen in new frames." },
-                            detectedChanges = v.evidence_seen,
-                            status = "verified"
-                        )
-                        _uiState.update {
-                            it.copy(
-                                missionState = MissionState.COMPLETED,
-                                latestVerificationResult = result,
-                                verifiedStepsCount = it.verifiedStepsCount + 1,
-                                isLoading = false
+                        // Crucial invariant: verified ONLY if status is "verified" AND confidence >= 0.85
+                        if (v.confidence >= 0.85f) {
+                            val result = VerificationResult(
+                                isVerified = true,
+                                confidenceScore = v.confidence,
+                                evidenceType = EvidenceType.VISUAL_CAMERA_DIFF,
+                                reasoning = v.reason.ifBlank { "All expected evidence seen in new frames." },
+                                detectedChanges = v.evidence_seen,
+                                status = "verified"
                             )
+                            _uiState.update {
+                                it.copy(
+                                    missionState = MissionState.VERIFICATION,
+                                    latestVerificationResult = result,
+                                    verifiedStepsCount = it.verifiedStepsCount + 1,
+                                    isLoading = false
+                                )
+                            }
+                        } else {
+                            // Sub-threshold confidence: must be treated as UNCERTAIN_REVIEW, cannot claim success
+                            val result = VerificationResult(
+                                isVerified = false,
+                                confidenceScore = v.confidence,
+                                evidenceType = EvidenceType.VISUAL_CAMERA_DIFF,
+                                reasoning = "Confidence (${v.confidence}) below 0.85 verification threshold: ${v.reason}",
+                                detectedChanges = v.evidence_seen,
+                                uncertaintyFactors = listOf("Low confidence: ${v.confidence} < 0.85 threshold"),
+                                status = "uncertain"
+                            )
+                            _uiState.update {
+                                it.copy(
+                                    missionState = MissionState.UNCERTAIN_REVIEW,
+                                    latestVerificationResult = result,
+                                    isLoading = false
+                                )
+                            }
                         }
                     }
 
@@ -328,8 +373,13 @@ class MissionViewModel(
                         }
                     }
                 }
-            }.onFailure {
-                handleOfflineVerificationFallback()
+            }.onFailure { err ->
+                _uiState.update {
+                    it.copy(
+                        errorMessage = "Verification request failed: ${err.message ?: "network error"}. Verification not granted.",
+                        isLoading = false
+                    )
+                }
             }
         }
     }
@@ -343,58 +393,10 @@ class MissionViewModel(
         } else {
             _uiState.update {
                 it.copy(
-                    missionState = MissionState.COMPLETED,
-                    isMissionCompleted = true,
-                    latestVerificationResult = null
+                    errorMessage = "Cannot advance: no active session.",
+                    isLoading = false
                 )
             }
-        }
-    }
-
-    // Safe fallbacks for offline execution
-    private fun handleOfflineGoalFallback(goal: String) {
-        _uiState.update {
-            it.copy(
-                currentSessionId = "OFFLINE-${System.currentTimeMillis() % 10000}",
-                interpretedIntent = "prepare the space ($goal)",
-                missionState = MissionState.PERCEIVING,
-                isLoading = false
-            )
-        }
-    }
-
-    private fun handleOfflineSceneFallback() {
-        val sampleStep = PlanStep(
-            stepNumber = _uiState.value.verifiedStepsCount + 1,
-            title = "Organize Workspace Target",
-            physicalInstruction = "Move the cup off the surface.",
-            targetObject = "Cup",
-            verificationCriterion = "no cup visible"
-        )
-        _uiState.update {
-            it.copy(
-                planSteps = listOf(sampleStep),
-                missionState = MissionState.AWAITING_CONFIRMATION,
-                isLoading = false
-            )
-        }
-    }
-
-    private fun handleOfflineVerificationFallback() {
-        val result = VerificationResult(
-            isVerified = true,
-            confidenceScore = 0.92f,
-            evidenceType = EvidenceType.VISUAL_CAMERA_DIFF,
-            reasoning = "All expected evidence seen in the new frames.",
-            detectedChanges = listOf("no cup visible")
-        )
-        _uiState.update {
-            it.copy(
-                missionState = MissionState.COMPLETED,
-                latestVerificationResult = result,
-                verifiedStepsCount = it.verifiedStepsCount + 1,
-                isLoading = false
-            )
         }
     }
 

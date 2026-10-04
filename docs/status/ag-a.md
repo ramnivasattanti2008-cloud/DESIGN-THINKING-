@@ -14,7 +14,11 @@ Last updated: 2026-10-04
     - "Check room lighting & ventilation"
   - **Optional hazard button on ActionPlanScreen**: Updated `ActionPlanScreen.kt` to make `onTriggerSafetyHazard: (() -> Unit)? = null` nullable and optional. When null (as in real app flows), the button is completely hidden from the layout.
   - **Screen decoupling verified**: Verified that all screens in `src/ui/screens/` depend strictly on `com.mirror.ui.model`, `components`, and `theme`. Zero imports from `navigation`, `network`, or `viewmodel`.
-  - **Browser preview aligned**: Updated `src/ui/web_preview/index.html` and `public/index.html` with clean framing reticles, MVP-safe presets, and live `/v1` health check / API endpoints with contract-compliant client fallback.
+  - **Resolved Claude blocking review finding (offline fallbacks & verification threshold)**:
+    - Deleted `handleOfflineGoalFallback()`, `handleOfflineSceneFallback()`, and `handleOfflineVerificationFallback()` from `src/ui/viewmodel/MissionViewModel.kt`.
+    - If the backend is unreachable or session is missing, the viewmodel sets `errorMessage` and halts without fabricating plans, sessions, or verifications.
+    - Enforced the strict verification invariant: status `"verified"` only passes if `confidence >= 0.85f`. Sub-threshold confidences are routed to `MissionState.UNCERTAIN_REVIEW`.
+    - Verified step transitions to `MissionState.VERIFICATION` (not immediate `COMPLETED`); `COMPLETED` is only reached when the backend returns outcome `"completed"`.
   - **Pytest test suite verified**: Ran `.venv\Scripts\python -m pytest` -> **81 / 81 tests passing**.
 
 ## Half done
@@ -32,6 +36,7 @@ Last updated: 2026-10-04
 - `src/ui/screens/CameraViewScreen.kt`
 - `src/ui/screens/HomeScreen.kt`
 - `src/ui/screens/ActionPlanScreen.kt`
+- `src/ui/viewmodel/MissionViewModel.kt`
 - `src/ui/web_preview/index.html`
 - `public/index.html`
 - `docs/status/ag-a.md`
