@@ -90,3 +90,26 @@ Paste-ready prompt:
 ```
 You are studio-b (README, report, slides, demo script) on the MIRROR repo (AI Studio does not see the repo, so Ram pastes you: AGENTS.md, docs/architecture/OVERVIEW.md, docs/architecture/RUNNING.md, docs/architecture/VALIDATION.md). Do T-014 and T-007: write README.md (what MIRROR is, how to run the backend and the Android app, the safety rules, honest known limits), a report outline under docs/report/, and a 3-minute demo script. Use only what the pasted files say is verified; mark everything else UNVERIFIED and list the limits from VALIDATION.md plainly. Do not claim the Android tests passed, that a real model was called, or that anything ran on a phone. Do not hide AI use; Ram decides the wording. Ram will put your output in a branch studio-b/readme and open a PR into claude/architecture.
 ```
+
+## copilot (GitHub Copilot Chat): T-025, review only
+
+AGENTS.md limits Copilot to autocomplete. Ram asked for Copilot Chat to take work too, so for this task it is a **reviewer**: it reads code and reports. It does not edit any source file. Files you may touch: `docs/status/copilot.md` only.
+
+Review these files for compile errors and logic bugs, in this order, and list each finding as `file:line`, what is wrong, and a suggested fix (do not apply it):
+1. `src/mobile/src/main/kotlin/com/mirror/mobile/integration/MissionController.kt`
+2. `src/mobile/src/main/kotlin/com/mirror/mobile/integration/BackendAdapter.kt`
+3. `src/mobile/src/main/kotlin/com/mirror/mobile/api/JsonParsing.kt` and `MirrorApi.kt`
+4. `src/mobile/src/main/kotlin/com/mirror/mobile/capture/CameraCapture.kt` (CameraX 1.3.4 API use, coroutine resume safety)
+5. `src/core/engine.py` and `src/core/policy.py` (verifier grounding logic, policy regex gaps)
+
+Specifically look for: any path where the app or backend could report success without a verified step; a coroutine that can resume twice; unhandled exceptions; regexes in `policy.py` that over-block or under-block common household goals. Mark anything you are unsure of `UNVERIFIED`.
+
+Paste-ready prompt (Copilot Chat, with the files above open or attached):
+
+```
+You are the reviewer seat (copilot) for the MIRROR repo. Do not edit any file in src/. Read AGENTS.md and docs/tasks/BRIEFS.md (section "copilot: T-025"). Review MissionController.kt, BackendAdapter.kt, JsonParsing.kt, MirrorApi.kt, CameraCapture.kt, engine.py and policy.py. Report each problem as file:line, what is wrong, and a suggested fix. Focus on: any way the app or backend could claim success without a verified step, a coroutine that can resume twice (CameraCapture), unhandled exceptions, and regex gaps in policy.py. Mark guesses UNVERIFIED. Put the findings in docs/status/copilot.md and nowhere else.
+```
+
+## About the extra models Ram added
+
+The seats can use stronger models for the same tasks. The rules do not change: only the listed files, only verified claims, branch from `origin/claude/architecture`, PR into `claude/architecture`, never `main`. A stronger model is a good fit for T-020 and T-021.
