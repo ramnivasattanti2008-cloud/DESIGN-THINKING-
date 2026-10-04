@@ -1,18 +1,11 @@
 package com.mirror.mobile.app
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,13 +18,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.mirror.mobile.integration.AppScreen
 import com.mirror.mobile.api.ServerSettings
 import com.mirror.mobile.api.ServerConfig
 import com.mirror.mobile.integration.MissionController
 import com.mirror.ui.screens.ActionPlanScreen
+import com.mirror.ui.screens.CompletedScreen
+import com.mirror.ui.screens.ExecutingScreen
+import com.mirror.ui.screens.NoticeBanner
+import com.mirror.ui.screens.PhotoConsentDialog
+import com.mirror.ui.screens.ServerSettingsDialog
 import com.mirror.ui.screens.CameraViewScreen
 import com.mirror.ui.screens.HomeScreen
 import com.mirror.ui.screens.MissionSummaryScreen
@@ -42,8 +39,8 @@ import kotlinx.coroutines.launch
 
 /**
  * Real app host. Replaces the UI seat's nav host and view model (not compiled into this module, see
- * build.gradle.kts) with the UI seat's screens driven by [MissionController], so every plan and every
- * verification result comes from the backend.
+ * build.gradle.kts) with the UI seat's screens and components driven by [MissionController], so every
+ * plan and every verification result comes from the backend.
  */
 @Composable
 fun MirrorApp(
@@ -56,6 +53,7 @@ fun MirrorApp(
     val ui by controller.data.collectAsState()
     val scope = rememberCoroutineScope()
     var showServer by remember { mutableStateOf(false) }
+    var serverError by remember { mutableStateOf<String?>(null) }
     val goal = ui.goalText
 
     MirrorTheme {
@@ -127,25 +125,28 @@ fun MirrorApp(
                     ) { Text("Server") }
                 }
                 if (showServer && serverSettings != null) {
-                    ServerSettingsDialog(serverSettings, allowHttp) { showServer = false }
+                    val current = remember { serverSettings.current() }
+                    ServerSettingsDialog(
+                        initialUrl = current.baseUrl,
+                        initialKey = current.apiKey,
+                        error = serverError,
+                        onSave = { url, key ->
+                            val problem = ServerConfig.problem(url, allowHttp)
+                            if (problem != null) {
+                                serverError = problem
+                            } else {
+                                serverSettings.save(ServerConfig(ServerConfig.cleanUrl(url).orEmpty(), key.trim()))
+                                serverError = null
+                                showServer = false
+                            }
+                        },
+                        onClose = { serverError = null; showServer = false }
+                    )
                 }
                 if (app.busy) CircularProgressIndicator(Modifier.align(Alignment.Center))
 
                 if (app.awaitingConsent) {
-                    AlertDialog(
-                        onDismissRequest = controller::declineConsent,
-                        title = { Text("Send photos for this task?") },
-                        text = {
-                            Text(
-                                "MIRROR sends the photos you take to your MIRROR server, which may pass them to a " +
-                                    "cloud AI model so it can see what is in your space. MIRROR does not store the " +
-                                    "photos; the AI provider terms apply. Do not photograph people, documents or " +
-                                    "screens. If you say no, nothing is taken or sent."
-                            )
-                        },
-                        confirmButton = { Button(onClick = controller::grantConsent) { Text("Allow for this task") } },
-                        dismissButton = { OutlinedButton(onClick = controller::declineConsent) { Text("Do not allow") } }
-                    )
+                    PhotoConsentDialog(onAllow = controller::grantConsent, onDecline = controller::declineConsent)
                 }
 
                 ui.activeAlert?.let { alert ->
@@ -159,94 +160,4 @@ fun MirrorApp(
             }
         }
     }
-}
-
-@Composable
-private fun NoticeBanner(text: String, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.statusBarsPadding().padding(12.dp).fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 6.dp
-    ) {
-        Text(text, Modifier.padding(14.dp), color = MaterialTheme.colorScheme.onSurface)
-    }
-}
-
-/** Minimal functional screen: the person does the physical step, then asks MIRROR to check it. */
-@Composable
-private fun ExecutingScreen(instruction: String, evidence: String, onDone: () -> Unit, onCancel: () -> Unit) {
-    Column(
-        Modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
-    ) {
-        Text("Do this step", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
-        Text(instruction, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
-        Text("MIRROR will look for: $evidence", color = MaterialTheme.colorScheme.onBackground)
-        Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) { Text("I did it. Check with the camera") }
-        OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) { Text("Cancel mission") }
-    }
-}
-
-/** Reached only after the backend reports `completed`, which needs at least one verified step. */
-@Composable
-private fun CompletedScreen(verifiedSteps: Int, onDone: () -> Unit) {
-    Column(
-        Modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
-    ) {
-        Text("Done and verified", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
-        Text(
-            "The camera confirmed $verifiedSteps step(s), and a fresh scan shows nothing left to do.",
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) { Text("Back to start") }
-    }
-}
-
-/** Server address and optional API key, editable on the phone. Development convenience. */
-@Composable
-private fun ServerSettingsDialog(settings: ServerSettings, allowHttp: Boolean, onClose: () -> Unit) {
-    val start = remember { settings.current() }
-    var url by remember { mutableStateOf(start.baseUrl) }
-    var key by remember { mutableStateOf(start.apiKey) }
-    var error by remember { mutableStateOf<String?>(null) }
-    AlertDialog(
-        onDismissRequest = onClose,
-        title = { Text("Server") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = url,
-                    onValueChange = { url = it; error = null },
-                    label = { Text("Server address") },
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = key,
-                    onValueChange = { key = it },
-                    label = { Text("API key (optional)") },
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation()
-                )
-                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                Text(
-                    "For development. A key stored in the app can be extracted.",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = {
-                val problem = ServerConfig.problem(url, allowHttp)
-                if (problem != null) {
-                    error = problem
-                } else {
-                    settings.save(ServerConfig(ServerConfig.cleanUrl(url).orEmpty(), key.trim()))
-                    onClose()
-                }
-            }) { Text("Save") }
-        },
-        dismissButton = { OutlinedButton(onClick = onClose) { Text("Cancel") } }
-    )
 }
