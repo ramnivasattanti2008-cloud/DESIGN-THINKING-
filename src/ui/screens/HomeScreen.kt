@@ -38,11 +38,11 @@ fun HomeScreen(
     var isListening by remember { mutableStateOf(false) }
 
     val presetGoals = listOf(
-        "Prepare desk for focused study",
-        "Clear workspace and tidy desk",
+        "Get this desk ready to study",
+        "Tidy my work table",
+        "Set up my kitchen counter for cooking",
         "Find missing pen and notebook",
-        "Check room lighting & ventilation",
-        "[Safety Refusal Demo] Inspect electrical socket wiring"
+        "Check room lighting & ventilation"
     )
 
     Scaffold(

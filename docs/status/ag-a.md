@@ -3,53 +3,35 @@
 Last updated: 2026-10-04
 
 ## Done
-- Completed final frontend integration and polish pass connecting the UI layer directly to the FastAPI `/v1` backend contract:
-  - `src/ui/screens/HomeScreen.kt`:
-    - Updated quick task presets to clean supported MVP tasks ("Prepare desk for focused study", "Clear workspace and tidy desk", "Find missing pen and notebook", "Check room lighting & ventilation").
-    - Explicitly labeled safety refusal demo: `"[Safety Refusal Demo] Inspect electrical socket wiring"` so users and evaluators can test Tier A3 PolicyGate block deliberately without false positives on standard presets.
-    - Updated text field placeholder to reflect space preparation goal.
-  - `src/ui/screens/MissionSummaryScreen.kt`:
-    - Decoupled from hardcoded cable wiring text.
-    - Made task decomposition, detected items, missing prerequisites, and safety preconditions fully dynamic based on perceived scene state.
-  - `src/ui/screens/VerificationScreen.kt`:
-    - Added explicit `UNCERTAIN (CANNOT_TELL)` status rendering matching backend `cannot_tell` responses (0.0 confidence, frame quality warning, no false success).
-    - Added dedicated retake photo button for uncertain states.
-  - `src/ui/model/MirrorModels.kt`:
-    - Added `status` field to `VerificationResult` ("verified", "not_verified", "cannot_tell") for contract parity.
-  - `src/ui/viewmodel/MissionViewModel.kt`:
-    - Forwarded backend verification status directly to `VerificationResult`.
-    - Maintained strict invariant: no step or mission can be marked complete unless verification passes.
-  - `src/ui/navigation/MirrorNavHost.kt`:
-    - Forwarded dynamic detected tools, missing prerequisites, and interpreted intent from `uiState` to `MissionSummaryScreen`.
-    - Updated recent mission goals to safe supported task ("Prepare space to study").
-  - `src/ui/web_preview/index.html` & `public/index.html`:
-    - Integrated live `/v1` HTTP client with health check (`GET http://localhost:8000/v1/health`).
-    - Added live API calls to `/v1/sessions`, `/v1/sessions/{id}/observe`, `/v1/sessions/{id}/plan`, and `/v1/sessions/{id}/verify`.
-    - Added seamless contract-compliant client fallback when the backend is offline or CORS-restricted.
-    - Interactive toolbar buttons allowing instant testing of all contract modes:
-      - `✔ /verify: verified (0.92)`
-      - `❓ /verify: cannot_tell (0.0)`
-      - `🎯 /plan: no_action_needed`
-      - `👤 /plan: needs_human`
-      - `🚫 /sessions: A3 block`
-- Test suite: **81 / 81 tests passing** (`.venv\Scripts\python -m pytest`).
+- **Task T-020 (UI cleanup & decoupling) completed**:
+  - **CameraViewScreen compile error fixed**: Line 171 corrected from `horizontalAlignment = Alignment.CenterVertically` to `Alignment.CenterHorizontally`.
+  - **Removed fake perception & telemetry**: Removed misleading fake detection bounding boxes ("Desk Cable Clutter (Conf: 94%)", "Zip-Ties (Found)") and fake sensor numbers ("380 lx", "Camera Stable") from `src/ui/screens/CameraViewScreen.kt`. Replaced with an honest viewfinder aiming reticle ("Framing Target Area") and framing guidance ("Align scene in frame"). Real scene capture occurs strictly via `onSceneCaptured`.
+  - **MVP-safe presets on HomeScreen**: Replaced the electrical wiring preset with the requested MVP-safe presets in `src/ui/screens/HomeScreen.kt`:
+    - "Get this desk ready to study"
+    - "Tidy my work table"
+    - "Set up my kitchen counter for cooking"
+    - "Find missing pen and notebook"
+    - "Check room lighting & ventilation"
+  - **Optional hazard button on ActionPlanScreen**: Updated `ActionPlanScreen.kt` to make `onTriggerSafetyHazard: (() -> Unit)? = null` nullable and optional. When null (as in real app flows), the button is completely hidden from the layout.
+  - **Screen decoupling verified**: Verified that all screens in `src/ui/screens/` depend strictly on `com.mirror.ui.model`, `components`, and `theme`. Zero imports from `navigation`, `network`, or `viewmodel`.
+  - **Browser preview aligned**: Updated `src/ui/web_preview/index.html` and `public/index.html` with clean framing reticles, MVP-safe presets, and live `/v1` health check / API endpoints with contract-compliant client fallback.
+  - **Pytest test suite verified**: Ran `.venv\Scripts\python -m pytest` -> **81 / 81 tests passing**.
 
-## In progress
-- None (frontend integration and polish complete).
+## Half done
+- None.
 
 ## Next
-- Hand off to Android packaging (`src/mobile/`) when Claude finishes T-010.
+- PR into `claude/architecture` for Claude's review and Ram's merge.
+- `ag-b` can run Android CI (`:app:assembleDebug` and `:app:testDebugUnitTest`) knowing the Kotlin compiler error in `CameraViewScreen.kt` is resolved.
 
 ## Blockers / requests
-- None. Claude's note regarding the electrical preset mismatch in `docs/status/claude.md` has been fully addressed.
+- **Local Gradle status**: Java JDK is not installed in the local host environment (`java` not recognized on PATH), so `:app` build was not run locally. Per the integrity rules, no local compile claim is made; compilation should be verified on GitHub Actions runners via `android.yml`.
+- **Recommendation on excluded folders**: Regarding `src/ui/navigation/`, `src/ui/network/`, and `src/ui/viewmodel/` (which are excluded from the Android build), we recommend keeping them as a reference architecture for the standalone web preview and test harnesses. Claude may archive or delete them if `src/mobile/` is the sole desired host.
 
-## Files I touched
+## Files touched
+- `src/ui/screens/CameraViewScreen.kt`
 - `src/ui/screens/HomeScreen.kt`
-- `src/ui/screens/MissionSummaryScreen.kt`
-- `src/ui/screens/VerificationScreen.kt`
-- `src/ui/model/MirrorModels.kt`
-- `src/ui/navigation/MirrorNavHost.kt`
-- `src/ui/viewmodel/MissionViewModel.kt`
+- `src/ui/screens/ActionPlanScreen.kt`
 - `src/ui/web_preview/index.html`
 - `public/index.html`
 - `docs/status/ag-a.md`

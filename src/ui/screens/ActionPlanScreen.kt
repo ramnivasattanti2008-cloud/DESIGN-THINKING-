@@ -30,7 +30,7 @@ fun ActionPlanScreen(
     activeStepIndex: Int,
     onStepSelected: (Int) -> Unit,
     onConfirmPlanAndExecute: () -> Unit,
-    onTriggerSafetyHazard: () -> Unit,
+    onTriggerSafetyHazard: (() -> Unit)? = null,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -94,29 +94,31 @@ fun ActionPlanScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                if (onTriggerSafetyHazard != null) {
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                OutlinedButton(
-                    onClick = onTriggerSafetyHazard,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(46.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MirrorCritical),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MirrorCriticalMuted),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = "Simulate Hazard",
-                        tint = MirrorCritical,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Simulate Environmental Hazard Alert",
-                        fontSize = 12.sp,
-                        color = MirrorCritical
-                    )
+                    OutlinedButton(
+                        onClick = onTriggerSafetyHazard,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(46.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MirrorCritical),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MirrorCriticalMuted),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Simulate Hazard",
+                            tint = MirrorCritical,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Simulate Environmental Hazard Alert",
+                            fontSize = 12.sp,
+                            color = MirrorCritical
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

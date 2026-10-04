@@ -65,55 +65,29 @@ fun CameraViewScreen(
                     .border(1.dp, MirrorBorder, RoundedCornerShape(16.dp))
             )
 
-            // Simulated Detected Physical Object 1 (Bounding Box)
+            // Viewfinder Aiming Reticle (Framing Guide)
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .offset(x = (-30).dp, y = (-20).dp)
-                    .size(width = 160.dp, height = 110.dp)
-                    .border(2.dp, MirrorCyan, RoundedCornerShape(8.dp))
-                    .background(MirrorCyanGlow)
+                    .size(width = 240.dp, height = 180.dp)
+                    .border(1.5.dp, MirrorCyan.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
             ) {
                 Surface(
-                    color = MirrorSurfaceElevated,
-                    shape = RoundedCornerShape(topStart = 6.dp, bottomEnd = 6.dp),
+                    color = MirrorSurfaceElevated.copy(alpha = 0.85f),
+                    shape = RoundedCornerShape(bottomEnd = 6.dp),
                     modifier = Modifier.align(Alignment.TopStart)
                 ) {
                     Text(
-                        text = "Desk Cable Clutter (Conf: 94%)",
+                        text = "Framing Target Area",
                         fontSize = 10.sp,
                         color = MirrorCyan,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                 }
             }
 
-            // Simulated Detected Physical Object 2 (Tool Detection)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .offset(x = 45.dp, y = (-180).dp)
-                    .size(width = 110.dp, height = 70.dp)
-                    .border(1.5.dp, MirrorSuccess, RoundedCornerShape(8.dp))
-                    .background(MirrorSuccessMuted)
-            ) {
-                Surface(
-                    color = MirrorSurfaceElevated,
-                    shape = RoundedCornerShape(topStart = 6.dp, bottomEnd = 6.dp),
-                    modifier = Modifier.align(Alignment.TopStart)
-                ) {
-                    Text(
-                        text = "Zip-Ties (Found)",
-                        fontSize = 10.sp,
-                        color = MirrorSuccess,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                    )
-                }
-            }
-
-            // Real-Time Sensor Telemetry Overlay
+            // Real-Time Camera Telemetry & Framing Guidance (Honest, non-fabricated)
             Card(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -129,23 +103,12 @@ fun CameraViewScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Illumination",
+                            contentDescription = "Guidance",
                             tint = MirrorCyan,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("380 lx", fontSize = 11.sp, color = TextPrimary)
-                    }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(MirrorSuccess)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Camera Stable", fontSize = 11.sp, color = TextPrimary)
+                        Text("Align scene in frame", fontSize = 11.sp, color = TextPrimary)
                     }
 
                     IconButton(
@@ -168,7 +131,7 @@ fun CameraViewScreen(
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .padding(20.dp),
-                horizontalAlignment = Alignment.CenterVertically
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Goal Pill
                 Surface(
