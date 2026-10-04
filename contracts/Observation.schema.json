@@ -1,0 +1,35 @@
+{
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "label": {
+      "title": "Label",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "where_hint": {
+      "default": "",
+      "title": "Where Hint",
+      "type": "string"
+    },
+    "source_frame": {
+      "title": "Source Frame",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "label",
+    "confidence",
+    "source_frame"
+  ],
+  "title": "Observation",
+  "type": "object"
+}

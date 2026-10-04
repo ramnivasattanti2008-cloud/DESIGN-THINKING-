@@ -1,0 +1,17 @@
+[project]
+name = "mirror"
+version = "0.1.0"
+description = "MIRROR backend: perception, plan, policy gate and verification loop"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.110",
+  "pydantic>=2",
+  "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27"]
+
+[tool.pytest.ini_options]
+testpaths = ["src/core/tests", "tests"]
+pythonpath = ["."]

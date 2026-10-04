@@ -1,0 +1,47 @@
+{
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "blur": {
+      "default": 0.0,
+      "description": "0 sharp, 1 unusable",
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Blur",
+      "type": "number"
+    },
+    "brightness": {
+      "default": 0.5,
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Brightness",
+      "type": "number"
+    },
+    "data_b64": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Data B64"
+    },
+    "fake_labels": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Fake Labels",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "Frame",
+  "type": "object"
+}

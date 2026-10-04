@@ -1,0 +1,39 @@
+{
+  "$defs": {
+    "Tier": {
+      "enum": [
+        "A0",
+        "A1",
+        "A2",
+        "A3"
+      ],
+      "title": "Tier",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "step_id": {
+      "title": "Step Id",
+      "type": "string"
+    },
+    "tier": {
+      "$ref": "#/$defs/Tier"
+    },
+    "decision": {
+      "title": "Decision",
+      "type": "string"
+    },
+    "rule_id": {
+      "title": "Rule Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "step_id",
+    "tier",
+    "decision",
+    "rule_id"
+  ],
+  "title": "GateDecision",
+  "type": "object"
+}

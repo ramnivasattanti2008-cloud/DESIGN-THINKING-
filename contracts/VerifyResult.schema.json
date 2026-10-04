@@ -1,0 +1,49 @@
+{
+  "$defs": {
+    "VerifyStatus": {
+      "enum": [
+        "verified",
+        "not_verified",
+        "cannot_tell"
+      ],
+      "title": "VerifyStatus",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "step_id": {
+      "title": "Step Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/VerifyStatus"
+    },
+    "evidence_seen": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Seen",
+      "type": "array"
+    },
+    "evidence_missing": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Missing",
+      "type": "array"
+    },
+    "frame_quality": {
+      "default": "ok",
+      "title": "Frame Quality",
+      "type": "string"
+    }
+  },
+  "required": [
+    "step_id",
+    "status"
+  ],
+  "title": "VerifyResult",
+  "type": "object"
+}

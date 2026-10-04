@@ -3,20 +3,21 @@
 Last updated: 2026-10-04
 
 ## Done
-- Coordination files (earlier setup commit).
-- T-001, T-002: goal in PROJECT_STATE, D-001 stack decision.
-- T-009: architecture docs in `docs/architecture/` (branch `claude/architecture`, needs Ram's review).
+- Coordination files, T-001, T-002, T-009 (architecture docs).
+- T-008 (review): `contracts/*.schema.json` generated from `src/core/models.py` (`python -m contracts.generate`), `db/schema.sql`, `/v1` API in `src/api/main.py`.
+- T-003 backend part: `pyproject.toml`, `.env.example`, `src/core/` (models, policy gate, fake ModelClient, session engine), tests in `src/core/tests/`.
+- Branch `claude/architecture`. 36 tests pass with `.venv/Scripts/python -m pytest` (deps: `pip install -e .[dev]`).
+- Fixed a policy gap found by a test: plural words ("pills") were not matched by the A3 rules.
 
 ## In progress
-- Nothing.
+- Nothing half done.
 
 ## Next
-- T-003 scaffold and T-008 contracts, after Ram answers D-002 and the checklist section 0.
+- T-010 Android Gradle skeleton. Review the other seats' local work when it arrives as PRs.
 
 ## Blockers / requests
-- Ram: decide D-002 (cloud-first vs on-device), model provider and budget, frame opt-in wording, success targets.
+- Ram: D-002, model provider and budget, frame opt-in wording, success targets.
+- Not verified: uvicorn server start, anything on a real phone, any real model.
 
 ## Files I touched
-- `docs/architecture/*`, `docs/TASKS.md`, `docs/DECISIONS.md`, `docs/PROJECT_STATE.md`, `docs/ROLES.md`, `docs/status/claude.md`
-
-Nothing has been run or tested. This is documentation only.
+- `docs/architecture/*`, `docs/*.md`, `docs/status/claude.md`, `pyproject.toml`, `.env.example`, `contracts/`, `db/schema.sql`, `src/__init__.py`, `src/core/`, `src/api/`
