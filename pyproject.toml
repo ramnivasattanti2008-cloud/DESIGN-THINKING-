@@ -14,5 +14,5 @@ dependencies = [
 dev = ["pytest>=8", "httpx>=0.27", "cryptography>=42", "hypothesis>=6"]
 
 [tool.pytest.ini_options]
-testpaths = ["src/core/tests", "tests"]
+testpaths = ["src/core/tests", "tests", "tools"]
 pythonpath = ["."]
