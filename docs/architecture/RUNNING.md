@@ -1,0 +1,49 @@
+# Running MIRROR (backend + Android app)
+
+## Backend
+
+```bash
+python -m venv .venv
+.venv/Scripts/python -m pip install -e ".[dev]"      # Windows; use .venv/bin/python on macOS/Linux
+.venv/Scripts/python -m pytest                        # backend tests
+.venv/Scripts/python -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+```
+
+Providers (env, see `.env.example`):
+- `MIRROR_MODEL_PROVIDER=fake` (default): reads labels from test input. No real perception.
+- `MIRROR_MODEL_PROVIDER=anthropic` with `MIRROR_MODEL_API_KEY` set: real vision calls. Not yet exercised against the live API.
+
+## Android app
+
+One Gradle module (`:app`) built from `src/mobile` (integration, owned by `claude`) plus `src/ui` (screens, owned by `ag-a`, compiled unchanged).
+
+Needs JDK 17 and the Android SDK (platform 34, build-tools 34.0.0). Put the SDK path in `local.properties` (`sdk.dir=...`, git-ignored).
+
+```bash
+./gradlew :app:testDebugUnitTest          # JVM unit tests (controller, adapter, parsing, metrics)
+./gradlew :app:assembleDebug              # debug APK
+```
+
+Backend address is baked in at build time:
+- Emulator: default `http://10.0.2.2:8000`.
+- Real phone on the same Wi-Fi: `./gradlew :app:assembleDebug -PmirrorBackendUrl=http://<your-pc-lan-ip>:8000`, and allow port 8000 through the PC firewall.
+
+Debug builds allow plain http for this; release builds should use https.
+
+## The loop in the app
+
+`HOME` goal -> `CAMERA` real photo -> backend `observe` + `plan` -> `SUMMARY` -> `PLAN` -> `EXECUTING` (person does the step) -> real photo -> backend `verify` -> `VERIFICATION` -> accept (only if verified with confidence >= 0.85) -> next plan, until the backend reports `completed`.
+
+## Success rules (enforced in both layers)
+
+1. A step passes only when the backend status is `verified` and confidence >= 0.85. `not_verified`, `cannot_tell` and any unknown status never pass.
+2. The mission screen "Done and verified" is reachable only from a backend `completed` outcome, which needs at least one verified step and a fresh scan with nothing left to do.
+3. "Nothing to change" is reported as such, never as success.
+4. Unsafe goals are refused before any scan. Hazards seen in the scene stop the flow; there is no override.
+5. Server, model or camera failures show a message and change no state toward success.
+
+## Known limits
+
+- The planner is a rule template (study / work / cook plus clutter and hazards), not a model. With the Anthropic provider only perception is real.
+- `ag-a`'s camera screen draws a simulated HUD (sample boxes, sample sensor numbers). The photo MIRROR actually sends is a separate real capture. Their screens are unchanged.
+- Blur and brightness thresholds, the confidence formula and the 0.85 bar are heuristics, not calibrated.

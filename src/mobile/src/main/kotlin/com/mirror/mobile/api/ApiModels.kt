@@ -1,7 +1,7 @@
 package com.mirror.mobile.api
 
 /**
- * App-side view of the backend `/v1` API. Mirrors contracts/*.schema.json and src/api/main.py.
+ * App-side view of the backend `/v1` API. Mirrors the JSON Schemas in contracts/ and src/api/main.py.
  * Change the contract first, then this file.
  */
 
