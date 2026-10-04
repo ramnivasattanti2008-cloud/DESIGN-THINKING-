@@ -1,0 +1,55 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ main, "claude/*", "ag-*" ]
+  pull_request:
+    branches: [ main, "claude/*" ]
+
+jobs:
+  build-and-test:
+    name: Android Unit Tests & Debug Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "platforms;android-34 build-tools;34.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Build Debug APK
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-unit-test-report
+          path: src/mobile/build/reports/tests/testDebugUnitTest/
+          if-no-files-found: ignore
+
+      - name: Upload Debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mirror-debug-apk
+          path: src/mobile/build/outputs/apk/debug/*.apk
+          if-no-files-found: ignore

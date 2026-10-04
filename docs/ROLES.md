@@ -5,12 +5,13 @@ Folder ownership is what keeps two tools from editing the same file. The folders
 | Path | Owner | Notes |
 |---|---|---|
 | `/` (repo root files, config, CI, dependencies) | `claude` | Ask for changes, don't make them |
-| `src/core/`, `src/api/`, `db/`, `deploy/` | `claude` | Core logic, API, schema, hosting config. `claude` may hand a small piece to `ag-c` by naming the exact files in `TASKS.md` |
+| `src/core/`, `src/api/`, `src/mobile/`, `contracts/`, `db/`, `deploy/`, `docs/architecture/` | `claude` | Core logic, API, schema, hosting config. `claude` may hand a small piece to `ag-c` by naming the exact files in `TASKS.md` |
 | `src/ui/`, `public/`, `assets/` | `ag-a` | Screens, components, styling |
 | `tests/`, `.github/workflows/` | `ag-b` | Tests, CI. Workflow changes go through `claude` for review |
 | `research/`, `data/`, `prompts/`, `experiments/` | `studio-a` | Every claim needs a source in `research/sources.md` |
 | `docs/report/`, `docs/slides/`, `README.md` | `studio-b` | Writing and presentation material |
 | `docs/TASKS.md`, `docs/PROJECT_STATE.md`, `docs/DECISIONS.md` | `claude` | Everyone reads, one person writes |
+| `tools/`, `docs/status/copilot.md` | `copilot` | Small standalone developer tools (T-026). Ram applies the output; no other folders |
 | `docs/status/<seat>.md` | that seat | Each seat edits only its own file |
 
 ## Cross-lane requests

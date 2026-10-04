@@ -1,0 +1,19 @@
+{
+  "description": "Response of GET /v1/health.",
+  "properties": {
+    "ok": {
+      "title": "Ok",
+      "type": "boolean"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "provider"
+  ],
+  "title": "Health",
+  "type": "object"
+}

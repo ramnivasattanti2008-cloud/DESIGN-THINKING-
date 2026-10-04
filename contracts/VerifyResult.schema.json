@@ -1,0 +1,62 @@
+{
+  "$defs": {
+    "VerifyStatus": {
+      "enum": [
+        "verified",
+        "not_verified",
+        "cannot_tell"
+      ],
+      "title": "VerifyStatus",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "step_id": {
+      "title": "Step Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/VerifyStatus"
+    },
+    "evidence_seen": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Seen",
+      "type": "array"
+    },
+    "evidence_missing": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Missing",
+      "type": "array"
+    },
+    "frame_quality": {
+      "default": "ok",
+      "title": "Frame Quality",
+      "type": "string"
+    },
+    "confidence": {
+      "default": 0.0,
+      "description": "heuristic, calibration UNVERIFIED",
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "reason": {
+      "default": "",
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "step_id",
+    "status"
+  ],
+  "title": "VerifyResult",
+  "type": "object"
+}

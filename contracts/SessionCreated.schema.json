@@ -1,0 +1,79 @@
+{
+  "$defs": {
+    "GateDecision": {
+      "properties": {
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        },
+        "tier": {
+          "$ref": "#/$defs/Tier"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step_id",
+        "tier",
+        "decision",
+        "rule_id"
+      ],
+      "title": "GateDecision",
+      "type": "object"
+    },
+    "Tier": {
+      "enum": [
+        "A0",
+        "A1",
+        "A2",
+        "A3"
+      ],
+      "title": "Tier",
+      "type": "string"
+    }
+  },
+  "description": "Response of POST /v1/sessions.",
+  "properties": {
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "interpreted_intent": {
+      "title": "Interpreted Intent",
+      "type": "string"
+    },
+    "goal_gate": {
+      "$ref": "#/$defs/GateDecision"
+    },
+    "blocked": {
+      "title": "Blocked",
+      "type": "boolean"
+    },
+    "message": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Message"
+    }
+  },
+  "required": [
+    "session_id",
+    "interpreted_intent",
+    "goal_gate",
+    "blocked"
+  ],
+  "title": "SessionCreated",
+  "type": "object"
+}

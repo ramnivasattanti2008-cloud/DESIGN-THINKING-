@@ -1,0 +1,59 @@
+{
+  "$defs": {
+    "Tier": {
+      "enum": [
+        "A0",
+        "A1",
+        "A2",
+        "A3"
+      ],
+      "title": "Tier",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "instruction": {
+      "title": "Instruction",
+      "type": "string"
+    },
+    "tier": {
+      "$ref": "#/$defs/Tier"
+    },
+    "tier_reason": {
+      "default": "",
+      "title": "Tier Reason",
+      "type": "string"
+    },
+    "expected_evidence": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Expected Evidence",
+      "type": "array"
+    },
+    "rollback_hint": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rollback Hint"
+    }
+  },
+  "required": [
+    "id",
+    "instruction",
+    "tier"
+  ],
+  "title": "Step",
+  "type": "object"
+}

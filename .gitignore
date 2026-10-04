@@ -17,3 +17,15 @@ build/
 .DS_Store
 .idea/
 .vscode/
+.uvicorn.log
+.http.log
+
+# android / gradle
+local.properties
+.gradle/
+build/
+*.apk
+.gradle-test.log
+.kotlin/
+.verify/
+certs/
