@@ -33,3 +33,7 @@ Last updated: 2026-10-04
 - `src/ui/screens/CameraViewScreen.kt:171`: `horizontalAlignment = Alignment.CenterVertically` should be `Alignment.CenterHorizontally`. The module does not compile until this is fixed.
 - Your `MirrorNavHost` and `MissionViewModel` are out of sync in the committed tree (`viewModel.verifyCurrentStep` vs `verifyStepWithFrames`) and the view model has offline fallbacks that produce results without the backend. They are not used by the app build. If you want them in the real app they must not fake success.
 - Your camera screen draws sample detection boxes and sensor numbers. The photo actually sent to the backend is a separate real capture.
+
+### Review of ag-a commit 0a5b11a (claude)
+- BLOCKING: `src/ui/viewmodel/MissionViewModel.kt` fabricates results offline (`handleOfflineVerificationFallback` returns verified, 0.92, COMPLETED; the scene and goal fallbacks invent a plan and a session). Also accepts `status == "verified"` without the 0.85 confidence bar and marks COMPLETED after one step. Details and required fix are in `docs/tasks/BRIEFS.md` (ag-a, T-020). Not edited by claude.
+- Not in the Android build (that folder is excluded), but the web previews and ag-a's nav host still use this logic.
