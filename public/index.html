@@ -2,870 +2,997 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIRROR - Embodied AI Assistant (Live Gemini Powered)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MIRROR • Apple Intelligence Vision Assistant</title>
   <style>
     :root {
-      --mirror-obsidian: #0D0F15;
-      --mirror-surface: #161922;
-      --mirror-elevated: #212534;
-      --mirror-border: #2E3547;
-      --mirror-cyan: #00F0FF;
-      --mirror-cyan-glow: rgba(0, 240, 255, 0.2);
-      --mirror-blue: #387BFF;
-      --mirror-success: #00E676;
-      --mirror-success-glow: rgba(0, 230, 118, 0.2);
-      --mirror-warning: #FFB800;
-      --mirror-warning-glow: rgba(255, 184, 0, 0.2);
-      --mirror-critical: #FF3B30;
-      --mirror-critical-glow: rgba(255, 59, 48, 0.2);
-      --mirror-uncertain: #A855F7;
-      --mirror-uncertain-glow: rgba(168, 85, 247, 0.2);
-      --text-primary: #F3F4F6;
-      --text-secondary: #9CA3AF;
-      --text-muted: #6B7280;
+      /* Apple iOS 18 Design Tokens */
+      --apple-bg: #000000;
+      --apple-surface: rgba(28, 28, 30, 0.65);
+      --apple-surface-elevated: rgba(44, 44, 46, 0.75);
+      --apple-card: rgba(30, 30, 32, 0.70);
+      --apple-border: rgba(255, 255, 255, 0.12);
+      --apple-border-strong: rgba(255, 255, 255, 0.22);
+      --apple-blue: #007AFF;
+      --apple-blue-pressed: #0062CC;
+      --apple-teal: #30B0C7;
+      --apple-green: #34C759;
+      --apple-green-bg: rgba(52, 199, 89, 0.15);
+      --apple-yellow: #FFCC00;
+      --apple-orange: #FF9500;
+      --apple-red: #FF3B30;
+      --apple-red-bg: rgba(255, 59, 48, 0.18);
+      --apple-purple: #AF52DE;
+      --apple-text-primary: #FFFFFF;
+      --apple-text-secondary: rgba(235, 235, 245, 0.60);
+      --apple-text-tertiary: rgba(235, 235, 245, 0.38);
+      --apple-glass-blur: blur(35px) saturate(190%);
+      --apple-radius-sm: 10px;
+      --apple-radius-md: 16px;
+      --apple-radius-lg: 24px;
+      --apple-radius-xl: 38px;
+      --apple-spring: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
-      background: #07080C;
-      color: var(--text-primary);
+      background: #000000;
+      color: var(--apple-text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px 12px;
-      user-select: none;
+      justify-content: center;
+      padding: 20px 10px;
+      overflow-x: hidden;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    header h1 {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--mirror-cyan);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-shadow: 0 0 16px var(--mirror-cyan-glow);
-    }
-    header p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 4px;
+    /* Ambient Apple Intelligence Aura in background */
+    .ambient-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 900px;
+      background: radial-gradient(circle at 50% 30%, rgba(0, 122, 255, 0.12), rgba(175, 82, 222, 0.08) 50%, transparent 70%);
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
     }
 
-    /* Live Backend Status Bar */
-    .backend-bar {
+    /* iPhone 16 Pro Max Hardware Container */
+    .iphone-device {
+      width: 412px;
+      max-width: 96vw;
+      height: 870px;
+      background: #000000;
+      border-radius: 54px;
+      position: relative;
+      box-shadow: 
+        0 0 0 4px #262628,
+        0 0 0 6px #121214,
+        0 25px 80px rgba(0, 0, 0, 0.95),
+        0 0 50px rgba(0, 122, 255, 0.12);
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* Apple Intelligence Luminescent Border Glow */
+    .iphone-device::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 56px;
+      padding: 2px;
+      background: conic-gradient(from 180deg at 50% 50%, #007AFF, #30B0C7, #AF52DE, #FF2D55, #FF9500, #007AFF);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.35;
+      animation: rotateGlow 8s linear infinite;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    @keyframes rotateGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Dynamic Island */
+    .dynamic-island-container {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 124px;
+      height: 35px;
+      background: #000000;
+      border-radius: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+      transition: all 0.4s var(--apple-spring);
+      cursor: pointer;
+    }
+    .dynamic-island-container:hover {
+      width: 220px;
+    }
+    .island-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #1C1C1E;
+      display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--mirror-surface);
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--mirror-border);
-      margin-bottom: 14px;
-      font-size: 12px;
-      max-width: 600px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
-    .backend-dot {
-      width: 10px;
-      height: 10px;
+    .island-sensor {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: var(--text-muted);
-      transition: all 0.3s;
+      background: var(--apple-green);
+      box-shadow: 0 0 6px var(--apple-green);
+      animation: pulseSens 2s infinite;
     }
-    .backend-dot.online {
-      background: var(--mirror-success);
-      box-shadow: 0 0 10px var(--mirror-success);
+    @keyframes pulseSens {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
     }
-    .backend-dot.offline {
-      background: var(--mirror-warning);
-    }
-    .btn-xs {
-      background: var(--mirror-elevated);
-      color: var(--text-secondary);
-      border: 1px solid var(--mirror-border);
-      border-radius: 6px;
-      padding: 4px 9px;
+    .island-text {
       font-size: 11px;
-      cursor: pointer;
-      transition: all 0.2s;
+      font-weight: 600;
+      color: #FFF;
+      letter-spacing: -0.2px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      white-space: nowrap;
     }
-    .btn-xs:hover {
-      color: var(--mirror-cyan);
-      border-color: var(--mirror-cyan);
-    }
-    .btn-xs.active {
-      background: var(--mirror-cyan);
-      color: #000;
-      font-weight: bold;
+    .dynamic-island-container:hover .island-text {
+      opacity: 1;
     }
 
-    /* Journey Stage Stepper */
-    .journey-bar {
+    /* iOS Status Bar */
+    .ios-status-bar {
+      height: 52px;
+      padding: 14px 28px 0 28px;
       display: flex;
-      gap: 6px;
-      background: var(--mirror-surface);
-      border: 1px solid var(--mirror-border);
-      border-radius: 14px;
-      padding: 6px;
-      margin-bottom: 16px;
-      max-width: 420px;
-      width: 100%;
       justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      z-index: 90;
     }
-    .journey-node {
-      font-size: 11px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      color: var(--text-muted);
-      cursor: pointer;
-      text-align: center;
-      flex: 1;
-      transition: all 0.2s;
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
     }
-    .journey-node.active {
-      background: var(--mirror-elevated);
-      color: var(--mirror-cyan);
-      font-weight: 700;
-      border: 1px solid var(--mirror-border);
-      box-shadow: 0 0 8px var(--mirror-cyan-glow);
+    .battery-pill {
+      width: 24px;
+      height: 12px;
+      border: 1.5px solid #FFF;
+      border-radius: 4px;
+      padding: 1.5px;
+      display: flex;
+      align-items: center;
+    }
+    .battery-level {
+      width: 80%;
+      height: 100%;
+      background: #FFF;
+      border-radius: 1.5px;
     }
 
-    /* Mobile Phone Shell */
-    .phone-frame {
-      width: 390px;
-      max-width: 95vw;
-      min-height: 640px;
-      background: var(--mirror-obsidian);
-      border: 2px solid var(--mirror-border);
-      border-radius: 36px;
-      padding: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.08);
+    /* Screen Views Container */
+    .screen-viewport {
+      flex: 1;
       display: flex;
       flex-direction: column;
       position: relative;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 20px 24px 20px;
+      scrollbar-width: none;
     }
+    .screen-viewport::-webkit-scrollbar { display: none; }
 
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: var(--text-secondary);
-      padding: 4px 8px 12px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .screen {
+    /* Screen Transition */
+    .ios-screen {
       display: none;
       flex-direction: column;
-      gap: 14px;
-      flex: 1;
-      margin-top: 10px;
-      animation: fadeIn 0.25s ease-out;
+      gap: 16px;
+      animation: iosFadeIn 0.35s var(--apple-spring);
     }
-    .screen.active {
+    .ios-screen.active {
       display: flex;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+
+    @keyframes iosFadeIn {
+      0% { opacity: 0; transform: scale(0.98) translateY(6px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    .card {
-      background: var(--mirror-surface);
-      border: 1px solid var(--mirror-border);
-      border-radius: 16px;
-      padding: 14px;
+    /* Apple Navigation Bar */
+    .ios-nav-header {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
     }
-    .card-elevated {
-      background: var(--mirror-elevated);
-      border: 1px solid var(--mirror-border);
-      border-radius: 12px;
-      padding: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .card-elevated:hover {
-      border-color: var(--mirror-cyan);
-      transform: translateY(-1px);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 10px;
+    .ios-large-title {
+      font-size: 28px;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      align-self: flex-start;
+      letter-spacing: -0.6px;
+      color: #FFFFFF;
     }
-    .badge-cyan { background: var(--mirror-cyan-glow); color: var(--mirror-cyan); border: 1px solid var(--mirror-cyan); }
-    .badge-success { background: var(--mirror-success-glow); color: var(--mirror-success); border: 1px solid var(--mirror-success); }
-    .badge-warning { background: var(--mirror-warning-glow); color: var(--mirror-warning); border: 1px solid var(--mirror-warning); }
-    .badge-critical { background: var(--mirror-critical-glow); color: var(--mirror-critical); border: 1px solid var(--mirror-critical); }
-    .badge-uncertain { background: var(--mirror-uncertain-glow); color: var(--mirror-uncertain); border: 1px solid var(--mirror-uncertain); }
-
-    .btn {
-      background: var(--mirror-cyan);
-      color: #0A0D14;
-      font-weight: 700;
+    .ios-subtitle {
       font-size: 13px;
-      padding: 12px 18px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
+      color: var(--apple-text-secondary);
+      letter-spacing: -0.2px;
+      margin-top: 2px;
+    }
+
+    /* iOS Segmented Pill Stepper */
+    .ios-segmented-control {
+      background: rgba(118, 118, 128, 0.24);
+      backdrop-filter: var(--apple-glass-blur);
+      border-radius: 14px;
+      padding: 3px;
+      display: flex;
+      gap: 2px;
+      margin-bottom: 12px;
+    }
+    .ios-segment {
+      flex: 1;
+      padding: 7px 0;
       text-align: center;
-      transition: all 0.2s;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: var(--apple-text-secondary);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: all 0.25s var(--apple-spring);
+    }
+    .ios-segment.active {
+      background: rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    /* iOS Cupertino Inset Glass Card */
+    .ios-card {
+      background: var(--apple-card);
+      backdrop-filter: var(--apple-glass-blur);
+      border: 0.5px solid var(--apple-border);
+      border-radius: var(--apple-radius-lg);
+      padding: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    /* iOS Buttons */
+    .ios-btn-primary {
+      background: var(--apple-blue);
+      color: #FFFFFF;
+      border: none;
+      border-radius: var(--apple-radius-md);
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      transition: all 0.2s var(--apple-spring);
+      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.35);
+      width: 100%;
     }
-    .btn:hover {
-      opacity: 0.92;
-      box-shadow: 0 0 16px var(--mirror-cyan-glow);
-    }
-    .btn-secondary {
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--mirror-border);
-    }
-    .btn-secondary:hover {
-      color: var(--text-primary);
-      border-color: var(--text-secondary);
-      box-shadow: none;
-    }
-    .btn-success {
-      background: var(--mirror-success);
-      color: #0A0D14;
-    }
-    .btn-success:hover {
-      box-shadow: 0 0 16px var(--mirror-success-glow);
-    }
-    .btn-critical {
-      background: var(--mirror-critical);
-      color: #FFF;
+    .ios-btn-primary:active {
+      transform: scale(0.97);
+      background: var(--apple-blue-pressed);
     }
 
-    /* Camera Viewfinder Area */
-    .viewfinder-container {
-      position: relative;
-      width: 100%;
-      height: 270px;
-      background: #000;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid var(--mirror-border);
+    .ios-btn-secondary {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: var(--apple-glass-blur);
+      color: #FFFFFF;
+      border: 0.5px solid var(--apple-border);
+      border-radius: var(--apple-radius-md);
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .ios-btn-secondary:active {
+      transform: scale(0.97);
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    /* iOS Inset Group List Item */
+    .ios-list-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--apple-radius-md);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ios-list-row:hover {
+      background: rgba(255, 255, 255, 0.09);
+    }
+    .ios-list-row:active {
+      transform: scale(0.98);
+    }
+
+    /* Apple Switch Toggle */
+    .ios-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 26px;
+    }
+    .ios-switch input { opacity: 0; width: 0; height: 0; }
+    .ios-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: rgba(120, 120, 128, 0.35);
+      transition: 0.3s var(--apple-spring);
+      border-radius: 26px;
+    }
+    .ios-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.3s var(--apple-spring);
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    input:checked + .ios-slider {
+      background-color: var(--apple-green);
+    }
+    input:checked + .ios-slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Apple Camera Viewfinder */
+    .apple-camera-viewport {
+      width: 100%;
+      height: 380px;
+      background: #000;
+      border-radius: 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
     }
     #webcam-stream {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       display: none;
     }
     #viewfinder-canvas {
-      width: 100%; height: 100%;
-      position: absolute;
-      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
-    .viewfinder-hud {
+
+    /* Apple Reticle Brackets */
+    .camera-corner {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 12px;
-      z-index: 10;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.65);
       pointer-events: none;
     }
-    
+    .tl { top: 20px; left: 20px; border-right: none; border-bottom: none; border-top-left-radius: 8px; }
+    .tr { top: 20px; right: 20px; border-left: none; border-bottom: none; border-top-right-radius: 8px; }
+    .bl { bottom: 20px; left: 20px; border-right: none; border-top: none; border-bottom-left-radius: 8px; }
+    .br { bottom: 20px; right: 20px; border-left: none; border-top: none; border-bottom-right-radius: 8px; }
+
     /* Spatial Bounding Boxes Overlay */
     .spatial-overlay {
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
+      inset: 0;
       pointer-events: none;
-      z-index: 8;
+      z-index: 10;
     }
     .spatial-box {
       position: absolute;
-      border: 2px solid var(--mirror-cyan);
-      background: rgba(0, 240, 255, 0.15);
-      border-radius: 6px;
-      box-shadow: 0 0 12px var(--mirror-cyan-glow);
-      transition: all 0.3s ease;
-      animation: pulseBox 2s infinite ease-in-out;
+      border: 2px solid var(--apple-teal);
+      background: rgba(48, 176, 199, 0.18);
+      border-radius: 8px;
+      box-shadow: 0 0 16px rgba(48, 176, 199, 0.35);
+      animation: appleBoxGlow 2.5s infinite ease-in-out;
     }
-    @keyframes pulseBox {
-      0%, 100% { border-color: var(--mirror-cyan); box-shadow: 0 0 8px var(--mirror-cyan-glow); }
-      50% { border-color: #FFF; box-shadow: 0 0 16px var(--mirror-cyan); }
+    @keyframes appleBoxGlow {
+      0%, 100% { border-color: var(--apple-teal); }
+      50% { border-color: #FFF; box-shadow: 0 0 24px rgba(48, 176, 199, 0.6); }
     }
     .box-tag {
       position: absolute;
-      top: -22px; left: 0;
-      background: var(--mirror-cyan);
+      top: -24px; left: 0;
+      background: var(--apple-teal);
       color: #000;
       font-size: 10px;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
       white-space: nowrap;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
-    /* Voice Mic Button */
-    .btn-voice {
+
+    /* Apple Camera Shutter Button */
+    .apple-shutter-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+    .apple-shutter-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 4px solid #FFFFFF;
+      padding: 4px;
+      background: transparent;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      background: linear-gradient(135deg, #1e1b4b, #312e81);
-      border: 1px solid #6366f1;
-      color: #c7d2fe;
-      font-size: 12px;
-      font-weight: 700;
-      border-radius: 12px;
-      padding: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
+      transition: transform 0.15s;
+    }
+    .apple-shutter-btn:active {
+      transform: scale(0.92);
+    }
+    .shutter-inner {
       width: 100%;
-      margin-top: 8px;
+      height: 100%;
+      background: #FFFFFF;
+      border-radius: 50%;
+      transition: background 0.2s;
     }
-    .btn-voice.listening {
-      background: linear-gradient(135deg, #4c1d95, #7c3aed);
-      border-color: #a855f7;
-      color: #fff;
-      animation: pulseVoice 1.5s infinite;
-    }
-    @keyframes pulseVoice {
-      0%, 100% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
-      50% { box-shadow: 0 0 22px rgba(168, 85, 247, 0.8); }
+    .apple-shutter-btn:active .shutter-inner {
+      background: rgba(255, 255, 255, 0.7);
     }
 
-    .laser-line {
-      position: absolute;
-      top: 15%;
-      left: 8%;
-      right: 8%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--mirror-cyan), transparent);
-      box-shadow: 0 0 10px var(--mirror-cyan);
-      animation: scanLaser 2.2s infinite alternate ease-in-out;
-      pointer-events: none;
-      z-index: 5;
-    }
-    @keyframes scanLaser {
-      0% { top: 15%; opacity: 0.3; }
-      50% { opacity: 0.9; }
-      100% { top: 85%; opacity: 0.3; }
-    }
-
-    .camera-tabs {
+    /* Siri / Voice Agent Pill Bar */
+    .siri-voice-bar {
       display: flex;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-    .camera-tab-btn {
-      flex: 1;
-      padding: 6px;
-      font-size: 11px;
-      background: var(--mirror-elevated);
-      color: var(--text-secondary);
-      border: 1px solid var(--mirror-border);
-      border-radius: 8px;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, rgba(175, 82, 222, 0.18), rgba(0, 122, 255, 0.18));
+      backdrop-filter: var(--apple-glass-blur);
+      border: 0.5px solid rgba(175, 82, 222, 0.35);
+      border-radius: var(--apple-radius-lg);
+      padding: 12px 16px;
       cursor: pointer;
-      text-align: center;
+      transition: all 0.3s;
     }
-    .camera-tab-btn.active {
-      background: var(--mirror-cyan);
-      color: #000;
-      font-weight: bold;
+    .siri-voice-bar.listening {
+      border-color: var(--apple-teal);
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.28), rgba(48, 176, 199, 0.28));
+      box-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
     }
 
-    /* Modal Overlay */
-    .modal-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.88);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 100;
-      backdrop-filter: blur(4px);
+    /* Bottom Home Indicator Bar */
+    .ios-home-indicator {
+      width: 138px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 3px;
+      margin: 12px auto 6px auto;
     }
-    .modal-card {
-      background: #181216;
-      border: 2px solid var(--mirror-critical);
-      border-radius: 20px;
-      padding: 20px;
-      text-align: center;
+
+    /* Badges */
+    .ios-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 8px;
+      letter-spacing: -0.1px;
+    }
+    .badge-blue { background: rgba(0, 122, 255, 0.15); color: var(--apple-blue); }
+    .badge-green { background: var(--apple-green-bg); color: var(--apple-green); }
+    .badge-orange { background: rgba(255, 149, 0, 0.15); color: var(--apple-orange); }
+    .badge-red { background: var(--apple-red-bg); color: var(--apple-red); }
+
+    /* Modal Sheet */
+    .ios-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(20px);
+      display: none;
+      align-items: flex-end;
+      z-index: 200;
+      border-radius: 54px;
+      overflow: hidden;
+    }
+    .ios-modal-sheet {
+      width: 100%;
+      background: #1C1C1E;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      padding: 16px 20px 32px 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 10px 40px rgba(255,59,48,0.3);
+      gap: 14px;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+      border-top: 0.5px solid var(--apple-border);
+      animation: sheetUp 0.3s var(--apple-spring);
     }
-
-    .log-tray {
-      font-size: 10px;
-      color: var(--text-muted);
-      background: rgba(0,0,0,0.5);
-      padding: 8px 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.05);
-      margin-top: auto;
-      line-height: 1.4;
+    @keyframes sheetUp {
+      0% { transform: translateY(100%); }
+      100% { transform: translateY(0); }
+    }
+    .sheet-handle {
+      width: 36px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+      align-self: center;
+      margin-bottom: 6px;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>MIRROR Embodied Assistant</h1>
-    <p>Safe Multi-Modal Task Verification • Powered by Google Gemini</p>
-  </header>
+  <div class="ambient-glow"></div>
 
-  <!-- Live Backend Connection Bar -->
-  <div class="backend-bar">
-    <div class="backend-dot offline" id="backend-dot"></div>
-    <span id="backend-status-text">Checking backend connection...</span>
-    <button class="btn-xs" onclick="checkBackendHealth()">Ping Server</button>
-    <button id="voice-btn" class="btn-xs" onclick="toggleVoice()">🔊 Voice: ON</button>
-  </div>
+  <!-- iPhone 16 Pro Hardware Shell -->
+  <div class="iphone-device">
 
-  <!-- Journey Stage Stepper -->
-  <div class="journey-bar">
-    <div id="step-node-0" class="journey-node active" onclick="navTo('home')">1. Goal</div>
-    <div id="step-node-1" class="journey-node" onclick="navTo('camera')">2. Observe</div>
-    <div id="step-node-2" class="journey-node" onclick="navTo('summary')">3. Intent</div>
-    <div id="step-node-3" class="journey-node" onclick="navTo('plan')">4. Action</div>
-    <div id="step-node-4" class="journey-node" onclick="navTo('verify')">5. Verify</div>
-  </div>
-
-  <!-- Mobile Screen Shell -->
-  <div class="phone-frame">
-    <!-- Top Hardware Status Bar -->
-    <div class="status-bar">
-      <span>12:45</span>
-      <span style="color: var(--mirror-cyan); font-weight: 700;">MIRROR • GEMINI LIVE</span>
-      <span id="backend-status-indicator" style="color: var(--mirror-warning);">○ CONNECTING</span>
+    <!-- Dynamic Island -->
+    <div class="dynamic-island-container" onclick="checkBackendHealth()">
+      <div class="island-dot">
+        <div class="island-sensor" id="island-led"></div>
+      </div>
+      <span class="island-text" id="island-status-label">Gemini Vision Active</span>
+      <div style="font-size: 11px;">⚡</div>
     </div>
 
-    <!-- SCREEN 1: HOME -->
-    <div id="screen-home" class="screen active">
-      <div>
-        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Enter Space Goal</h2>
-        <p style="font-size: 12px; color: var(--text-secondary);">Describe your goal. MIRROR verifies safety upfront and guides physical preparation.</p>
-      </div>
-
-      <div class="card" style="border-color: var(--mirror-cyan);">
-        <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; outline: none;" placeholder="e.g. get my desk ready to study...">get my desk ready to study</textarea>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-          <span class="badge badge-cyan">POST /v1/sessions</span>
-          <button class="btn" style="padding: 8px 14px; font-size: 12px;" onclick="onGoalSubmitted()">Create Session</button>
+    <!-- iOS Status Bar -->
+    <div class="ios-status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <span>5G</span>
+        <div class="battery-pill">
+          <div class="battery-level"></div>
         </div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Preset Tasks</h3>
-        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-          <div class="card-elevated" onclick="setPreset('get my desk ready to study')">📖 Get my desk ready to study (A0 Safe)</div>
-          <div class="card-elevated" onclick="setPreset('tidy my work table')">💻 Tidy my work table (A0 Safe)</div>
-          <div class="card-elevated" onclick="setPreset('set up my kitchen counter for cooking')">🍳 Set up kitchen counter for cooking (A0 Safe)</div>
-          <div class="card-elevated" style="border-color: rgba(255,59,48,0.4);" onclick="setPreset('inspect electrical outlet for loose wire')">⚠️ Inspect outlet for loose wire (A3 Hazard Block Test)</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Active Session Contract</h3>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary);">
-          <span id="session-id-pill">Session: None</span>
-          <span id="session-tier-pill">Tier: -</span>
-          <span style="color: var(--mirror-success);" id="session-gate-pill">Gate: -</span>
-        </div>
-      </div>
-
-      <div class="log-tray" id="log-home">
-        Invariant: Empty goals rejected (422) • A3 goals blocked upfront with zero model invocation.
       </div>
     </div>
 
-    <!-- SCREEN 2: CAMERA VIEWFINDER -->
-    <div id="screen-camera" class="screen">
-      <!-- Camera Source Selection -->
-      <div class="camera-tabs">
-        <button id="tab-webcam" class="camera-tab-btn" onclick="activateCameraTab('webcam')">📹 Live Webcam</button>
-        <button id="tab-upload" class="camera-tab-btn active" onclick="activateCameraTab('upload')">📁 Upload / File</button>
-        <button id="tab-synthetic" class="camera-tab-btn" onclick="activateCameraTab('synthetic')">🎨 Test Scene</button>
+    <!-- Main Viewport -->
+    <div class="screen-viewport">
+
+      <!-- iOS Segmented Stepper -->
+      <div class="ios-segmented-control">
+        <div id="seg-0" class="ios-segment active" onclick="navTo('home')">Goal</div>
+        <div id="seg-1" class="ios-segment" onclick="navTo('camera')">Observe</div>
+        <div id="seg-2" class="ios-segment" onclick="navTo('summary')">Intent</div>
+        <div id="seg-3" class="ios-segment" onclick="navTo('plan')">Action</div>
+        <div id="seg-4" class="ios-segment" onclick="navTo('verify')">Verify</div>
       </div>
 
-      <div class="viewfinder-container">
-        <video id="webcam-stream" autoplay playsinline muted></video>
-        <canvas id="viewfinder-canvas"></canvas>
-        <div class="laser-line"></div>
-        <div id="spatial-overlay" class="spatial-overlay"></div>
-
-        <div class="viewfinder-hud">
-          <div style="display: flex; justify-content: space-between;">
-            <span class="badge badge-cyan" id="camera-mode-badge">FILE / CANVAS</span>
-            <span class="badge badge-cyan" id="camera-quality-badge">Ready to Observe</span>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 6px; pointer-events: auto;">
-            <div style="background: rgba(0,0,0,0.65); padding: 6px 12px; border-radius: 20px; align-self: center; font-size: 11px; border: 1px solid var(--mirror-border);">
-              🎯 Target: <span id="camera-goal-pill" style="color: var(--mirror-cyan); font-weight: bold;">study</span>
-            </div>
-            <button class="btn" id="btn-capture-observe" onclick="onSceneCaptured()">📸 Capture & Observe with Gemini</button>
-          </div>
-        </div>
-      </div>
-
-      
-      <!-- Privacy Shield & Hands-Free Voice Agent Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0; background: var(--mirror-surface); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--mirror-border);">
-        <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary);">
-          <input type="checkbox" id="privacy-shield-toggle" checked> 🔒 Privacy Shield (Edge Anonymization)
-        </label>
-        <span style="font-size: 10px; color: var(--mirror-cyan);">AI Privacy Active</span>
-      </div>
-
-      <button id="btn-voice-agent" class="btn-voice" onclick="toggleVoiceAgent()">🎙️ Hands-Free Voice Agent (Click to Listen)</button>
-
-      <input type="file" id="file-picker" accept="image/*" style="display: none;" onchange="handleFilePicked(event)">
-
-      <div style="display: flex; gap: 8px;">
-        <button class="btn btn-secondary" style="flex: 1; padding: 10px; font-size: 11px;" onclick="triggerFilePicker()">📁 Select Image File</button>
-        <button class="btn btn-secondary" style="flex: 1; padding: 10px; font-size: 11px;" id="btn-webcam-toggle" onclick="toggleWebcam()">📹 Start Webcam</button>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Vision Telemetry</h3>
-        <div style="font-size: 11px; color: var(--text-secondary); display: flex; justify-content: space-between;">
-          <span>Model: <b id="telemetry-model">Gemini 3.5 Flash</b></span>
-          <span id="telemetry-latency">Latency: --</span>
-        </div>
-      </div>
-
-      <div class="log-tray" id="log-camera">
-        Sending image Base64 to POST /v1/sessions/{sid}/observe
-      </div>
-    </div>
-
-    <!-- SCREEN 3: MISSION SUMMARY & INTENT -->
-    <div id="summary-screen" class="screen">
-      <div>
-        <h2 style="font-size: 20px; font-weight: 700;">Scene Interpretation</h2>
-        <p style="font-size: 12px; color: var(--text-secondary);">Real objects detected by Google Gemini multimodal vision.</p>
-      </div>
-
-      <div class="card">
-        <span class="badge badge-cyan" id="summary-sid">Session: -</span>
-        <h3 style="font-size: 13px; font-weight: 700; margin-top: 6px;">Interpreted Physical Intent</h3>
-        <p id="summary-intent-text" style="font-size: 12px; color: var(--text-primary); font-style: italic;">prepare the space to study</p>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Gemini Detected Objects</h3>
-        <div id="summary-observations" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
-          <!-- dynamically populated -->
-        </div>
-      </div>
-
-      <button class="btn" onclick="onProceedToPlan()">Request Action Plan (/plan)</button>
-      <button class="btn btn-secondary" onclick="navTo('camera')">Rescan Scene</button>
-
-      <div class="log-tray" id="log-summary">
-        Contract: Outcome may be 'step', 'no_action_needed', or 'needs_observation'
-      </div>
-    </div>
-
-    <!-- SCREEN 4: ACTION PLAN STEP (ExecutingScreen) -->
-    <div id="plan-screen" class="screen">
-      <div>
-        <h2 style="font-size: 20px; font-weight: 700; color: var(--mirror-cyan);">Do this step</h2>
-        <p style="font-size: 12px; color: var(--text-secondary);">Execute one physical step. MIRROR will verify evidence before proceeding.</p>
-      </div>
-
-      <div class="card" style="border: 2px solid var(--mirror-cyan); background: var(--mirror-elevated); padding: 18px;">
-        <span class="badge badge-warning" id="step-tier-text" style="margin-bottom: 8px;">Tier A1 (Reversible)</span>
-        <h3 id="step-instruction-text" style="font-size: 16px; font-weight: 800; color: #FFF; line-height: 1.4;">Move the cup off the surface.</h3>
-        <hr style="border: none; border-top: 1px solid var(--mirror-border); margin: 12px 0;">
-        <div style="font-size: 12px; color: var(--text-secondary);">
-          MIRROR will look for: <b id="step-evidence-text" style="color: var(--mirror-cyan);">no cup visible</b>
-        </div>
-      </div>
-
-      <button class="btn" style="padding: 14px;" onclick="onStepDoneTriggerVerification()">I did it. Check with the camera</button>
-      <button class="btn btn-secondary" onclick="resetAllToHome()">Cancel mission</button>
-
-      <div class="log-tray" id="log-plan">
-        ExecutingScreen: Success claims forbidden here. Outcome remains pending sensor verification.
-      </div>
-    </div>
-
-    <!-- SCREEN 5: VERIFICATION -->
-    <div id="verify-screen" class="screen">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-size: 20px; font-weight: 700;">Result Verification</h2>
-        <span id="v-status-badge" class="badge badge-success">VERIFIED</span>
-      </div>
-
-      <!-- Result Card -->
-      <div id="v-card" class="card" style="border-color: var(--mirror-success); background: var(--mirror-success-glow);">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <span id="v-icon" style="font-size: 28px;">✅</span>
+      <!-- SCREEN 1: HOME (Goal Input) -->
+      <div id="screen-home" class="ios-screen active">
+        <div class="ios-nav-header">
           <div>
-            <div id="v-title" style="font-weight: 800; font-size: 14px; color: var(--mirror-success);">VERIFIED COMPLETE</div>
-            <div id="v-confidence" style="font-size: 11px; color: var(--text-secondary);">Confidence: 0.95 (Grounded in anchor evidence)</div>
+            <h1 class="ios-large-title">Physical Goal</h1>
+            <p class="ios-subtitle">Apple Intelligence Task Guidance</p>
+          </div>
+          <span class="ios-badge badge-blue" id="home-status-badge">AI Ready</span>
+        </div>
+
+        <!-- Inset Text Input Card -->
+        <div class="ios-card">
+          <textarea id="goal-input" style="width: 100%; height: 70px; background: transparent; border: none; color: #FFF; font-size: 16px; letter-spacing: -0.3px; outline: none; resize: none;" placeholder="What space would you like to prepare?">get my desk ready to study</textarea>
+          <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+            <button class="ios-btn-primary" style="width: auto; padding: 10px 18px; font-size: 14px;" onclick="onGoalSubmitted()">
+              Start Mission →
+            </button>
           </div>
         </div>
-        <div style="margin-top: 10px; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden;">
-          <div id="v-bar" style="width: 95%; height: 100%; background: var(--mirror-success); transition: width 0.4s;"></div>
+
+        <!-- Presets Group -->
+        <div class="ios-card" style="padding: 12px;">
+          <div style="font-size: 12px; font-weight: 600; color: var(--apple-text-secondary); text-transform: uppercase; margin-bottom: 8px; padding-left: 4px;">
+            Suggested Tasks
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="ios-list-row" onclick="setPreset('get my desk ready to study')">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">📖</span>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600;">Study Desk Setup</div>
+                  <div style="font-size: 11px; color: var(--apple-text-secondary);">Clear clutter, set lighting</div>
+                </div>
+              </div>
+              <span class="ios-badge badge-green">A0 Safe</span>
+            </div>
+
+            <div class="ios-list-row" onclick="setPreset('set up my kitchen counter for cooking')">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">🍳</span>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600;">Kitchen Prep</div>
+                  <div style="font-size: 11px; color: var(--apple-text-secondary);">Sanitize surface & cutting board</div>
+                </div>
+              </div>
+              <span class="ios-badge badge-green">A0 Safe</span>
+            </div>
+
+            <div class="ios-list-row" onclick="setPreset('tidy my work table')">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">💻</span>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600;">Work Table Organization</div>
+                  <div style="font-size: 11px; color: var(--apple-text-secondary);">Laptop & cable management</div>
+                </div>
+              </div>
+              <span class="ios-badge badge-green">A0 Safe</span>
+            </div>
+
+            <div class="ios-list-row" onclick="setPreset('inspect electrical outlet for loose wire')">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 18px;">⚠️</span>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600; color: var(--apple-red);">Inspect Loose Wire</div>
+                  <div style="font-size: 11px; color: var(--apple-text-secondary);">Safety policy interlock test</div>
+                </div>
+              </div>
+              <span class="ios-badge badge-red">A3 Hazard</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Card -->
+        <div class="ios-card" style="display: flex; justify-content: space-between; font-size: 12px;">
+          <div>Session: <b id="session-id-pill" style="color: var(--apple-teal);">-</b></div>
+          <div>Tier: <b id="session-tier-pill">A0</b></div>
+          <div>Policy Gate: <b id="session-gate-pill" style="color: var(--apple-green);">Allow</b></div>
         </div>
       </div>
 
-      <!-- Evidence Seen vs Missing -->
-      <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Sensor Evidence Comparison</h3>
-        <div id="v-evidence-list" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
-          <!-- dynamically populated -->
+      <!-- SCREEN 2: CAMERA VIEWFINDER -->
+      <div id="screen-camera" class="ios-screen">
+        <div class="ios-nav-header">
+          <div>
+            <h1 class="ios-large-title">Observe</h1>
+            <p class="ios-subtitle" id="camera-goal-pill">Point camera at workspace</p>
+          </div>
+          <span class="ios-badge badge-blue" id="camera-mode-badge">Camera Ready</span>
         </div>
+
+        <!-- Camera Viewport with Apple Reticles -->
+        <div class="apple-camera-viewport">
+          <video id="webcam-stream" autoplay playsinline muted></video>
+          <canvas id="viewfinder-canvas"></canvas>
+          <div class="camera-corner tl"></div>
+          <div class="camera-corner tr"></div>
+          <div class="camera-corner bl"></div>
+          <div class="camera-corner br"></div>
+          <div id="spatial-overlay" class="spatial-overlay"></div>
+        </div>
+
+        <!-- Apple Privacy & Source Controls -->
+        <div class="ios-card" style="padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <label class="ios-switch">
+              <input type="checkbox" id="privacy-shield-toggle" checked>
+              <span class="ios-slider"></span>
+            </label>
+            <div>
+              <div style="font-size: 13px; font-weight: 600;">Privacy Shield</div>
+              <div style="font-size: 11px; color: var(--apple-text-secondary);">On-Device Face/PII Masking</div>
+            </div>
+          </div>
+          <span class="ios-badge badge-green">Protected</span>
+        </div>
+
+        <!-- Shutter & Source Buttons -->
+        <div class="apple-shutter-wrap">
+          <button class="ios-btn-secondary" style="width: auto; padding: 10px 14px; font-size: 12px;" onclick="triggerFilePicker()">
+            📁 Choose Photo
+          </button>
+
+          <button class="apple-shutter-btn" id="btn-capture-observe" onclick="onSceneCaptured()" title="Capture with Gemini">
+            <div class="shutter-inner"></div>
+          </button>
+
+          <button class="ios-btn-secondary" style="width: auto; padding: 10px 14px; font-size: 12px;" id="btn-webcam-toggle" onclick="toggleWebcam()">
+            📹 Live Cam
+          </button>
+        </div>
+
+        <!-- Siri Voice Assistant Pill -->
+        <div class="siri-voice-bar" id="btn-voice-agent" onclick="toggleVoiceAgent()">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">🎙️</span>
+            <div>
+              <div style="font-size: 13px; font-weight: 600;" id="voice-agent-title">Apple Voice Guidance</div>
+              <div style="font-size: 11px; color: var(--apple-text-secondary);" id="voice-agent-subtitle">Tap to speak or listen hands-free</div>
+            </div>
+          </div>
+          <span class="ios-badge badge-blue">Siri Audio</span>
+        </div>
+
+        <input type="file" id="file-picker" accept="image/*" style="display: none;" onchange="handleFilePicked(event)">
       </div>
 
-      <button id="v-primary-btn" class="btn btn-success" onclick="onAdvanceOrPlanNext()">Advance & Plan Next Step</button>
-      <button class="btn btn-secondary" onclick="navTo('camera')">Retake Verification Photo</button>
+      <!-- SCREEN 3: SUMMARY & INTENT -->
+      <div id="summary-screen" class="ios-screen">
+        <div class="ios-nav-header">
+          <div>
+            <h1 class="ios-large-title">Scene Analysis</h1>
+            <p class="ios-subtitle">Gemini Multimodal Perception</p>
+          </div>
+          <span class="ios-badge badge-green" id="telemetry-latency">Latency: 1.8s</span>
+        </div>
 
-      <div class="log-tray" id="log-verify">
-        Confidence bar: &ge; 0.85 required. Sub-threshold confidences downgraded to cannot_tell.
+        <div class="ios-card">
+          <div style="font-size: 11px; color: var(--apple-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Interpreted Physical Goal</div>
+          <div id="summary-intent-text" style="font-size: 17px; font-weight: 700; color: #FFF;">prepare the space to study</div>
+        </div>
+
+        <div class="ios-card">
+          <div style="font-size: 11px; color: var(--apple-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Identified Workspace Objects</div>
+          <div id="summary-observations" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- dynamically inserted -->
+          </div>
+        </div>
+
+        <button class="ios-btn-primary" onclick="onProceedToPlan()">
+          Generate Action Plan →
+        </button>
+        <button class="ios-btn-secondary" onclick="navTo('camera')">
+          Rescan Space
+        </button>
+      </div>
+
+      <!-- SCREEN 4: ACTION PLAN STEP -->
+      <div id="plan-screen" class="ios-screen">
+        <div class="ios-nav-header">
+          <div>
+            <h1 class="ios-large-title">Action Step</h1>
+            <p class="ios-subtitle">Physical Task Guidance</p>
+          </div>
+          <span class="ios-badge badge-orange" id="step-tier-text">Tier A1</span>
+        </div>
+
+        <div class="ios-card" style="border: 1px solid var(--apple-blue); background: rgba(0, 122, 255, 0.08);">
+          <div style="font-size: 11px; color: var(--apple-blue); text-transform: uppercase; font-weight: 700; margin-bottom: 6px;">Instruction</div>
+          <div id="step-instruction-text" style="font-size: 19px; font-weight: 700; line-height: 1.35; color: #FFF; margin-bottom: 12px;">
+            Move the cup off the surface.
+          </div>
+          <div style="border-top: 0.5px solid var(--apple-border); padding-top: 10px; font-size: 12px; color: var(--apple-text-secondary);">
+            Expected Evidence: <b id="step-evidence-text" style="color: #FFF;">no cup visible</b>
+          </div>
+        </div>
+
+        <button class="ios-btn-primary" onclick="onStepDoneTriggerVerification()">
+          ✓ Done, Verify With Camera
+        </button>
+        <button class="ios-btn-secondary" onclick="resetAllToHome()">
+          Cancel Mission
+        </button>
+      </div>
+
+      <!-- SCREEN 5: VERIFICATION RESULT -->
+      <div id="verify-screen" class="ios-screen">
+        <div class="ios-nav-header">
+          <div>
+            <h1 class="ios-large-title">Verification</h1>
+            <p class="ios-subtitle">Closed-Loop Visual Proof</p>
+          </div>
+          <span class="ios-badge badge-green" id="v-status-badge">VERIFIED</span>
+        </div>
+
+        <!-- Apple Health / Rings Style Verification Card -->
+        <div class="ios-card" id="v-card" style="border-color: var(--apple-green);">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--apple-green-bg); display: flex; align-items: center; justify-content: center; font-size: 24px;" id="v-icon">
+              ✓
+            </div>
+            <div>
+              <div id="v-title" style="font-size: 17px; font-weight: 700; color: var(--apple-green);">Step Verified</div>
+              <div id="v-confidence" style="font-size: 12px; color: var(--apple-text-secondary);">Confidence: 95%</div>
+            </div>
+          </div>
+          <div style="margin-top: 14px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+            <div id="v-bar" style="width: 95%; height: 100%; background: var(--apple-green); transition: width 0.5s var(--apple-spring);"></div>
+          </div>
+        </div>
+
+        <div class="ios-card">
+          <div style="font-size: 11px; color: var(--apple-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Sensor Evidence</div>
+          <div id="v-evidence-list" style="font-size: 13px; display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+
+        <button class="ios-btn-primary" id="v-primary-btn" onclick="onAdvanceOrPlanNext()">
+          Complete & Done →
+        </button>
+        <button class="ios-btn-secondary" onclick="navTo('camera')">
+          Retake Verification Photo
+        </button>
+      </div>
+
+      <!-- SCREEN 6: MISSION COMPLETED -->
+      <div id="complete-screen" class="ios-screen">
+        <div style="text-align: center; padding: 24px 0 10px 0;">
+          <div style="font-size: 56px; margin-bottom: 8px;">🎉</div>
+          <h1 class="ios-large-title" style="color: var(--apple-green);" id="complete-title">Space Ready</h1>
+          <p class="ios-subtitle" id="complete-desc" style="margin-top: 4px;">Verified by camera with zero unverified claims.</p>
+        </div>
+
+        <div class="ios-card">
+          <div style="font-size: 11px; color: var(--apple-green); text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Verified Audit Record</div>
+          <div id="complete-summary-list" style="font-size: 13px; display: flex; flex-direction: column; gap: 6px;">
+            <div>✔ Physical step verified with visual proof.</div>
+          </div>
+        </div>
+
+        <button class="ios-btn-primary" onclick="exportAuditLog()">
+          Export Tamper-Proof Audit JSON
+        </button>
+        <button class="ios-btn-secondary" onclick="resetAllToHome()">
+          Start New Mission
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Safety Interlock Modal Sheet -->
+    <div id="safety-modal" class="ios-modal-overlay">
+      <div class="ios-modal-sheet">
+        <div class="sheet-handle"></div>
+        <div style="font-size: 32px; align-self: center;">🛑</div>
+        <div style="font-size: 19px; font-weight: 700; color: var(--apple-red); text-align: center;" id="modal-hazard-title">
+          Safety Policy Interlock
+        </div>
+        <p style="font-size: 13px; color: var(--apple-text-secondary); text-align: center; line-height: 1.4;" id="modal-hazard-desc">
+          MIRROR will not guide this. Ask a qualified professional or emergency services.
+        </p>
+        <div style="display: flex; justify-content: center;">
+          <span class="ios-badge badge-red" id="modal-rule-pill">Rule: Hazardous Task</span>
+        </div>
+        <button class="ios-btn-primary" style="background: var(--apple-red);" onclick="onAbortMission()">
+          Acknowledge & Abort
+        </button>
       </div>
     </div>
 
-    <!-- SCREEN 6: MISSION COMPLETED (CompletedScreen) -->
-    <div id="complete-screen" class="screen">
-      <div style="text-align: center; padding: 24px 0 10px 0;">
-        <div style="font-size: 52px; margin-bottom: 8px;">🎉</div>
-        <h2 id="complete-title" style="font-size: 22px; font-weight: 800; color: var(--mirror-success);">Done and verified</h2>
-        <p id="complete-desc" style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">The camera confirmed 1 step(s), and a fresh scan shows nothing left to do.</p>
-      </div>
+    <!-- iOS Home Indicator -->
+    <div class="ios-home-indicator"></div>
 
-      <div class="card" style="border-color: var(--mirror-success);">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--mirror-success); margin-bottom: 8px;">Verified Audit Trail</h3>
-        <div id="complete-summary-list" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
-          <div>✔ Step s1 verified with empirical proof.</div>
-          <div style="color: var(--text-secondary); font-size: 10px;">Zero unverified claims made. Verified steps: <b id="final-steps-count">1</b></div>
-        </div>
-      </div>
-
-      <button class="btn" style="background: var(--mirror-cyan);" onclick="resetAllToHome()">Back to start</button>
-      <button class="btn btn-secondary" onclick="exportAuditLog()">📥 Download Audit Log (JSON)</button>
-    </div>
-
-    <!-- SAFETY ALERT MODAL -->
-    <div id="safety-modal" class="modal-overlay">
-      <div class="modal-card">
-        <div style="font-size: 40px;">⚠️</div>
-        <span id="modal-tier-badge" class="badge badge-critical" style="align-self: center;">TIER A3 BLOCKED</span>
-        <h2 id="modal-hazard-title" style="font-size: 16px; color: #fff;">Safety Policy Refusal</h2>
-        <p id="modal-hazard-desc" style="font-size: 12px; color: var(--text-primary); line-height: 1.4;">MIRROR will not guide this. Ask a qualified professional or emergency services.</p>
-        <div id="modal-rule-pill" style="background: rgba(0,0,0,0.5); padding: 8px; border-radius: 8px; font-size: 11px; color: var(--mirror-warning); text-align: left;">
-          Rule Triggered: R-A3-electrical
-        </div>
-        <button class="btn btn-critical" onclick="onAbortMission()">Acknowledge & Close</button>
-      </div>
-    </div>
   </div>
 
   <script>
-    const defaultHost = window.location.hostname || "localhost";
-    const API_BASE = (window.location.protocol === "https:" ? "https://" : "http://") + defaultHost + ":8000";
-    let backendOnline = false;
-    let voiceEnabled = true;
-
-    let webcamStream = null;
-    let currentImageBase64 = null;
-    let activeCameraTab = "upload";
-    let isVerifyingCapture = false;
-
-    // State model mapped 1:1 to FastAPI backend models
+    // State Model
     const backendState = {
       sessionId: null,
       goal: "get my desk ready to study",
       interpretedIntent: "prepare the space to study",
-      goalGate: { step_id: "goal", tier: "A0", decision: "allow", rule_id: "R-planner" },
-      world: { observations: [], unknowns: [], hazards: [] },
+      goalGate: null,
+      world: { observations: [] },
       currentStep: null,
       currentGate: null,
+      lastVerification: null,
       verifiedSteps: 0
     };
 
-    function speak(text) {
-      if (!voiceEnabled || !window.speechSynthesis) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.0;
-      u.pitch = 1.0;
-      window.speechSynthesis.speak(u);
-    }
+    let backendOnline = false;
+    let activeCameraTab = "upload";
+    let webcamStream = null;
+    let isVerifyingCapture = false;
+    let currentImageBase64 = null;
+    let isVoiceActive = true;
 
-    function toggleVoice() {
-      voiceEnabled = !voiceEnabled;
-      document.getElementById("voice-btn").innerText = voiceEnabled ? "🔊 Voice: ON" : "🔇 Voice: OFF";
-      document.getElementById("voice-btn").className = voiceEnabled ? "btn-xs active" : "btn-xs";
-    }
+    const API_BASE = window.location.port === "8080" 
+      ? `http://${window.location.hostname}:8000` 
+      : "";
 
-    // Check Live FastAPI Backend Health
     async function checkBackendHealth() {
-      const dot = document.getElementById("backend-dot");
-      const txt = document.getElementById("backend-status-text");
-      const indicator = document.getElementById("backend-status-indicator");
       try {
-        const res = await fetch(`${API_BASE}/v1/health`, { method: "GET" });
+        const res = await fetch(`${API_BASE}/v1/health`);
         if (res.ok) {
           const data = await res.json();
           backendOnline = true;
-          dot.className = "backend-dot online";
-          txt.innerText = `Connected: ${API_BASE} (${data.provider})`;
-          indicator.innerText = "● LIVE /v1 (" + data.provider + ")";
-          indicator.style.color = "var(--mirror-success)";
-          document.getElementById("telemetry-model").innerText = data.provider;
-          return true;
+          document.getElementById("island-led").style.background = "var(--apple-green)";
+          document.getElementById("island-status-label").innerText = "Gemini Vision Active";
+          document.getElementById("home-status-badge").innerText = "Apple & Gemini Live";
         }
-      } catch (e) {
-        console.warn("Backend health check failed:", e);
+      } catch (err) {
+        backendOnline = false;
+        document.getElementById("island-led").style.background = "var(--apple-orange)";
+        document.getElementById("island-status-label").innerText = "Local Fallback";
+        document.getElementById("home-status-badge").innerText = "Local Mode";
       }
-      backendOnline = false;
-      dot.className = "backend-dot offline";
-      txt.innerText = `Backend unreachable at ${API_BASE} • Start server on port 8000`;
-      indicator.innerText = "○ OFFLINE";
-      indicator.style.color = "var(--mirror-warning)";
-      return false;
     }
 
-    // Canvas Simulation Setup for Camera Viewfinder
+    function speak(text) {
+      if (!isVoiceActive || !("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.05;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Canvas drawing for synthetic fallback
     const canvas = document.getElementById("viewfinder-canvas");
     const ctx = canvas.getContext("2d");
 
     function resizeCanvas() {
-      if (!canvas || !canvas.parentElement) return;
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
+      canvas.width = canvas.parentElement.clientWidth || 360;
+      canvas.height = canvas.parentElement.clientHeight || 380;
     }
 
     function drawDeskScene(hasCup = true) {
-      if (!ctx || !canvas) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Office background & desk surface
-      const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      bg.addColorStop(0, "#1F232E");
-      bg.addColorStop(0.4, "#2A2F3D");
-      bg.addColorStop(0.4, "#8B5A2B"); // tabletop
-      bg.addColorStop(1, "#5C3A1E");
-      ctx.fillStyle = bg;
+      ctx.fillStyle = "#12141C";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Desk edge line
-      ctx.strokeStyle = "#3D2411";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height * 0.4);
-      ctx.lineTo(canvas.width, canvas.height * 0.4);
-      ctx.stroke();
+      ctx.fillStyle = "#222533";
+      ctx.fillRect(20, canvas.height * 0.45, canvas.width - 40, canvas.height * 0.45);
+
+      ctx.fillStyle = "#374151";
+      ctx.fillRect(canvas.width * 0.35, canvas.height * 0.48, canvas.width * 0.35, canvas.height * 0.22);
+      ctx.fillStyle = "#111827";
+      ctx.fillRect(canvas.width * 0.37, canvas.height * 0.50, canvas.width * 0.31, canvas.height * 0.17);
+
+      ctx.fillStyle = "#E5E7EB";
+      ctx.fillRect(canvas.width * 0.10, canvas.height * 0.55, canvas.width * 0.18, canvas.height * 0.22);
 
       if (hasCup) {
-        // Red coffee mug on left
-        const mugX = canvas.width * 0.25;
-        const mugY = canvas.height * 0.55;
-        ctx.fillStyle = "#E53935";
-        ctx.fillRect(mugX, mugY, 44, 60);
-        ctx.strokeStyle = "#8E0000";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(mugX, mugY, 44, 60);
-        // Handle
+        ctx.fillStyle = "#EF4444";
         ctx.beginPath();
-        ctx.arc(mugX + 44, mugY + 30, 14, 1.5 * Math.PI, 0.5 * Math.PI, false);
+        ctx.arc(canvas.width * 0.82, canvas.height * 0.60, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#991B1B";
+        ctx.lineWidth = 3;
         ctx.stroke();
       }
-
-      // Lamp on right
-      const lampX = canvas.width * 0.75;
-      ctx.fillStyle = "#4B5563";
-      ctx.fillRect(lampX - 4, canvas.height * 0.35, 8, 80);
-      ctx.fillStyle = "#F59E0B";
-      ctx.beginPath();
-      ctx.moveTo(lampX - 25, canvas.height * 0.35);
-      ctx.lineTo(lampX + 25, canvas.height * 0.35);
-      ctx.lineTo(lampX + 15, canvas.height * 0.22);
-      ctx.lineTo(lampX - 15, canvas.height * 0.22);
-      ctx.closePath();
-      ctx.fill();
-
-      // Framing target reticle
-      const rx = canvas.width * 0.12, ry = canvas.height * 0.15, rw = canvas.width * 0.76, rh = canvas.height * 0.7;
-      ctx.strokeStyle = "rgba(0, 240, 255, 0.5)";
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(rx, ry, rw, rh);
-      ctx.fillStyle = "#00F0FF";
-      ctx.font = "11px sans-serif";
-      ctx.fillText(hasCup ? "Target: Desk with cup" : "Target: Clean desk (no cup)", rx + 10, ry + 20);
     }
 
-    function activateCameraTab(tab) {
-      activeCameraTab = tab;
-      document.querySelectorAll(".camera-tab-btn").forEach(b => b.classList.remove("active"));
-      document.getElementById("tab-" + tab).classList.add("active");
-
-      const video = document.getElementById("webcam-stream");
-      if (tab === "webcam") {
-        startWebcam();
-        document.getElementById("camera-mode-badge").innerText = "LIVE WEBCAM";
-      } else {
-        stopWebcam();
-        if (tab === "upload") {
-          document.getElementById("camera-mode-badge").innerText = "FILE UPLOAD";
-          if (!currentImageBase64) drawDeskScene(true);
-        } else if (tab === "synthetic") {
-          document.getElementById("camera-mode-badge").innerText = "SYNTHETIC DESK";
-          drawDeskScene(!isVerifyingCapture);
-          currentImageBase64 = null;
-        }
-      }
-    }
-
-    async function startWebcam() {
-      try {
-        const video = document.getElementById("webcam-stream");
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
-        });
-        webcamStream = stream;
-        video.srcObject = stream;
-        video.style.display = "block";
-        canvas.style.display = "none";
-        document.getElementById("btn-webcam-toggle").innerText = "⏹ Stop Webcam";
-        document.getElementById("camera-quality-badge").innerText = "📹 Live Video Active";
-      } catch (err) {
-        alert("Camera access unavailable: " + err.message + ". You can use file upload instead.");
-        activateCameraTab("upload");
-      }
-    }
-
+    // Camera Management
     function stopWebcam() {
       if (webcamStream) {
         webcamStream.getTracks().forEach(t => t.stop());
@@ -874,16 +1001,27 @@
       const video = document.getElementById("webcam-stream");
       video.style.display = "none";
       canvas.style.display = "block";
-      document.getElementById("btn-webcam-toggle").innerText = "📹 Start Webcam";
-      document.getElementById("camera-quality-badge").innerText = "Ready to Observe";
+      document.getElementById("btn-webcam-toggle").innerText = "📹 Live Cam";
     }
 
-    function toggleWebcam() {
+    async function toggleWebcam() {
       if (webcamStream) {
         stopWebcam();
-        activateCameraTab("upload");
-      } else {
-        activateCameraTab("webcam");
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        webcamStream = stream;
+        const video = document.getElementById("webcam-stream");
+        video.srcObject = stream;
+        video.style.display = "block";
+        canvas.style.display = "none";
+        document.getElementById("btn-webcam-toggle").innerText = "⏹️ Stop Cam";
+        document.getElementById("camera-mode-badge").innerText = "Live Webcam";
+      } catch (err) {
+        alert("Camera access denied or unavailable: " + err.message);
       }
     }
 
@@ -902,7 +1040,7 @@
           resizeCanvas();
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           currentImageBase64 = e.target.result.split(",")[1];
-          document.getElementById("camera-quality-badge").innerText = "📁 Photo Loaded (" + file.name + ")";
+          document.getElementById("camera-mode-badge").innerText = "Photo: " + file.name.substring(0, 15);
         };
         img.src = e.target.result;
       };
@@ -910,7 +1048,7 @@
     }
 
     function extractCaptureBase64() {
-      if (currentImageBase64 && activeCameraTab !== "webcam") {
+      if (currentImageBase64 && !webcamStream) {
         return currentImageBase64;
       }
       const video = document.getElementById("webcam-stream");
@@ -926,23 +1064,20 @@
         const cx = c.getContext("2d");
         cx.drawImage(canvas, 0, 0);
       }
-      
-      // On-Device Privacy Shield: Mask faces/text before transmission if enabled
-      const privacyEnabled = document.getElementById("privacy-shield-toggle")?.checked;
-      if (privacyEnabled) {
-        // Subtle edge anonymization: apply privacy tint & corner redaction
-        cx.fillStyle = "rgba(10, 15, 25, 0.4)";
-        cx.fillRect(c.width * 0.35, 0, c.width * 0.3, c.height * 0.25); // Face zone blur
+
+      // Privacy shield mask if enabled
+      if (document.getElementById("privacy-shield-toggle")?.checked) {
+        const cx = c.getContext("2d");
+        cx.fillStyle = "rgba(0, 0, 0, 0.45)";
+        cx.fillRect(c.width * 0.35, 0, c.width * 0.3, c.height * 0.25);
       }
 
       return c.toDataURL("image/jpeg", 0.85).split(",")[1];
     }
 
-    
     // Spatial Bounding Box Renderer
     function renderBoundingBoxes(observations) {
       const overlay = document.getElementById("spatial-overlay");
-      if (!overlay) return;
       overlay.innerHTML = "";
       if (!observations || observations.length === 0) return;
 
@@ -961,14 +1096,14 @@
       });
     }
 
-    // Hands-Free Speech Recognition Agent
+    // Hands-Free Voice Agent
     let recognition = null;
     let isListening = false;
 
     function toggleVoiceAgent() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        alert("Speech Recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+        alert("Speech Recognition not supported in this browser. Use Safari/Chrome.");
         return;
       }
 
@@ -976,7 +1111,8 @@
         recognition.stop();
         isListening = false;
         document.getElementById("btn-voice-agent").classList.remove("listening");
-        document.getElementById("btn-voice-agent").innerText = "🎙️ Hands-Free Voice Agent (Click to Listen)";
+        document.getElementById("voice-agent-title").innerText = "Apple Voice Guidance";
+        document.getElementById("voice-agent-subtitle").innerText = "Tap to speak or listen hands-free";
         speak("Voice agent paused.");
         return;
       }
@@ -990,31 +1126,32 @@
         recognition.onstart = function() {
           isListening = true;
           document.getElementById("btn-voice-agent").classList.add("listening");
-          document.getElementById("btn-voice-agent").innerText = "🎙️ Listening... (Say 'observe', 'verify', or 'next')";
-          speak("Voice agent active. Say observe, verify, or next step.");
+          document.getElementById("voice-agent-title").innerText = "Listening to your voice...";
+          document.getElementById("voice-agent-subtitle").innerText = "Say 'observe', 'verify', or 'next'";
+          speak("Listening. Say observe, verify, or next step.");
         };
 
         recognition.onresult = function(event) {
           const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-          console.log("Voice transcript heard:", transcript);
+          console.log("Voice heard:", transcript);
 
           if (transcript.includes("observe") || transcript.includes("scan") || transcript.includes("capture") || transcript.includes("check")) {
-            speak("Scanning workspace now.");
+            speak("Scanning workspace.");
             onSceneCaptured();
-          } else if (transcript.includes("verify") || transcript.includes("done") || transcript.includes("finished") || transcript.includes("complete")) {
+          } else if (transcript.includes("verify") || transcript.includes("done") || transcript.includes("finished")) {
             speak("Verifying step evidence.");
             onStepDoneTriggerVerification();
-          } else if (transcript.includes("plan") || transcript.includes("next") || transcript.includes("proceed")) {
+          } else if (transcript.includes("plan") || transcript.includes("next")) {
             speak("Requesting plan.");
             onProceedToPlan();
-          } else if (transcript.includes("cancel") || transcript.includes("reset") || transcript.includes("home")) {
+          } else if (transcript.includes("cancel") || transcript.includes("reset")) {
             speak("Resetting mission.");
             resetAllToHome();
           }
         };
 
         recognition.onerror = function(e) {
-          console.warn("Speech recognition error:", e.error);
+          console.warn("Speech error:", e.error);
         };
 
         recognition.onend = function() {
@@ -1031,30 +1168,30 @@
 
     // Navigation and Screen Flow
     function navTo(screenName) {
-      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-      document.querySelectorAll(".journey-node").forEach(n => n.classList.remove("active"));
+      document.querySelectorAll(".ios-screen").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".ios-segment").forEach(s => s.classList.remove("active"));
 
       if (screenName === "home") {
         document.getElementById("screen-home").classList.add("active");
-        document.getElementById("step-node-0").classList.add("active");
+        document.getElementById("seg-0").classList.add("active");
       } else if (screenName === "camera") {
         document.getElementById("screen-camera").classList.add("active");
-        document.getElementById("step-node-1").classList.add("active");
+        document.getElementById("seg-1").classList.add("active");
         document.getElementById("camera-goal-pill").innerText = backendState.goal;
         resizeCanvas();
-        if (activeCameraTab === "synthetic" || (!currentImageBase64 && activeCameraTab !== "webcam")) {
+        if (!currentImageBase64 && !webcamStream) {
           drawDeskScene(!isVerifyingCapture);
         }
       } else if (screenName === "summary") {
         document.getElementById("summary-screen").classList.add("active");
-        document.getElementById("step-node-2").classList.add("active");
+        document.getElementById("seg-2").classList.add("active");
       } else if (screenName === "plan") {
         document.getElementById("plan-screen").classList.add("active");
-        document.getElementById("step-node-3").classList.add("active");
+        document.getElementById("seg-3").classList.add("active");
         renderPlanScreen();
       } else if (screenName === "verify") {
         document.getElementById("verify-screen").classList.add("active");
-        document.getElementById("step-node-4").classList.add("active");
+        document.getElementById("seg-4").classList.add("active");
         renderVerifyScreen();
       } else if (screenName === "complete") {
         document.getElementById("complete-screen").classList.add("active");
@@ -1066,7 +1203,7 @@
       backendState.goal = text;
     }
 
-    // POST /v1/sessions
+    // API Calls
     async function onGoalSubmitted() {
       const val = document.getElementById("goal-input").value.trim();
       if (!val) {
@@ -1088,20 +1225,19 @@
             backendState.interpretedIntent = data.interpreted_intent;
             backendState.goalGate = data.goal_gate;
             if (data.blocked) {
-              document.getElementById("modal-tier-badge").innerText = `TIER ${data.goal_gate.tier} BLOCKED`;
               document.getElementById("modal-hazard-title").innerText = "Safety Policy Refusal (" + data.goal_gate.tier + ")";
               document.getElementById("modal-hazard-desc").innerText = data.message || "MIRROR will not guide this. Ask a qualified professional or emergency services.";
-              document.getElementById("modal-rule-pill").innerText = "Rule Triggered: " + data.goal_gate.rule_id;
+              document.getElementById("modal-rule-pill").innerText = "Rule: " + data.goal_gate.rule_id;
               document.getElementById("safety-modal").style.display = "flex";
-              speak("Warning. Safety policy blocked this goal. " + (data.message || ""));
+              speak("Warning. Safety policy blocked this goal.");
               return;
             }
-            document.getElementById("session-id-pill").innerText = "Session: " + backendState.sessionId;
-            document.getElementById("session-tier-pill").innerText = "Tier: " + data.goal_gate.tier;
-            document.getElementById("session-gate-pill").innerText = "Gate: " + data.goal_gate.decision;
+            document.getElementById("session-id-pill").innerText = backendState.sessionId;
+            document.getElementById("session-tier-pill").innerText = data.goal_gate.tier;
+            document.getElementById("session-gate-pill").innerText = data.goal_gate.decision;
             isVerifyingCapture = false;
             navTo("camera");
-            speak("Session created. Please point your camera at the scene.");
+            speak("Session active. Point camera at the workspace.");
             return;
           }
         } catch (err) {
@@ -1109,29 +1245,26 @@
         }
       }
 
-      // Local fallback safety rule check matching policy.py
+      // Local fallback safety
       const low = val.toLowerCase();
-      if (/wire|circuit|voltage|breaker|gas|bleach|ammonia|medication|prescription/i.test(low)) {
+      if (/wire|circuit|voltage|breaker|gas|bleach|ammonia/i.test(low)) {
         document.getElementById("safety-modal").style.display = "flex";
         speak("Warning. Safety policy blocked this goal.");
         return;
       }
 
       backendState.sessionId = "sess_" + Math.random().toString(36).substring(2, 8);
-      document.getElementById("session-id-pill").innerText = "Session: " + backendState.sessionId;
+      document.getElementById("session-id-pill").innerText = backendState.sessionId;
       isVerifyingCapture = false;
       navTo("camera");
     }
 
-    // Capture Scene
     async function onSceneCaptured() {
       const b64 = extractCaptureBase64();
       const startT = performance.now();
-      document.getElementById("btn-capture-observe").innerText = "⏳ Observing with Gemini...";
 
       if (isVerifyingCapture) {
         await executeVerificationWithImage(b64);
-        document.getElementById("btn-capture-observe").innerText = "📸 Capture & Observe with Gemini";
         return;
       }
 
@@ -1157,21 +1290,18 @@
         }
       }
 
-      document.getElementById("btn-capture-observe").innerText = "📸 Capture & Observe with Gemini";
       document.getElementById("summary-intent-text").innerText = backendState.interpretedIntent;
-      document.getElementById("summary-sid").innerText = "Session ID: " + backendState.sessionId;
-
       const obsContainer = document.getElementById("summary-observations");
       obsContainer.innerHTML = "";
       const obs = backendState.world.observations || [];
       if (obs.length === 0) {
-        obsContainer.innerHTML = `<div style="color: var(--text-secondary);">No clutter or obstacles recognized. Space appears clear.</div>`;
+        obsContainer.innerHTML = `<div style="color: var(--apple-text-secondary); font-size: 13px;">No clutter or obstacles found. Space appears ready.</div>`;
       } else {
         obs.forEach(o => {
           obsContainer.innerHTML += `
-            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--mirror-elevated); padding: 6px 10px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.06); padding: 8px 12px; border-radius: 12px;">
               <span><b>${o.label}</b> ${o.where_hint ? '(' + o.where_hint + ')' : ''}</span>
-              <span class="badge badge-success">${Math.round(o.confidence * 100)}%</span>
+              <span class="ios-badge badge-green">${Math.round(o.confidence * 100)}%</span>
             </div>
           `;
         });
@@ -1181,7 +1311,6 @@
       speak("Scene analyzed by Gemini. Ready to plan.");
     }
 
-    // POST /v1/sessions/{sid}/plan
     async function onProceedToPlan() {
       if (backendOnline && backendState.sessionId) {
         try {
@@ -1192,10 +1321,10 @@
             const planData = await res.json();
             if (planData.outcome === "no_action_needed") {
               document.getElementById("complete-title").innerText = "No action needed";
-              document.getElementById("complete-desc").innerText = "Space is already clean and prepared. Zero tasks required.";
+              document.getElementById("complete-desc").innerText = "Space is clean and ready. Zero tasks required.";
               document.getElementById("complete-summary-list").innerHTML = "<div>✔ Space verified ready.</div>";
               navTo("complete");
-              speak("The space is already prepared. No action needed.");
+              speak("The space is already clean and prepared.");
               return;
             }
             if (planData.outcome === "completed") {
@@ -1211,11 +1340,11 @@
             }
           }
         } catch (err) {
-          console.warn("Live plan failed:", err);
+          console.warn("Plan failed:", err);
         }
       }
 
-      // Fallback default
+      // Fallback
       backendState.currentStep = {
         id: "s1",
         instruction: "Move the cup off the surface.",
@@ -1236,9 +1365,8 @@
     function onStepDoneTriggerVerification() {
       isVerifyingCapture = true;
       currentImageBase64 = null;
-      document.getElementById("btn-capture-observe").innerText = "📸 Capture Verification Evidence";
       navTo("camera");
-      speak("Please point your camera at the completed step.");
+      speak("Please point the camera at the completed step.");
     }
 
     async function executeVerificationWithImage(b64) {
@@ -1283,51 +1411,48 @@
       const evList = document.getElementById("v-evidence-list");
 
       if (v.status === "verified") {
-        badge.className = "badge badge-success";
+        badge.className = "ios-badge badge-green";
         badge.innerText = "VERIFIED";
-        card.style.borderColor = "var(--mirror-success)";
-        card.style.background = "var(--mirror-success-glow)";
-        title.innerText = "VERIFIED COMPLETE";
-        title.style.color = "var(--mirror-success)";
-        conf.innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}% (Grounded in visual evidence)`;
+        card.style.borderColor = "var(--apple-green)";
+        title.innerText = "Step Verified";
+        title.style.color = "var(--apple-green)";
+        conf.innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}% (Visual proof confirmed)`;
         bar.style.width = `${Math.round(v.confidence * 100)}%`;
-        bar.style.background = "var(--mirror-success)";
-        evList.innerHTML = `<div style="color: var(--mirror-success);">✔ Evidence seen: ${v.evidenceSeen.join(", ")}</div>`;
-        speak("Verification confirmed. Step verified at " + Math.round(v.confidence * 100) + " percent confidence.");
+        bar.style.background = "var(--apple-green)";
+        evList.innerHTML = `<div style="color: var(--apple-green);">✔ Evidence confirmed: ${v.evidenceSeen.join(", ")}</div>`;
+        speak("Verification confirmed at " + Math.round(v.confidence * 100) + " percent confidence.");
       } else {
-        badge.className = "badge badge-uncertain";
+        badge.className = "ios-badge badge-orange";
         badge.innerText = v.status.toUpperCase();
-        card.style.borderColor = "var(--mirror-uncertain)";
-        card.style.background = "var(--mirror-uncertain-glow)";
-        title.innerText = "COULD NOT VERIFY";
-        title.style.color = "var(--mirror-uncertain)";
+        card.style.borderColor = "var(--apple-orange)";
+        title.innerText = "Could Not Verify";
+        title.style.color = "var(--apple-orange)";
         conf.innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}%`;
-        bar.style.width = "20%";
-        bar.style.background = "var(--mirror-uncertain)";
-        evList.innerHTML = `<div style="color: var(--mirror-warning);">⚠ ${v.reason || "Scene mismatch. Retake verification photo."}</div>`;
-        speak("Could not verify step. Please point the camera at the same area.");
+        bar.style.width = "25%";
+        bar.style.background = "var(--apple-orange)";
+        evList.innerHTML = `<div style="color: var(--apple-orange);">⚠ ${v.reason || "Scene mismatch. Retake photo."}</div>`;
+        speak("Could not verify step. Point the camera at the same area.");
       }
     }
 
     async function onAdvanceOrPlanNext() {
       backendState.verifiedSteps += 1;
-      document.getElementById("final-steps-count").innerText = backendState.verifiedSteps;
       isVerifyingCapture = false;
       onMissionCompleted();
     }
 
     function onMissionCompleted() {
-      document.getElementById("complete-title").innerText = "Done and verified";
-      document.getElementById("complete-desc").innerText = `The camera confirmed ${backendState.verifiedSteps} step(s), and a fresh scan shows nothing left to do.`;
+      document.getElementById("complete-title").innerText = "Done & Verified";
+      document.getElementById("complete-desc").innerText = `Camera confirmed ${backendState.verifiedSteps} physical step(s). Space is ready.`;
       navTo("complete");
-      speak("Done and verified. The camera confirmed all steps.");
+      speak("Done and verified. All physical steps confirmed.");
     }
 
     function exportAuditLog() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backendState, null, 2));
       const downloadAnchor = document.createElement("a");
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `mirror_audit_${backendState.sessionId || "session"}.json`);
+      downloadAnchor.setAttribute("download", `apple_mirror_audit_${backendState.sessionId || "session"}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -1338,9 +1463,6 @@
       backendState.verifiedSteps = 0;
       backendState.currentStep = null;
       isVerifyingCapture = false;
-      document.getElementById("session-id-pill").innerText = "Session: None";
-      document.getElementById("session-tier-pill").innerText = "Tier: -";
-      document.getElementById("session-gate-pill").innerText = "Gate: -";
       stopWebcam();
       navTo("home");
     }
