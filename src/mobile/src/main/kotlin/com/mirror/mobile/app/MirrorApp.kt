@@ -12,16 +12,24 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.mirror.mobile.integration.AppScreen
+import com.mirror.mobile.api.ServerSettings
+import com.mirror.mobile.api.ServerConfig
 import com.mirror.mobile.integration.MissionController
 import com.mirror.ui.screens.ActionPlanScreen
 import com.mirror.ui.screens.CameraViewScreen
@@ -38,10 +46,16 @@ import kotlinx.coroutines.launch
  * verification result comes from the backend.
  */
 @Composable
-fun MirrorApp(controller: MissionController, cameraPreview: (@Composable () -> Unit)? = null) {
+fun MirrorApp(
+    controller: MissionController,
+    cameraPreview: (@Composable () -> Unit)? = null,
+    serverSettings: ServerSettings? = null,
+    allowHttp: Boolean = false
+) {
     val app by controller.app.collectAsState()
     val ui by controller.data.collectAsState()
     val scope = rememberCoroutineScope()
+    var showServer by remember { mutableStateOf(false) }
     val goal = ui.goalText
 
     MirrorTheme {
@@ -106,6 +120,15 @@ fun MirrorApp(controller: MissionController, cameraPreview: (@Composable () -> U
                 }
 
                 app.notice?.let { NoticeBanner(it, Modifier.align(Alignment.TopCenter)) }
+                if (serverSettings != null && app.screen == AppScreen.HOME && !app.busy && !app.awaitingConsent) {
+                    TextButton(
+                        onClick = { showServer = true },
+                        modifier = Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(8.dp)
+                    ) { Text("Server") }
+                }
+                if (showServer && serverSettings != null) {
+                    ServerSettingsDialog(serverSettings, allowHttp) { showServer = false }
+                }
                 if (app.busy) CircularProgressIndicator(Modifier.align(Alignment.Center))
 
                 if (app.awaitingConsent) {
@@ -179,4 +202,51 @@ private fun CompletedScreen(verifiedSteps: Int, onDone: () -> Unit) {
         )
         Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) { Text("Back to start") }
     }
+}
+
+/** Server address and optional API key, editable on the phone. Development convenience. */
+@Composable
+private fun ServerSettingsDialog(settings: ServerSettings, allowHttp: Boolean, onClose: () -> Unit) {
+    val start = remember { settings.current() }
+    var url by remember { mutableStateOf(start.baseUrl) }
+    var key by remember { mutableStateOf(start.apiKey) }
+    var error by remember { mutableStateOf<String?>(null) }
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text("Server") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = url,
+                    onValueChange = { url = it; error = null },
+                    label = { Text("Server address") },
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = key,
+                    onValueChange = { key = it },
+                    label = { Text("API key (optional)") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation()
+                )
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                Text(
+                    "For development. A key stored in the app can be extracted.",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                val problem = ServerConfig.problem(url, allowHttp)
+                if (problem != null) {
+                    error = problem
+                } else {
+                    settings.save(ServerConfig(ServerConfig.cleanUrl(url).orEmpty(), key.trim()))
+                    onClose()
+                }
+            }) { Text("Save") }
+        },
+        dismissButton = { OutlinedButton(onClick = onClose) { Text("Cancel") } }
+    )
 }

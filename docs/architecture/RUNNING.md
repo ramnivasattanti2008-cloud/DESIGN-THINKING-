@@ -12,6 +12,8 @@ python -m venv .venv
 Providers (env, see `.env.example`):
 - `MIRROR_MODEL_PROVIDER=fake` (default): reads labels from test input. No real perception.
 - `MIRROR_MODEL_PROVIDER=anthropic` with `MIRROR_MODEL_API_KEY` set: real vision calls. Not yet exercised against the live API.
+- `MIRROR_MODEL_PROVIDER=gemini` with `MIRROR_MODEL_API_KEY` (or `GEMINI_API_KEY`) set: real vision calls through Google Gemini; a free key comes from Google AI Studio. `MIRROR_MODEL_NAME` overrides the default model (`gemini-2.5-flash`, UNVERIFIED against the live API). Only request and response handling is tested (mocked transport); nobody has called the live API from this repo yet.
+- `python tools/check_model.py photo.jpg` makes one real call with one photo and prints the objects, confidences and time. It refuses the fake provider. Start here. The full phone walkthrough is `docs/architecture/DEVICE_TEST.md`.
 
 ## Production hardening (backend)
 
@@ -43,7 +45,7 @@ Needs JDK 17 and the Android SDK (platform 34, build-tools 34.0.0). Put the SDK 
 ./gradlew :app:assembleDebug              # debug APK
 ```
 
-Backend address is baked in at build time:
+The server address and optional API key can be changed on the phone (**Server** button on the start screen), so a rebuild is not needed when the PC address changes. Plain `http://` is accepted only in debug builds. The address baked in at build time is just the starting default:
 - Emulator: default `http://10.0.2.2:8000`.
 - Real phone on the same Wi-Fi: `./gradlew :app:assembleDebug -PmirrorBackendUrl=http://<your-pc-lan-ip>:8000`, and allow port 8000 through the PC firewall.
 

@@ -23,7 +23,7 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-015 | CI workflow: install `.[dev]`, run `pytest` | ag-b | done | `.github/workflows/` | |
 | T-016 | Policy gaps from ag-b's red-team report: wire-tie over-block, add chemical rule, with tests (closed on `claude/architecture`; ag-b's two gap tests flipped to the fixed behaviour) | claude | review | `src/core/policy.py`, `src/core/tests/` | |
 | T-017 | Wire the session log into the engine once T-024 lands (sink wired; the real session-log writer tests now pass) | claude | done | `src/core/engine.py`, `src/api/` | |
-| T-018 | First real model call and measured latency, once Ram supplies a provider key (needs a provider key from Ram) | claude | blocked | `src/core/model_client.py` | |
+| T-018 | First real model call and measured latency, once Ram supplies a provider key (a free Gemini key works: run `tools/check_model.py`) (needs a provider key from Ram) | claude | blocked | `src/core/model_client.py` | |
 | T-020 | UI cleanup: fix CameraViewScreen.kt:171 compile bug, remove or label fake HUD data, MVP-safe presets, optional hazard-simulation button. See `docs/tasks/BRIEFS.md` (merged up to `b901585`; the later "Sara chat" commit `5ff5bcd` is NOT merged (out of MVP scope, backend has no chat)) | ag-a | review | `src/ui/screens/`, `src/ui/components/`, `src/ui/theme/`, `src/ui/model/`, `src/ui/web_preview/`, `public/`, `assets/` | `ag-a/ui-cleanup` |
 | T-021 | Android CI job: Gradle unit tests and debug build on GitHub Actions (workflow merged; its first run is on GitHub Actions) | ag-b | review | `.github/workflows/android.yml` | `ag-b/android-ci` |
 | T-022 | HTTP end-to-end loop test against a real uvicorn process (7 HTTP end-to-end tests pass; claude fixed a flaky server wait) | ag-b | review | `tests/e2e/` | `ag-b/android-ci` |
@@ -32,6 +32,11 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-027 | Keyword planner with open-ended goals and an optional model hook, ported from `ag-a/ui-cleanup@171ecde` (`src/core/planner.py`) and reviewed: steps must be checkable from a photo, the engine decides completion | ag-a (port and review: claude) | review | `src/core/planner.py`, `src/core/tests/` | `claude/architecture` |
 | T-028 | API production hardening (API key, rate limit, size limit, CORS opt-in, security headers, bounded sessions, production startup check, HTTPS dev launcher), ported from `ag-a/ui-cleanup@171ecde` and reworked | ag-a (rework: claude) | review | `src/api/`, `tools/run_secure_server.py`, `tests/api/` | `claude/architecture` |
 | T-029 | Android: live camera preview, API-key header, per-task photo consent | claude | review | `src/mobile/` | `claude/architecture` |
+| T-030 | Gemini provider behind `ModelClient` (key in a header, mocked-transport tests) and `tools/check_model.py`, a one-photo real-call check | claude | review | `src/core/model_client.py`, `tools/check_model.py` | `claude/architecture` |
+| T-031 | Android: server address and API key editable on the phone | claude | review | `src/mobile/` | `claude/architecture` |
+| T-032 | Phone test: first real run with a real model (guide: `docs/architecture/DEVICE_TEST.md`) | Ram | todo | none | |
+| T-033 | UI components for the new flow (executing, completed, photo consent, server settings, notice banner), see `docs/tasks/BRIEFS.md` Round 3 | ag-a | todo | `src/ui/screens/`, `src/ui/components/` | `ag-a/ui-components` |
+| T-034 | Property-based invariant tests and an API red-team pass | ag-b | todo | `tests/property/`, `tests/api/` | `ag-b/property-tests` |
 
 Detailed briefs and paste-ready prompts for each seat are in `docs/tasks/BRIEFS.md`. T-013 (studio-a) and T-007/T-014 (studio-b) stand as listed.
 
