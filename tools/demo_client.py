@@ -37,7 +37,7 @@ def build_frames(labels: Sequence[str]) -> list[dict]:
 
 
 def load_script(path: str) -> list[list[str]]:
-    with open(path, "r", encoding="utf-8") as handle:
+    with open(path, "r", encoding="utf-8-sig") as handle:
         data = json.load(handle)
     if not isinstance(data, list):
         raise ValueError("script must be a JSON list of label sets")
@@ -69,6 +69,8 @@ def _request_json(client_or_url, method: str, path: str, payload: dict | None = 
             response = client_or_url.get(path)
         else:
             response = client_or_url.post(path, json=payload)
+    except httpx.InvalidURL as exc:
+        raise RuntimeError(f"Invalid URL: {exc}") from exc
     except httpx.HTTPError as exc:  # pragma: no cover - exercised through CLI errors
         raise RuntimeError(f"Connection failed for {method} {path}: {exc}") from exc
     if response.is_error:
@@ -127,7 +129,7 @@ def _prompt_for_labels(label_name: str) -> list[str]:
     return parse_labels(raw)
 
 
-def run_demo_loop(client_or_url, goal: str, script: list[list[str]] | None = None):
+def run_demo_loop(client_or_url, goal: str, script: list[list[str]] | None = None) -> dict:
     health_check(client_or_url)
     session = create_session(client_or_url, goal)
     session_id = session["session_id"]
@@ -146,6 +148,8 @@ def run_demo_loop(client_or_url, goal: str, script: list[list[str]] | None = Non
         plan_result = plan(client_or_url, session_id)
         _print_plan_result(plan_result)
         outcome = plan_result.get("outcome")
+        gate = plan_result.get("gate") or {}
+        decision = gate.get("decision")
 
         if outcome == "completed":
             print("completed")
@@ -155,6 +159,24 @@ def run_demo_loop(client_or_url, goal: str, script: list[list[str]] | None = Non
             return plan_result
         if outcome in {"blocked_goal", "needs_human"}:
             return plan_result
+
+        # If gate decision is block, refuse and stop. Never verify or complete.
+        if decision == "block":
+            reason = gate.get("reason", "Action blocked by safety policy")
+            rule_id = gate.get("rule_id", "safety")
+            print(f"Blocked step by safety policy [{rule_id}]: {reason}")
+            print("Stopping: blocked steps cannot be verified.")
+            return plan_result
+
+        # If gate decision is confirm, require confirmation.
+        if decision == "confirm":
+            reason = gate.get("reason", "This action requires confirmation")
+            print(f"Confirmation required: {reason}")
+            if script is None:
+                confirm = input("Confirm to proceed with this step? [y/N]: ").strip().lower()
+                if confirm not in {"y", "yes"}:
+                    print("Step cancelled by user.")
+                    return plan_result
 
         if outcome == "needs_observation":
             continue
@@ -172,8 +194,14 @@ def run_demo_loop(client_or_url, goal: str, script: list[list[str]] | None = Non
         verify_result = verify(client_or_url, session_id, after_labels)
         status = verify_result.get("status")
         confidence = verify_result.get("confidence")
+        conf_val = float(confidence) if confidence is not None else 0.0
         reason = verify_result.get("reason")
-        print(f"Verification: status={status} | confidence={confidence} | reason={reason}")
+
+        # Client guard: print verified with confidence below 0.85 as NOT verified
+        if status == "verified" and conf_val < 0.85:
+            print(f"Verification: status=not_verified (confidence {conf_val:.2f} < 0.85) | confidence={confidence} | reason={reason}")
+        else:
+            print(f"Verification: status={status} | confidence={confidence} | reason={reason}")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -185,11 +213,19 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         script = load_script(args.script) if args.script else None
-        run_demo_loop(args.url, args.goal, script)
-    except (RuntimeError, ValueError, OSError, EOFError) as exc:
+        result = run_demo_loop(args.url, args.goal, script)
+    except (RuntimeError, ValueError, OSError, EOFError, httpx.InvalidURL, httpx.HTTPError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
-    return 0
+
+    outcome = result.get("outcome")
+    gate = result.get("gate") or {}
+    decision = gate.get("decision")
+
+    # exit non-zero for blocked goal, blocked step and needs_human; exit 0 only for completed and no_action_needed
+    if outcome in {"completed", "no_action_needed"} and decision != "block":
+        return 0
+    return 1
 
 
 if __name__ == "__main__":
