@@ -9,7 +9,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /** HTTP client for the MIRROR backend. Every failure becomes an [ApiException]. */
-class MirrorApi(private val baseUrl: String, private val apiKey: String = "") : Backend {
+class MirrorApi(private val config: () -> ServerConfig) : Backend {
+
+    constructor(baseUrl: String, apiKey: String = "") : this({ ServerConfig(baseUrl, apiKey) })
 
     override suspend fun createSession(goal: String): SessionInfo =
         JsonParsing.session(call("POST", "/v1/sessions", JSONObject().put("goal", goal)))
@@ -25,14 +27,15 @@ class MirrorApi(private val baseUrl: String, private val apiKey: String = "") : 
 
     private suspend fun call(method: String, path: String, body: JSONObject?): JSONObject =
         withContext(Dispatchers.IO) {
-            val conn = URL(baseUrl.trimEnd('/') + path).openConnection() as HttpURLConnection
+            val cfg = config()
+            val conn = URL(cfg.baseUrl.trimEnd('/') + path).openConnection() as HttpURLConnection
             try {
                 conn.requestMethod = method
                 conn.connectTimeout = 10_000
                 conn.readTimeout = 90_000 // a model call can be slow
                 conn.setRequestProperty("Content-Type", "application/json")
                 conn.setRequestProperty("Accept", "application/json")
-                headersFor(apiKey).forEach { (k, v) -> conn.setRequestProperty(k, v) }
+                headersFor(cfg.apiKey).forEach { (k, v) -> conn.setRequestProperty(k, v) }
                 if (body != null) {
                     conn.doOutput = true
                     conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
