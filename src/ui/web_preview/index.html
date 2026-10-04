@@ -3,65 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIRROR Mobile UI & Interaction Simulator</title>
+  <title>MIRROR - Embodied AI Mobile Assistant</title>
   <style>
     :root {
-      --mirror-obsidian: #0F1117;
-      --mirror-surface: #1A1D26;
-      --mirror-elevated: #252936;
-      --mirror-border: #333A4D;
+      --mirror-obsidian: #0D0F15;
+      --mirror-surface: #161922;
+      --mirror-elevated: #212534;
+      --mirror-border: #2E3547;
       --mirror-cyan: #00F0FF;
       --mirror-cyan-glow: rgba(0, 240, 255, 0.15);
       --mirror-blue: #387BFF;
       --mirror-success: #00E676;
+      --mirror-success-glow: rgba(0, 230, 118, 0.15);
       --mirror-warning: #FFB800;
+      --mirror-warning-glow: rgba(255, 184, 0, 0.15);
       --mirror-critical: #FF3B30;
-      --mirror-uncertain: #9E00FF;
+      --mirror-critical-glow: rgba(255, 59, 48, 0.15);
+      --mirror-uncertain: #A855F7;
+      --mirror-uncertain-glow: rgba(168, 85, 247, 0.15);
       --text-primary: #F3F4F6;
       --text-secondary: #9CA3AF;
       --text-muted: #6B7280;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
     body {
-      background: #080A0F;
+      background: #07080C;
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 16px;
+      padding: 16px 12px;
+      user-select: none;
     }
+
     header {
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     header h1 {
-      font-size: 24px;
+      font-size: 22px;
+      font-weight: 800;
       color: var(--mirror-cyan);
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
     }
     header p {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-secondary);
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     /* Simulation Control Toolbar */
-    .sim-toolbar {
+    .sim-bar {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       background: var(--mirror-surface);
-      padding: 8px 14px;
+      padding: 6px 12px;
       border-radius: 20px;
       border: 1px solid var(--mirror-border);
-      margin-bottom: 16px;
-      font-size: 12px;
+      margin-bottom: 14px;
+      font-size: 11px;
       align-items: center;
       flex-wrap: wrap;
       justify-content: center;
+      max-width: 500px;
     }
-    .sim-btn {
-      padding: 4px 10px;
+    .sim-bar span { color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
+    .sim-chip {
+      padding: 4px 9px;
       border-radius: 12px;
       background: var(--mirror-elevated);
       color: var(--text-primary);
@@ -70,119 +82,151 @@
       font-size: 11px;
       transition: all 0.2s;
     }
-    .sim-btn:hover { border-color: var(--mirror-cyan); color: var(--mirror-cyan); }
-    .sim-btn.active { background: var(--mirror-cyan); color: #000; font-weight: bold; border-color: var(--mirror-cyan); }
+    .sim-chip:hover { border-color: var(--mirror-cyan); }
+    .sim-chip.active { background: var(--mirror-cyan); color: #000; font-weight: bold; border-color: var(--mirror-cyan); }
 
-    /* Journey stepper */
-    .journey-stepper {
+    /* Journey Breadcrumbs */
+    .journey-bar {
       display: flex;
-      gap: 6px;
+      gap: 4px;
       background: var(--mirror-surface);
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 20px;
       border: 1px solid var(--mirror-border);
-      margin-bottom: 20px;
-      font-size: 11px;
+      margin-bottom: 14px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .journey-step {
-      padding: 4px 8px;
-      border-radius: 12px;
+    .journey-node {
+      padding: 3px 7px;
+      border-radius: 10px;
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.2s;
     }
-    .journey-step.active {
+    .journey-node.active {
       background: var(--mirror-cyan);
       color: #000;
       font-weight: bold;
     }
+    .journey-node.completed {
+      color: var(--mirror-success);
+    }
 
-    /* Mobile Phone Shell */
+    /* Mobile Device Shell */
     .phone-frame {
-      width: 375px;
-      height: 770px;
+      width: 380px;
+      height: 750px;
       background: var(--mirror-obsidian);
       border-radius: 40px;
       border: 8px solid #232734;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 25px rgba(0, 240, 255, 0.12);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 25px rgba(0, 240, 255, 0.12);
       position: relative;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
+
+    /* Top Hardware Status Bar */
     .status-bar {
-      height: 34px;
+      height: 32px;
       background: var(--mirror-obsidian);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 20px;
+      padding: 0 18px;
       font-size: 11px;
       color: var(--text-muted);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      z-index: 10;
     }
-    .screen-container {
+
+    /* Screens */
+    .screen {
       flex: 1;
       overflow-y: auto;
       display: none;
       padding: 16px;
-    }
-    .screen-container.visible {
-      display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
+    }
+    .screen.active {
+      display: flex;
     }
 
-    /* UI Components */
+    /* Cards & Components */
     .card {
       background: var(--mirror-surface);
       border: 1px solid var(--mirror-border);
       border-radius: 14px;
       padding: 14px;
     }
+    .card-elevated {
+      background: var(--mirror-elevated);
+    }
+
     .btn {
       background: var(--mirror-cyan);
       color: #000;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px;
-      font-weight: bold;
-      font-size: 14px;
+      font-weight: 700;
+      font-size: 13px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: opacity 0.2s;
+      transition: all 0.2s;
     }
-    .btn:hover { opacity: 0.9; }
+    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
     .btn-secondary {
       background: transparent;
       border: 1px solid var(--mirror-border);
       color: var(--text-primary);
     }
+    .btn-secondary:hover {
+      background: var(--mirror-elevated);
+      border-color: var(--mirror-cyan);
+    }
     .btn-critical {
       background: var(--mirror-critical);
       color: #fff;
     }
+    .btn-success {
+      background: var(--mirror-success);
+      color: #000;
+    }
+    .btn-uncertain {
+      background: var(--mirror-uncertain);
+      color: #fff;
+    }
+
     .badge {
-      display: inline-block;
-      padding: 3px 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 7px;
       border-radius: 6px;
       font-size: 10px;
-      font-weight: bold;
+      font-weight: 700;
+      text-transform: uppercase;
     }
     .badge-cyan { background: var(--mirror-cyan-glow); color: var(--mirror-cyan); }
-    .badge-success { background: rgba(0,230,118,0.15); color: var(--mirror-success); }
-    .badge-warning { background: rgba(255,184,0,0.15); color: var(--mirror-warning); }
-    .badge-critical { background: rgba(255,59,48,0.15); color: var(--mirror-critical); }
-    .badge-uncertain { background: rgba(158,0,255,0.15); color: var(--mirror-uncertain); }
+    .badge-success { background: var(--mirror-success-glow); color: var(--mirror-success); }
+    .badge-warning { background: var(--mirror-warning-glow); color: var(--mirror-warning); }
+    .badge-critical { background: var(--mirror-critical-glow); color: var(--mirror-critical); }
+    .badge-uncertain { background: var(--mirror-uncertain-glow); color: var(--mirror-uncertain); }
 
-    /* Camera View HUD */
-    .viewfinder {
+    /* Viewfinder HUD */
+    .viewfinder-container {
       position: relative;
-      background: #050608;
+      background: #040508;
       height: 380px;
-      border-radius: 14px;
+      border-radius: 16px;
       border: 1px solid var(--mirror-border);
       overflow: hidden;
       display: flex;
@@ -190,26 +234,36 @@
       justify-content: space-between;
       padding: 12px;
     }
-    .reticle-overlay {
+    canvas#viewfinder-canvas {
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 140px; height: 140px;
-      pointer-events: none;
-      opacity: 0.8;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1;
     }
-    .bbox {
+    .viewfinder-hud {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      pointer-events: none;
+    }
+    .laser-line {
       position: absolute;
-      border: 2px solid var(--mirror-cyan);
-      background: var(--mirror-cyan-glow);
-      border-radius: 6px;
-      padding: 4px;
-      font-size: 10px;
-      font-weight: bold;
-      color: var(--mirror-cyan);
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--mirror-cyan), transparent);
+      box-shadow: 0 0 10px var(--mirror-cyan);
+      animation: scanLaser 2.2s ease-in-out infinite alternate;
+      z-index: 2;
+    }
+    @keyframes scanLaser {
+      0% { top: 15%; opacity: 0.2; }
+      50% { opacity: 0.9; }
+      100% { top: 85%; opacity: 0.2; }
     }
 
-    /* Modal */
+    /* Modal Overlay */
     .modal-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -219,338 +273,790 @@
       justify-content: center;
       padding: 20px;
       z-index: 100;
+      backdrop-filter: blur(4px);
     }
     .modal-card {
       background: #251014;
       border: 2px solid var(--mirror-critical);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 20px;
       text-align: center;
       display: flex;
       flex-direction: column;
       gap: 12px;
+      box-shadow: 0 10px 40px rgba(255,59,48,0.3);
+    }
+
+    /* Step Card */
+    .step-item {
+      background: var(--mirror-surface);
+      border: 1px solid var(--mirror-border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .step-item.active {
+      border-color: var(--mirror-cyan);
+      background: var(--mirror-elevated);
+      box-shadow: 0 0 12px var(--mirror-cyan-glow);
+    }
+    .step-item.completed {
+      border-color: var(--mirror-success);
+    }
+
+    /* Telemetry log pill */
+    .log-tray {
+      font-size: 10px;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.5);
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-top: auto;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>MIRROR UI SIMULATOR</h1>
-    <p>Journey: User gives goal → App interprets task → App shows plan → User confirms → App verifies result</p>
+    <h1>MIRROR Mobile Flow</h1>
+    <p>Physical Embodied Task Assistant • iQOO Prototype</p>
   </header>
 
-  <!-- Simulation Control Toolbar -->
-  <div class="sim-toolbar">
-    <span style="color: var(--text-muted); font-size: 11px;">Backend Mock Response:</span>
-    <button class="sim-btn active" onclick="setBackendMode('verified')">✔ Verified (94%)</button>
-    <button class="sim-btn" onclick="setBackendMode('false_success')">⚠ False Success Gate</button>
-    <button class="sim-btn" onclick="setBackendMode('uncertain')">❓ Uncertain (74%)</button>
-    <button class="sim-btn" onclick="triggerModal(true)">🚨 Safety Hazard Interlock</button>
+  <!-- Live Simulation State Switcher -->
+  <div class="sim-bar">
+    <span>Verification Test Mode:</span>
+    <button id="sim-mode-normal" class="sim-chip active" onclick="setSimMode('NORMAL')">✔ Pass (94%)</button>
+    <button id="sim-mode-uncertain" class="sim-chip" onclick="setSimMode('UNCERTAIN_BLUR')">❓ Uncertain (72%)</button>
+    <button id="sim-mode-false" class="sim-chip" onclick="setSimMode('FALSE_SUCCESS')">🚫 False Success Intercept</button>
+    <button class="sim-chip" style="color: var(--mirror-critical);" onclick="triggerSafetyModal(true)">🚨 Test Hazard</button>
   </div>
 
-  <!-- Journey Step Nav -->
-  <div class="journey-stepper">
-    <div class="journey-step active" onclick="showScreen('screen-home', 0)">1. Goal</div>
-    <div class="journey-step" onclick="showScreen('screen-camera', 1)">2. Viewfinder</div>
-    <div class="journey-step" onclick="showScreen('screen-summary', 2)">3. Summary</div>
-    <div class="journey-step" onclick="showScreen('screen-plan', 3)">4. Action Plan</div>
-    <div class="journey-step" onclick="showScreen('screen-verify', 4)">5. Verification</div>
+  <!-- Journey Stage Stepper -->
+  <div class="journey-bar">
+    <div id="step-node-0" class="journey-node active" onclick="navTo('home')">1. Goal</div>
+    <div id="step-node-1" class="journey-node" onclick="navTo('camera')">2. Scan</div>
+    <div id="step-node-2" class="journey-node" onclick="navTo('summary')">3. Summary</div>
+    <div id="step-node-3" class="journey-node" onclick="navTo('plan')">4. Action Plan</div>
+    <div id="step-node-4" class="journey-node" onclick="navTo('verify')">5. Verification</div>
   </div>
 
+  <!-- Mobile Screen Shell -->
   <div class="phone-frame">
-    <!-- Top Status Bar -->
+    <!-- Top Hardware Status Bar -->
     <div class="status-bar">
       <span>12:45</span>
-      <span style="color: var(--mirror-cyan);">iQOO • MIRROR AI</span>
-      <span>100%</span>
+      <span style="color: var(--mirror-cyan); font-weight: 700;">iQOO • MIRROR</span>
+      <span id="hw-battery">⚡ 98%</span>
     </div>
 
     <!-- SCREEN 1: HOME -->
-    <div id="screen-home" class="screen-container visible">
+    <div id="screen-home" class="screen active">
       <div>
-        <h2 style="font-size: 20px; margin-bottom: 4px;">What's your physical goal?</h2>
-        <p style="font-size: 12px; color: var(--text-secondary);">Point camera at any room or object. MIRROR will interpret the scene and verify your results.</p>
+        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">What is your physical goal?</h2>
+        <p style="font-size: 12px; color: var(--text-secondary);">Point camera at any room or setup. MIRROR will interpret the scene, plan safe actions, and verify results.</p>
       </div>
 
       <div class="card" style="border-color: var(--mirror-cyan);">
-        <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; outline: none;" placeholder="e.g. Inspect desk wiring and bundle loose cables safely...">Inspect desk wiring and bundle loose cables safely</textarea>
+        <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; outline: none;" placeholder="Describe your physical task (e.g. Inspect desk wiring, assemble chair)...">Inspect desk wiring and bundle loose cables safely</textarea>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-          <span class="badge badge-cyan">🎙️ Voice Dictation Active</span>
-          <button class="btn" style="padding: 8px 14px; font-size: 12px;" onclick="showScreen('screen-camera', 1)">Scan & Plan</button>
+          <span class="badge badge-cyan" id="voice-indicator">🎙️ Voice Dictation Ready</span>
+          <button class="btn" style="padding: 8px 14px; font-size: 12px;" onclick="onGoalSubmitted()">Scan & Plan</button>
         </div>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 13px; margin-bottom: 8px;">Quick Task Presets</h3>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Quick Task Presets</h3>
         <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-          <div style="padding: 8px; background: var(--mirror-elevated); border-radius: 8px; cursor: pointer;" onclick="setGoal('Inspect wall outlet for loose wire')">⚡ Inspect wall outlet for loose wire</div>
-          <div style="padding: 8px; background: var(--mirror-elevated); border-radius: 8px; cursor: pointer;" onclick="setGoal('Assemble bookshelf hardware alignment')">🛠️ Assemble bookshelf hardware alignment</div>
-          <div style="padding: 8px; background: var(--mirror-elevated); border-radius: 8px; cursor: pointer;" onclick="setGoal('Clear workshop table chemical bottles')">🧪 Clear workshop table chemical bottles</div>
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('Inspect wall socket for loose cable wiring')">⚡ Inspect wall socket for loose cable wiring</div>
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('Assemble bookshelf corner hardware alignment')">🛠️ Assemble bookshelf corner hardware alignment</div>
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('Clear workshop table chemical bottles safely')">🧪 Clear workshop table chemical bottles safely</div>
         </div>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 13px; margin-bottom: 6px;">Device Sensing Telemetry</h3>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Device Sensing Telemetry</h3>
         <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary);">
           <span>Camera: 1080p 60fps</span>
-          <span>Lux: 380 lx (Good)</span>
-          <span style="color: var(--mirror-success);">IMU: Stable</span>
+          <span>Lux: 380 lx (Optimal)</span>
+          <span style="color: var(--mirror-success);">IMU: Stable (0.98)</span>
         </div>
+      </div>
+
+      <div class="log-tray" id="log-home">
+        State: IDLE • Ready for physical goal
       </div>
     </div>
 
     <!-- SCREEN 2: CAMERA VIEW -->
-    <div id="screen-camera" class="screen-container">
+    <div id="screen-camera" class="screen">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-size: 16px;">Live Viewfinder</h2>
+        <h2 style="font-size: 16px;">Spatial Viewfinder</h2>
         <span class="badge badge-cyan">PERCEIVING</span>
       </div>
 
-      <div class="viewfinder">
-        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--mirror-cyan);">
-          <span>FPS: 59.8</span>
-          <span>EXPOSURE: LOCKED</span>
-          <span>TORCH: AUTO</span>
-        </div>
+      <div class="viewfinder-container">
+        <canvas id="viewfinder-canvas"></canvas>
+        <div class="laser-line"></div>
+        
+        <div class="viewfinder-hud">
+          <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--mirror-cyan);">
+            <span>FPS: 60.0 • 1080p</span>
+            <span id="hud-lux">LUX: 380 lx</span>
+            <span style="color: var(--mirror-success);" id="hud-imu">IMU: STABLE</span>
+          </div>
 
-        <!-- HUD Reticle -->
-        <svg class="reticle-overlay" viewBox="0 0 200 200">
-          <path d="M 20 50 L 20 20 L 50 20" stroke="#00F0FF" stroke-width="3" fill="none" />
-          <path d="M 150 20 L 180 20 L 180 50" stroke="#00F0FF" stroke-width="3" fill="none" />
-          <path d="M 180 150 L 180 180 L 150 180" stroke="#00F0FF" stroke-width="3" fill="none" />
-          <path d="M 50 180 L 20 180 L 20 150" stroke="#00F0FF" stroke-width="3" fill="none" />
-          <circle cx="100" cy="100" r="14" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="4 2" fill="none" />
-        </svg>
+          <!-- Central Target HUD Overlay -->
+          <svg style="align-self: center; width: 120px; height: 120px; opacity: 0.8;" viewBox="0 0 200 200">
+            <path d="M 20 50 L 20 20 L 50 20" stroke="#00F0FF" stroke-width="3" fill="none" />
+            <path d="M 150 20 L 180 20 L 180 50" stroke="#00F0FF" stroke-width="3" fill="none" />
+            <path d="M 180 150 L 180 180 L 150 180" stroke="#00F0FF" stroke-width="3" fill="none" />
+            <path d="M 50 180 L 20 180 L 20 150" stroke="#00F0FF" stroke-width="3" fill="none" />
+            <circle cx="100" cy="100" r="14" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="4 2" fill="none" />
+          </svg>
 
-        <!-- Bounding boxes -->
-        <div class="bbox" style="top: 70px; left: 30px; width: 150px; height: 90px;">
-          Cable Clutter (94%)
-        </div>
-        <div class="bbox" style="bottom: 90px; right: 40px; width: 110px; height: 60px; border-color: var(--mirror-success); color: var(--mirror-success); background: rgba(0,230,118,0.1);">
-          Zip-Tie Found
-        </div>
-
-        <div style="background: rgba(26,29,38,0.85); padding: 8px; border-radius: 8px; font-size: 11px;">
-          🎯 Goal: <span id="camera-goal-display">Inspect desk wiring</span>
+          <div style="background: rgba(13,15,21,0.85); padding: 8px; border-radius: 8px; font-size: 11px; border: 1px solid var(--mirror-border);">
+            🎯 Goal: <span id="camera-goal-pill" style="color: var(--mirror-cyan);">Inspect desk wiring</span>
+          </div>
         </div>
       </div>
 
-      <button class="btn" onclick="showScreen('screen-summary', 2)">Capture & Interpret Scene</button>
-      <button class="btn btn-secondary" onclick="showScreen('screen-home', 0)">Cancel Scan</button>
+      <button class="btn" onclick="onSceneCaptured()">Capture & Interpret Scene</button>
+      <button class="btn btn-secondary" onclick="navTo('home')">Back to Goal Input</button>
+
+      <div class="log-tray" id="log-camera">
+        State: PERCEIVING • Tracking objects & lighting
+      </div>
     </div>
 
     <!-- SCREEN 3: MISSION SUMMARY -->
-    <div id="screen-summary" class="screen-container">
+    <div id="summary-screen" class="screen">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 style="font-size: 16px;">Task Interpretation</h2>
         <span class="badge badge-cyan">PLANNING</span>
       </div>
 
       <div class="card" style="border-color: var(--mirror-cyan);">
-        <h3 style="font-size: 13px; color: var(--mirror-cyan); margin-bottom: 4px;">Physical Intent Model</h3>
-        <p style="font-size: 12px; color: var(--text-primary);">Decomposed user goal into 3 physical manipulation steps targeting desk cable organization.</p>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--mirror-cyan); margin-bottom: 4px;">Decomposed Intent</h3>
+        <p id="summary-intent-text" style="font-size: 13px; font-weight: 600; color: #fff;">Deconstructed goal into physical manipulation steps.</p>
+        <p id="summary-room-type" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Environment: Home Office / Desk</p>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 13px; margin-bottom: 8px;">Preconditions & Items</h3>
-        <div style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
-          <div style="color: var(--mirror-success);">✔ Detected: Cable ties, Power strip, HDMI cords</div>
-          <div style="color: var(--mirror-warning);">⚠ Optional Missing: Cable cutters / scissors</div>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Prerequisite Inventory</h3>
+        <div id="summary-prereqs" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
+          <!-- dynamically populated -->
         </div>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 13px; margin-bottom: 6px;">Safety Preconditions</h3>
-        <p style="font-size: 11px; color: var(--text-secondary);">Power strip switch must be powered OFF prior to manipulating cables.</p>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--mirror-warning); margin-bottom: 6px;">Safety Preconditions</h3>
+        <p id="summary-safety-notice" style="font-size: 11px; color: var(--text-secondary);">Power strip switch must be powered OFF prior to manipulating cables.</p>
       </div>
 
-      <button class="btn" onclick="showScreen('screen-plan', 3)">Generate Action Plan</button>
-      <button class="btn btn-secondary" onclick="showScreen('screen-camera', 1)">Re-scan Environment</button>
+      <button class="btn" onclick="onProceedToPlan()">Generate Action Plan</button>
+      <button class="btn btn-secondary" onclick="navTo('camera')">Re-scan Environment</button>
+
+      <div class="log-tray" id="log-summary">
+        State: PLANNING • Intent model formulated
+      </div>
     </div>
 
     <!-- SCREEN 4: ACTION PLAN -->
-    <div id="screen-plan" class="screen-container">
+    <div id="plan-screen" class="screen">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 style="font-size: 16px;">Action Plan</h2>
         <span class="badge badge-warning">AWAITING CONFIRMATION</span>
       </div>
 
-      <!-- Step 1 -->
-      <div class="card" style="border-color: var(--mirror-cyan); background: var(--mirror-elevated);">
-        <div style="display: flex; justify-content: space-between;">
-          <span style="font-weight: bold; font-size: 13px; color: var(--mirror-cyan);">Step 1: Isolate Power</span>
-          <span class="badge badge-cyan">ACTIVE</span>
-        </div>
-        <p style="font-size: 12px; margin-top: 6px; color: var(--text-secondary);">Switch off power strip at the wall outlet before touching high-voltage cables.</p>
-        <span class="badge badge-warning" style="margin-top: 8px;">Shock Hazard: Verify LED unlit</span>
+      <p style="font-size: 11px; color: var(--text-secondary);">Review physical steps before acting. Tap a step to inspect target object and verification criterion.</p>
+
+      <div id="plan-steps-container" style="display: flex; flex-direction: column; gap: 8px;">
+        <!-- Dynamically populated with step cards -->
       </div>
 
-      <!-- Step 2 -->
-      <div class="card">
-        <div style="font-weight: bold; font-size: 13px;">Step 2: Group Signal Cables</div>
-        <p style="font-size: 12px; margin-top: 6px; color: var(--text-secondary);">Align HDMI, USB-C, and Ethernet cables together neatly.</p>
-      </div>
+      <button id="plan-confirm-btn" class="btn" onclick="onConfirmPlanAndExecute()">User Confirms: Begin Step 1</button>
+      <button class="btn btn-critical" onclick="triggerSafetyModal(true)">Simulate Hazard Alert</button>
+      <button class="btn btn-secondary" onclick="navTo('summary')">Back to Summary</button>
 
-      <!-- Step 3 -->
-      <div class="card">
-        <div style="font-weight: bold; font-size: 13px;">Step 3: Fasten Zip-Tie</div>
-        <p style="font-size: 12px; margin-top: 6px; color: var(--text-secondary);">Loop zip-tie around the bundle and pull tight.</p>
+      <div class="log-tray" id="log-plan">
+        State: AWAITING_CONFIRMATION • Step-by-step interlock
       </div>
-
-      <button class="btn" onclick="showScreen('screen-verify', 4)">User Confirms: Begin Step 1</button>
-      <button class="btn btn-critical" onclick="triggerModal(true)">Simulate Safety Alert</button>
     </div>
 
     <!-- SCREEN 5: VERIFICATION -->
-    <div id="screen-verify" class="screen-container">
+    <div id="verify-screen" class="screen">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 style="font-size: 16px;">Result Verification</h2>
         <span id="v-status-badge" class="badge badge-success">VERIFIED PASS</span>
       </div>
 
-      <div id="v-card" class="card" style="border-color: var(--mirror-success); background: rgba(0,230,118,0.1);">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span id="v-icon" style="font-size: 20px;">✅</span>
+      <!-- Result Banner -->
+      <div id="v-card" class="card" style="border-color: var(--mirror-success); background: var(--mirror-success-glow);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span id="v-icon" style="font-size: 24px;">✅</span>
           <div>
-            <div id="v-title" style="font-weight: bold; font-size: 14px; color: var(--mirror-success);">VERIFIED COMPLETE</div>
-            <div id="v-confidence" style="font-size: 11px; color: var(--text-secondary);">Confidence: 94% (Threshold: 85%)</div>
+            <div id="v-title" style="font-weight: 700; font-size: 14px; color: var(--mirror-success);">VERIFIED COMPLETE</div>
+            <div id="v-confidence" style="font-size: 11px; color: var(--text-secondary);">Empirical Confidence: 94% (Threshold: 85%)</div>
           </div>
         </div>
-        <div style="margin-top: 10px; height: 6px; background: #333; border-radius: 3px; overflow: hidden;">
+        <div style="margin-top: 10px; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden;">
           <div id="v-bar" style="width: 94%; height: 100%; background: var(--mirror-success); transition: width 0.4s;"></div>
         </div>
       </div>
 
+      <!-- Before / After Diff Viewer -->
       <div class="card">
-        <h3 style="font-size: 13px; margin-bottom: 8px;">Before / After Visual Diff</h3>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Visual Sensor Evidence Comparison</h3>
         <div style="display: flex; gap: 8px;">
-          <div style="flex: 1; height: 80px; background: #111; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); border: 1px solid var(--mirror-border);">T₀ Initial (Loose)</div>
-          <div id="v-after-frame" style="flex: 1; height: 80px; background: #111; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--mirror-success); border: 1px solid var(--mirror-success);">T₁ Post (Bundled)</div>
+          <div style="flex: 1; height: 85px; background: #0A0C10; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); border: 1px solid var(--mirror-border);">
+            <span>T₀ Initial Frame</span>
+            <span style="font-size: 9px; color: var(--text-secondary); margin-top: 2px;">Before Action</span>
+          </div>
+          <div id="v-after-frame" style="flex: 1; height: 85px; background: #0A0C10; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--mirror-success); border: 1.5px solid var(--mirror-success);">
+            <span id="v-after-label">T₁ Post-Action</span>
+            <span style="font-size: 9px; color: var(--text-secondary); margin-top: 2px;">Sensor Delta: 0.88</span>
+          </div>
         </div>
       </div>
 
+      <!-- Detected Changes & Reasoning -->
       <div class="card">
-        <h3 style="font-size: 13px; margin-bottom: 6px;">Verified Evidence Breakdown</h3>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Verification Criteria Breakdown</h3>
         <div id="v-breakdown" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: var(--text-primary);">
-          <div>✔ Power switch physically depressed to OFF</div>
-          <div>✔ Cable bundle diameter reduced from 14cm to 3.8cm</div>
-          <div>✔ Zip-tie fastener locked and tensioned</div>
+          <!-- populated dynamically -->
         </div>
       </div>
 
-      <button id="v-primary-btn" class="btn" style="background: var(--mirror-success); color: #000;" onclick="showScreen('screen-home', 0)">Complete Mission & Return Home</button>
-      <button class="btn btn-secondary" onclick="showScreen('screen-camera', 1)">Retake Verification Frame</button>
+      <button id="v-primary-btn" class="btn btn-success" onclick="onAdvanceStep()">Mark Verified & Advance</button>
+      <button class="btn btn-secondary" onclick="navTo('camera')">Retake Verification Frame</button>
+
+      <div class="log-tray" id="log-verify">
+        State: VERIFIED • Strict multi-modal corroboration
+      </div>
     </div>
 
-    <!-- SCREEN 6: SAFETY ALERT MODAL -->
+    <!-- SCREEN 6: MISSION COMPLETED CELEBRATION -->
+    <div id="complete-screen" class="screen">
+      <div style="text-align: center; padding: 20px 0;">
+        <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
+        <h2 style="font-size: 20px; font-weight: 800; color: var(--mirror-success);">MISSION FULLY VERIFIED!</h2>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">All physical steps completed with empirical multi-modal proof.</p>
+      </div>
+
+      <div class="card" style="border-color: var(--mirror-success);">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--mirror-success); margin-bottom: 8px;">Audit Trail Summary</h3>
+        <div id="complete-summary-list" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
+          <!-- dynamically populated -->
+        </div>
+      </div>
+
+      <button class="btn" style="background: var(--mirror-cyan);" onclick="resetAllToHome()">Start New Mission</button>
+    </div>
+
+    <!-- SAFETY ALERT MODAL -->
     <div id="safety-modal" class="modal-overlay">
       <div class="modal-card">
-        <div style="font-size: 36px;">⚠️</div>
+        <div style="font-size: 40px;">⚠️</div>
         <span class="badge badge-critical" style="align-self: center;">CRITICAL SAFETY INTERRUPT</span>
-        <h2 style="font-size: 16px; color: #fff;">High Voltage Wire Hazard Detected</h2>
-        <p style="font-size: 12px; color: var(--text-primary);">Exposed copper wiring detected near power supply. Do NOT touch bare wire conductors.</p>
-        <button class="btn btn-critical" onclick="triggerModal(false); showScreen('screen-home', 0);">Abort Mission Immediately</button>
-        <button class="btn btn-secondary" onclick="triggerModal(false)">Hazard Resolved (Override & Proceed)</button>
+        <h2 id="modal-hazard-title" style="font-size: 16px; color: #fff;">High Voltage Wire Hazard Detected</h2>
+        <p id="modal-hazard-desc" style="font-size: 12px; color: var(--text-primary);">Perception engine detected exposed copper wiring on a live power supply. Do NOT touch bare wire conductors.</p>
+        <div style="background: rgba(0,0,0,0.5); padding: 8px; border-radius: 8px; font-size: 11px; color: var(--mirror-warning); text-align: left;">
+          Mandatory Safe Action: Unplug power source at main breaker before proceeding.
+        </div>
+        <button class="btn btn-critical" onclick="onAbortMission()">Abort Mission Immediately</button>
+        <button class="btn btn-secondary" onclick="onDismissHazardOverride()">Area Secured (Override & Continue)</button>
       </div>
     </div>
   </div>
 
   <script>
-    const screens = ['screen-home', 'screen-camera', 'screen-summary', 'screen-plan', 'screen-verify'];
-    function showScreen(screenId, stepIndex) {
-      screens.forEach(id => {
-        document.getElementById(id).classList.remove('visible');
-      });
-      document.getElementById(screenId).classList.add('visible');
-      
-      const steps = document.querySelectorAll('.journey-step');
-      steps.forEach((el, idx) => {
-        if (idx === stepIndex) el.classList.add('active');
-        else el.classList.remove('active');
-      });
+    // State Model
+    const appState = {
+      goal: "Inspect desk wiring and bundle loose cables safely",
+      missionState: "IDLE", // IDLE, PERCEIVING, PLANNING, AWAITING_CONFIRMATION, EXECUTING, VERIFYING, COMPLETED, UNCERTAIN_REVIEW, HAZARD_BLOCKED
+      activeStepIndex: 0,
+      steps: [],
+      prerequisites: { detected: [], missing: [] },
+      simMode: "NORMAL", // NORMAL, UNCERTAIN_BLUR, FALSE_SUCCESS
+      hazardActive: false,
+      history: []
+    };
 
-      if (screenId === 'screen-camera') {
-        const val = document.getElementById('goal-input').value;
-        document.getElementById('camera-goal-display').innerText = val;
+    // Canvas Simulation Setup for Camera Viewfinder
+    const canvas = document.getElementById("viewfinder-canvas");
+    const ctx = canvas.getContext("2d");
+    let animationFrameId = null;
+    let t = 0;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+
+    function drawCameraSimulation() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      t += 0.03;
+
+      // Dark futuristic room backdrop gradient
+      const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      bg.addColorStop(0, "#080B12");
+      bg.addColorStop(1, "#020406");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Grid floor
+      ctx.strokeStyle = "rgba(46, 53, 71, 0.4)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Simulated Object 1 (Target Bundle)
+      const objX = canvas.width * 0.35 + Math.sin(t * 0.5) * 5;
+      const objY = canvas.height * 0.35 + Math.cos(t * 0.5) * 4;
+      ctx.strokeStyle = "#00F0FF";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(objX, objY, 130, 80);
+      ctx.fillStyle = "rgba(0, 240, 255, 0.1)";
+      ctx.fillRect(objX, objY, 130, 80);
+
+      ctx.fillStyle = "#00F0FF";
+      ctx.font = "bold 9px sans-serif";
+      ctx.fillText("Target Object (Conf: 94%)", objX + 4, objY + 12);
+
+      // Simulated Object 2 (Tool)
+      const toolX = canvas.width * 0.55 + Math.cos(t * 0.4) * 4;
+      const toolY = canvas.height * 0.65;
+      ctx.strokeStyle = "#00E676";
+      ctx.strokeRect(toolX, toolY, 90, 50);
+      ctx.fillStyle = "rgba(0, 230, 118, 0.08)";
+      ctx.fillRect(toolX, toolY, 90, 50);
+
+      ctx.fillStyle = "#00E676";
+      ctx.fillText("Detected Tool (Found)", toolX + 4, toolY + 12);
+
+      animationFrameId = requestAnimationFrame(drawCameraSimulation);
+    }
+
+    // Dynamic Plan Decomposer
+    function decomposeTaskGoal(goal) {
+      const g = goal.toLowerCase();
+      let steps = [];
+      let detected = [];
+      let missing = [];
+      let safety = "";
+
+      if (g.includes("wire") || g.includes("cable") || g.includes("socket") || g.includes("plug")) {
+        steps = [
+          {
+            num: 1,
+            title: "Isolate AC Power Source",
+            desc: "Turn off wall power strip switch before touching any power cords.",
+            target: "Wall AC Switch",
+            tool: null,
+            warning: "Shock Hazard: Verify power LED is completely unlit",
+            criterion: "Power strip LED extinguished; 0V potential",
+            completed: false
+          },
+          {
+            num: 2,
+            title: "Group Signal Cables",
+            desc: "Gather HDMI, USB-C, and Ethernet lines neatly into parallel bundle.",
+            target: "Desk Cable Cluster",
+            tool: "Zip-Tie (x1)",
+            warning: null,
+            criterion: "Cables aligned into compact 4cm diameter bundle",
+            completed: false
+          },
+          {
+            num: 3,
+            title: "Fasten and Tension Zip-Tie",
+            desc: "Loop zip-tie around the bundle and cinch firmly until snug.",
+            target: "Zip-Tie Fastener",
+            tool: "Zip-Tie",
+            warning: null,
+            criterion: "Zip-tie locked; bundle stationary under lateral pressure",
+            completed: false
+          }
+        ];
+        detected = ["Zip-Ties (Found in drawer)", "Wall Switch Surface"];
+        missing = ["Cable Cutter / Snips (Optional)"];
+        safety = "230V live socket detected nearby. Never pull cables plugged into live AC outlets.";
+      } else if (g.includes("shelf") || g.includes("assemble") || g.includes("chair") || g.includes("table")) {
+        steps = [
+          {
+            num: 1,
+            title: "Inventory Fasteners & Brackets",
+            desc: "Lay out M4 hex screws and corner angle plates on flat surface.",
+            target: "Hardware Fastener Tray",
+            tool: "Hex Key / Allen Wrench",
+            warning: null,
+            criterion: "All 4 corner brackets verified against guide",
+            completed: false
+          },
+          {
+            num: 2,
+            title: "Hand-Thread Primary Bolts",
+            desc: "Finger-tighten diagonal bolts 3 turns into pilot holes without cross-threading.",
+            target: "Diagonal Joints A & B",
+            tool: "Hands",
+            warning: null,
+            criterion: "Bolts threaded 4mm flush without bind",
+            completed: false
+          },
+          {
+            num: 3,
+            title: "Torque Fasteners to Flush Fit",
+            desc: "Use hex key clockwise until bolt head seats firmly against metal frame.",
+            target: "Corner Fasteners",
+            tool: "Hex Key",
+            warning: null,
+            criterion: "Zero mechanical gap; joint does not wobble",
+            completed: false
+          }
+        ];
+        detected = ["Hex Key (Found on table)", "Fastener Tray"];
+        missing = ["Rubber Mallet (Optional)"];
+        safety = "Pinch point alert: keep fingers clear of hinge joints during alignment.";
+      } else {
+        steps = [
+          {
+            num: 1,
+            title: "Clear 30cm Work Envelope",
+            desc: "Remove obstructions and debris from around the primary workspace.",
+            target: "Target Surface",
+            tool: null,
+            warning: null,
+            criterion: "Workspace clear of loose items",
+            completed: false
+          },
+          {
+            num: 2,
+            title: "Position and Align Component",
+            desc: "Place the target unit along reference guides indicated on screen.",
+            target: "Target Component",
+            tool: "Hands",
+            warning: null,
+            criterion: "Component aligned to target bounds",
+            completed: false
+          },
+          {
+            num: 3,
+            title: "Verify Stability & Engagement",
+            desc: "Apply gentle lateral hand pressure to confirm mechanical lock.",
+            target: "Assembled Structure",
+            tool: null,
+            warning: null,
+            criterion: "Zero movement detected under test force",
+            completed: false
+          }
+        ];
+        detected = ["Work Surface", "Reference Markers"];
+        missing = [];
+        safety = "Maintain balanced posture and stable lighting throughout task.";
+      }
+
+      return { steps, detected, missing, safety };
+    }
+
+    // Navigation and Screen Flow
+    function navTo(screenName) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".journey-node").forEach(n => n.classList.remove("active"));
+
+      if (screenName === "home") {
+        document.getElementById("screen-home").classList.add("active");
+        document.getElementById("step-node-0").classList.add("active");
+        appState.missionState = "IDLE";
+      } else if (screenName === "camera") {
+        document.getElementById("screen-camera").classList.add("active");
+        document.getElementById("step-node-1").classList.add("active");
+        document.getElementById("camera-goal-pill").innerText = appState.goal;
+        appState.missionState = "PERCEIVING";
+        resizeCanvas();
+        if (!animationFrameId) drawCameraSimulation();
+      } else if (screenName === "summary") {
+        document.getElementById("summary-screen").classList.add("active");
+        document.getElementById("step-node-2").classList.add("active");
+        appState.missionState = "PLANNING";
+      } else if (screenName === "plan") {
+        document.getElementById("plan-screen").classList.add("active");
+        document.getElementById("step-node-3").classList.add("active");
+        appState.missionState = "AWAITING_CONFIRMATION";
+        renderActionPlan();
+      } else if (screenName === "verify") {
+        document.getElementById("verify-screen").classList.add("active");
+        document.getElementById("step-node-4").classList.add("active");
+        appState.missionState = "VERIFYING";
+        renderVerificationScreen();
+      } else if (screenName === "complete") {
+        document.getElementById("complete-screen").classList.add("active");
+        appState.missionState = "COMPLETED";
+        renderCompletionScreen();
       }
     }
 
-    function setGoal(text) {
-      document.getElementById('goal-input').value = text;
+    function setPreset(text) {
+      document.getElementById("goal-input").value = text;
+      appState.goal = text;
     }
 
-    function triggerModal(show) {
-      document.getElementById('safety-modal').style.display = show ? 'flex' : 'none';
+    function onGoalSubmitted() {
+      const val = document.getElementById("goal-input").value.trim();
+      if (!val) {
+        alert("Please enter a goal.");
+        return;
+      }
+      appState.goal = val;
+      navTo("camera");
     }
 
-    function setBackendMode(mode) {
-      document.querySelectorAll('.sim-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
+    function onSceneCaptured() {
+      // Decompose goal dynamically
+      const decomp = decomposeTaskGoal(appState.goal);
+      appState.steps = decomp.steps;
+      appState.prerequisites.detected = decomp.detected;
+      appState.prerequisites.missing = decomp.missing;
+      appState.activeStepIndex = 0;
 
-      const badge = document.getElementById('v-status-badge');
-      const card = document.getElementById('v-card');
-      const icon = document.getElementById('v-icon');
-      const title = document.getElementById('v-title');
-      const conf = document.getElementById('v-confidence');
-      const bar = document.getElementById('v-bar');
-      const breakdown = document.getElementById('v-breakdown');
-      const afterFrame = document.getElementById('v-after-frame');
-      const btn = document.getElementById('v-primary-btn');
+      // Populate Summary Screen
+      document.getElementById("summary-intent-text").innerText = `"${appState.goal}"`;
+      document.getElementById("summary-safety-notice").innerText = decomp.safety;
 
-      if (mode === 'verified') {
-        badge.className = 'badge badge-success';
-        badge.innerText = 'VERIFIED PASS';
-        card.style.borderColor = 'var(--mirror-success)';
-        card.style.background = 'rgba(0,230,118,0.1)';
-        icon.innerText = '✅';
-        title.innerText = 'VERIFIED COMPLETE';
-        title.style.color = 'var(--mirror-success)';
-        conf.innerText = 'Confidence: 94% (Threshold: 85%)';
-        bar.style.width = '94%';
-        bar.style.background = 'var(--mirror-success)';
-        afterFrame.style.borderColor = 'var(--mirror-success)';
-        afterFrame.style.color = 'var(--mirror-success)';
-        afterFrame.innerText = 'T₁ Post (Bundled)';
-        breakdown.innerHTML = '<div>✔ Power switch physically depressed to OFF</div><div>✔ Cable bundle diameter reduced from 14cm to 3.8cm</div><div>✔ Zip-tie fastener locked and tensioned</div>';
-        btn.innerText = 'Complete Mission & Return Home';
-        btn.style.background = 'var(--mirror-success)';
-      } else if (mode === 'false_success') {
-        badge.className = 'badge badge-critical';
-        badge.innerText = 'FALSE SUCCESS BLOCKED';
-        card.style.borderColor = 'var(--mirror-critical)';
-        card.style.background = 'rgba(255,59,48,0.15)';
-        icon.innerText = '🚫';
-        title.innerText = 'COMPLETION REJECTED';
-        title.style.color = 'var(--mirror-critical)';
-        conf.innerText = 'Model claimed done, but Visual Delta: 0.02 (< 0.70 required)';
-        bar.style.width = '10%';
-        bar.style.background = 'var(--mirror-critical)';
-        afterFrame.style.borderColor = 'var(--mirror-critical)';
-        afterFrame.style.color = 'var(--mirror-critical)';
-        afterFrame.innerText = 'T₁ (Unchanged Frame)';
-        breakdown.innerHTML = '<div style="color: var(--mirror-critical);">✖ Visual state shows zero measurable displacement.</div><div>⚠ Invariant 2 triggered: Linguistic completion ignored without visual proof.</div>';
-        btn.innerText = 'Retake Camera Verification';
-        btn.style.background = 'var(--mirror-cyan)';
-      } else if (mode === 'uncertain') {
-        badge.className = 'badge badge-uncertain';
-        badge.innerText = 'UNCERTAIN REVIEW';
-        card.style.borderColor = 'var(--mirror-uncertain)';
-        card.style.background = 'rgba(158,0,255,0.15)';
-        icon.innerText = '❓';
-        title.innerText = 'HUMAN INSPECTION REQUIRED';
-        title.style.color = 'var(--mirror-uncertain)';
-        conf.innerText = 'Confidence: 74% (Below 85% safety threshold)';
-        bar.style.width = '74%';
-        bar.style.background = 'var(--mirror-uncertain)';
-        afterFrame.style.borderColor = 'var(--mirror-uncertain)';
-        afterFrame.style.color = 'var(--mirror-uncertain)';
-        afterFrame.innerText = 'T₁ (Motion Blurred)';
-        breakdown.innerHTML = '<div style="color: var(--mirror-warning);">⚠ Camera motion stability: 0.58 (blurred frame)</div><div>• Ambient shadow detected across target cable bundle</div>';
-        btn.innerText = 'Confirm Manually or Retake Frame';
-        btn.style.background = 'var(--mirror-uncertain)';
-        btn.style.color = '#fff';
+      const prereqContainer = document.getElementById("summary-prereqs");
+      prereqContainer.innerHTML = "";
+      decomp.detected.forEach(d => {
+        prereqContainer.innerHTML += `<div style="color: var(--mirror-success);">✔ Detected: ${d}</div>`;
+      });
+      if (decomp.missing.length > 0) {
+        decomp.missing.forEach(m => {
+          prereqContainer.innerHTML += `<div style="color: var(--mirror-warning);">⚠ Missing: ${m}</div>`;
+        });
+      } else {
+        prereqContainer.innerHTML += `<div style="color: var(--text-secondary);">All essential prerequisites available.</div>`;
+      }
+
+      navTo("summary");
+    }
+
+    function onProceedToPlan() {
+      navTo("plan");
+    }
+
+    function renderActionPlan() {
+      const container = document.getElementById("plan-steps-container");
+      container.innerHTML = "";
+
+      appState.steps.forEach((step, idx) => {
+        const isActive = idx === appState.activeStepIndex;
+        const isDone = step.completed;
+
+        let borderClass = isActive ? "active" : isDone ? "completed" : "";
+        let badgeHtml = isDone 
+          ? `<span class="badge badge-success">COMPLETED</span>` 
+          : isActive 
+          ? `<span class="badge badge-cyan">ACTIVE</span>` 
+          : `<span class="badge" style="background:#222; color:#888;">STEP ${idx+1}</span>`;
+
+        let warningHtml = step.warning ? `<div style="margin-top: 6px; font-size: 10px; color: var(--mirror-warning); background: var(--mirror-warning-glow); padding: 4px 6px; border-radius: 4px;">⚠ ${step.warning}</div>` : "";
+
+        container.innerHTML += `
+          <div class="step-item ${borderClass}" onclick="selectStep(${idx})">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 700; font-size: 13px; color: ${isActive ? 'var(--mirror-cyan)' : isDone ? 'var(--mirror-success)' : '#fff'};">Step ${step.num}: ${step.title}</span>
+              ${badgeHtml}
+            </div>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">${step.desc}</p>
+            <div style="display: flex; gap: 6px; margin-top: 6px; font-size: 10px; color: var(--text-muted);">
+              <span>Target: ${step.target}</span>
+              ${step.tool ? `<span>• Tool: ${step.tool}</span>` : ""}
+            </div>
+            ${warningHtml}
+          </div>
+        `;
+      });
+
+      const currentStep = appState.steps[appState.activeStepIndex];
+      const btn = document.getElementById("plan-confirm-btn");
+      if (currentStep) {
+        btn.innerText = `User Confirms: Begin Step ${currentStep.num}`;
       }
     }
+
+    function selectStep(idx) {
+      appState.activeStepIndex = idx;
+      renderActionPlan();
+    }
+
+    function onConfirmPlanAndExecute() {
+      navTo("verify");
+    }
+
+    function renderVerificationScreen() {
+      const step = appState.steps[appState.activeStepIndex];
+      const badge = document.getElementById("v-status-badge");
+      const card = document.getElementById("v-card");
+      const icon = document.getElementById("v-icon");
+      const title = document.getElementById("v-title");
+      const conf = document.getElementById("v-confidence");
+      const bar = document.getElementById("v-bar");
+      const breakdown = document.getElementById("v-breakdown");
+      const afterFrame = document.getElementById("v-after-frame");
+      const btn = document.getElementById("v-primary-btn");
+
+      if (appState.simMode === "NORMAL") {
+        badge.className = "badge badge-success";
+        badge.innerText = "VERIFIED PASS";
+        card.style.borderColor = "var(--mirror-success)";
+        card.style.background = "var(--mirror-success-glow)";
+        icon.innerText = "✅";
+        title.innerText = "VERIFIED COMPLETE";
+        title.style.color = "var(--mirror-success)";
+        conf.innerText = "Empirical Confidence: 94% (Threshold: 85%)";
+        bar.style.width = "94%";
+        bar.style.background = "var(--mirror-success)";
+        afterFrame.style.borderColor = "var(--mirror-success)";
+        afterFrame.style.color = "var(--mirror-success)";
+        afterFrame.innerHTML = "<span>T₁ Post-Action</span><span style='font-size: 9px; color: var(--mirror-success);'>Target Realigned</span>";
+        breakdown.innerHTML = `
+          <div>✔ Post-condition confirmed: ${step.criterion}</div>
+          <div>✔ Optical displacement measured: 14.2cm shift verified</div>
+          <div>✔ Zero residual clutter in bounding region</div>
+        `;
+        btn.className = "btn btn-success";
+        btn.innerText = appState.activeStepIndex + 1 < appState.steps.length ? "Mark Verified & Advance" : "Finish All Steps & Complete";
+        btn.onclick = onAdvanceStep;
+      } else if (appState.simMode === "UNCERTAIN_BLUR") {
+        badge.className = "badge badge-uncertain";
+        badge.innerText = "UNCERTAIN REVIEW";
+        card.style.borderColor = "var(--mirror-uncertain)";
+        card.style.background = "var(--mirror-uncertain-glow)";
+        icon.innerText = "❓";
+        title.innerText = "HUMAN INSPECTION REQUIRED";
+        title.style.color = "var(--mirror-uncertain)";
+        conf.innerText = "Confidence: 72% (Below 85% safety threshold)";
+        bar.style.width = "72%";
+        bar.style.background = "var(--mirror-uncertain)";
+        afterFrame.style.borderColor = "var(--mirror-uncertain)";
+        afterFrame.style.color = "var(--mirror-uncertain)";
+        afterFrame.innerHTML = "<span>T₁ (Motion Blurred)</span><span style='font-size: 9px; color: var(--mirror-uncertain);'>Tremor detected</span>";
+        breakdown.innerHTML = `
+          <div style="color: var(--mirror-warning);">⚠ Camera stability: 0.54 (hand tremor during snap)</div>
+          <div>• Ambient shadow detected across target fastener</div>
+          <div style="color: var(--text-secondary);">Human-in-the-loop interlock active: Please inspect physically.</div>
+        `;
+        btn.className = "btn btn-uncertain";
+        btn.innerText = "Confirm Physically (Human Override)";
+        btn.onclick = onHumanAffirmUncertain;
+      } else if (appState.simMode === "FALSE_SUCCESS") {
+        badge.className = "badge badge-critical";
+        badge.innerText = "FALSE SUCCESS INTERCEPT";
+        card.style.borderColor = "var(--mirror-critical)";
+        card.style.background = "var(--mirror-critical-glow)";
+        icon.innerText = "🚫";
+        title.innerText = "COMPLETION REJECTED";
+        title.style.color = "var(--mirror-critical)";
+        conf.innerText = "Sensor Delta: 0.01 (Model assertion rejected)";
+        bar.style.width = "12%";
+        bar.style.background = "var(--mirror-critical)";
+        afterFrame.style.borderColor = "var(--mirror-critical)";
+        afterFrame.style.color = "var(--mirror-critical)";
+        afterFrame.innerHTML = "<span>T₁ (Unchanged Frame)</span><span style='font-size: 9px; color: var(--mirror-critical);'>Delta: 0.01</span>";
+        breakdown.innerHTML = `
+          <div style="color: var(--mirror-critical);">✖ Invariant 2 violation: Model claimed done, but optical diff is near zero.</div>
+          <div>• Task remains in progress. Real physical action required.</div>
+        `;
+        btn.className = "btn btn-secondary";
+        btn.innerText = "Action Not Done - Retake Camera Frame";
+        btn.onclick = () => navTo("camera");
+      }
+    }
+
+    function onAdvanceStep() {
+      appState.steps[appState.activeStepIndex].completed = true;
+
+      if (appState.activeStepIndex + 1 < appState.steps.length) {
+        appState.activeStepIndex += 1;
+        navTo("plan");
+      } else {
+        navTo("complete");
+      }
+    }
+
+    function onHumanAffirmUncertain() {
+      // User manually affirmed
+      appState.steps[appState.activeStepIndex].completed = true;
+      if (appState.activeStepIndex + 1 < appState.steps.length) {
+        appState.activeStepIndex += 1;
+        navTo("plan");
+      } else {
+        navTo("complete");
+      }
+    }
+
+    function renderCompletionScreen() {
+      const list = document.getElementById("complete-summary-list");
+      list.innerHTML = "";
+      appState.steps.forEach(s => {
+        list.innerHTML += `
+          <div>
+            <span style="color: var(--mirror-success); font-weight: 700;">✔ Step ${s.num}: ${s.title}</span>
+            <div style="color: var(--text-secondary); font-size: 10px; margin-left: 14px;">Criterion verified: ${s.criterion}</div>
+          </div>
+        `;
+      });
+    }
+
+    function resetAllToHome() {
+      appState.steps = [];
+      appState.activeStepIndex = 0;
+      appState.simMode = "NORMAL";
+      navTo("home");
+    }
+
+    // Safety Alert Modal Handlers
+    function triggerSafetyModal(show) {
+      document.getElementById("safety-modal").style.display = show ? "flex" : "none";
+    }
+
+    function onAbortMission() {
+      triggerSafetyModal(false);
+      resetAllToHome();
+    }
+
+    function onDismissHazardOverride() {
+      triggerSafetyModal(false);
+    }
+
+    function setSimMode(mode) {
+      appState.simMode = mode;
+      document.querySelectorAll(".sim-chip").forEach(b => b.classList.remove("active"));
+      if (mode === "NORMAL") document.getElementById("sim-mode-normal").classList.add("active");
+      if (mode === "UNCERTAIN_BLUR") document.getElementById("sim-mode-uncertain").classList.add("active");
+      if (mode === "FALSE_SUCCESS") document.getElementById("sim-mode-false").classList.add("active");
+
+      if (document.getElementById("verify-screen").classList.contains("active")) {
+        renderVerificationScreen();
+      }
+    }
+
+    // Window load initialization
+    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("DOMContentLoaded", () => {
+      resizeCanvas();
+      drawCameraSimulation();
+    });
   </script>
 </body>
 </html>
