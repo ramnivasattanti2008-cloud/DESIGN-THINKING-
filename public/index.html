@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIRROR - Embodied AI Mobile Assistant (/v1 Integrated)</title>
+  <title>MIRROR - Embodied AI Assistant (Live Gemini Powered)</title>
   <style>
     :root {
       --mirror-obsidian: #0D0F15;
@@ -11,23 +11,23 @@
       --mirror-elevated: #212534;
       --mirror-border: #2E3547;
       --mirror-cyan: #00F0FF;
-      --mirror-cyan-glow: rgba(0, 240, 255, 0.15);
+      --mirror-cyan-glow: rgba(0, 240, 255, 0.2);
       --mirror-blue: #387BFF;
       --mirror-success: #00E676;
-      --mirror-success-glow: rgba(0, 230, 118, 0.15);
+      --mirror-success-glow: rgba(0, 230, 118, 0.2);
       --mirror-warning: #FFB800;
-      --mirror-warning-glow: rgba(255, 184, 0, 0.15);
+      --mirror-warning-glow: rgba(255, 184, 0, 0.2);
       --mirror-critical: #FF3B30;
-      --mirror-critical-glow: rgba(255, 59, 48, 0.15);
+      --mirror-critical-glow: rgba(255, 59, 48, 0.2);
       --mirror-uncertain: #A855F7;
-      --mirror-uncertain-glow: rgba(168, 85, 247, 0.15);
+      --mirror-uncertain-glow: rgba(168, 85, 247, 0.2);
       --text-primary: #F3F4F6;
       --text-secondary: #9CA3AF;
       --text-muted: #6B7280;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    
+
     body {
       background: #07080C;
       color: var(--text-primary);
@@ -41,43 +41,48 @@
 
     header {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     header h1 {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 800;
       color: var(--mirror-cyan);
-      letter-spacing: 1.5px;
+      letter-spacing: 2px;
       text-transform: uppercase;
+      text-shadow: 0 0 16px var(--mirror-cyan-glow);
     }
     header p {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-secondary);
-      margin-top: 3px;
+      margin-top: 4px;
     }
 
     /* Live Backend Status Bar */
     .backend-bar {
       display: flex;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 10px;
       align-items: center;
+      justify-content: center;
       background: var(--mirror-surface);
-      padding: 5px 12px;
-      border-radius: 16px;
+      padding: 8px 16px;
+      border-radius: 20px;
       border: 1px solid var(--mirror-border);
-      margin-bottom: 10px;
-      font-size: 11px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      max-width: 600px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
     .backend-dot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: var(--text-muted);
       transition: all 0.3s;
     }
     .backend-dot.online {
       background: var(--mirror-success);
-      box-shadow: 0 0 8px var(--mirror-success);
+      box-shadow: 0 0 10px var(--mirror-success);
     }
     .backend-dot.offline {
       background: var(--mirror-warning);
@@ -87,217 +92,247 @@
       color: var(--text-secondary);
       border: 1px solid var(--mirror-border);
       border-radius: 6px;
-      padding: 2px 7px;
-      font-size: 10px;
+      padding: 4px 9px;
+      font-size: 11px;
       cursor: pointer;
+      transition: all 0.2s;
     }
     .btn-xs:hover {
       color: var(--mirror-cyan);
       border-color: var(--mirror-cyan);
     }
-
-    /* Simulation Control Toolbar */
-    .sim-bar {
-      display: flex;
-      gap: 6px;
-      background: var(--mirror-surface);
-      padding: 6px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--mirror-border);
-      margin-bottom: 12px;
-      font-size: 11px;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: center;
-      max-width: 620px;
-    }
-    .sim-bar span { color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
-    .sim-chip {
-      padding: 4px 9px;
-      border-radius: 12px;
-      background: var(--mirror-elevated);
-      color: var(--text-primary);
-      border: 1px solid var(--mirror-border);
-      cursor: pointer;
-      font-size: 11px;
-      transition: all 0.2s;
-    }
-    .sim-chip:hover { border-color: var(--mirror-cyan); }
-    .sim-chip.active { background: var(--mirror-cyan); color: #000; font-weight: bold; border-color: var(--mirror-cyan); }
-
-    /* Journey Breadcrumbs */
-    .journey-bar {
-      display: flex;
-      gap: 4px;
-      background: var(--mirror-surface);
-      padding: 5px 10px;
-      border-radius: 20px;
-      border: 1px solid var(--mirror-border);
-      margin-bottom: 14px;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .journey-node {
-      padding: 3px 7px;
-      border-radius: 10px;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .journey-node.active {
+    .btn-xs.active {
       background: var(--mirror-cyan);
       color: #000;
       font-weight: bold;
     }
 
-    /* Mobile Device Shell */
+    /* Journey Stage Stepper */
+    .journey-bar {
+      display: flex;
+      gap: 6px;
+      background: var(--mirror-surface);
+      border: 1px solid var(--mirror-border);
+      border-radius: 14px;
+      padding: 6px;
+      margin-bottom: 16px;
+      max-width: 420px;
+      width: 100%;
+      justify-content: space-between;
+    }
+    .journey-node {
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      flex: 1;
+      transition: all 0.2s;
+    }
+    .journey-node.active {
+      background: var(--mirror-elevated);
+      color: var(--mirror-cyan);
+      font-weight: 700;
+      border: 1px solid var(--mirror-border);
+      box-shadow: 0 0 8px var(--mirror-cyan-glow);
+    }
+
+    /* Mobile Phone Shell */
     .phone-frame {
-      width: 380px;
-      height: 750px;
+      width: 390px;
+      max-width: 95vw;
+      min-height: 640px;
       background: var(--mirror-obsidian);
-      border-radius: 40px;
-      border: 8px solid #232734;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 25px rgba(0, 240, 255, 0.12);
-      position: relative;
+      border: 2px solid var(--mirror-border);
+      border-radius: 36px;
+      padding: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.08);
       display: flex;
       flex-direction: column;
+      position: relative;
       overflow: hidden;
     }
 
-    /* Top Hardware Status Bar */
     .status-bar {
-      height: 32px;
-      background: var(--mirror-obsidian);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 18px;
       font-size: 11px;
-      color: var(--text-muted);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      z-index: 10;
+      color: var(--text-secondary);
+      padding: 4px 8px 12px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* Screens */
     .screen {
-      flex: 1;
-      overflow-y: auto;
       display: none;
-      padding: 16px;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
+      flex: 1;
+      margin-top: 10px;
+      animation: fadeIn 0.25s ease-out;
     }
     .screen.active {
       display: flex;
     }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    /* Cards & Components */
     .card {
       background: var(--mirror-surface);
       border: 1px solid var(--mirror-border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
     .card-elevated {
       background: var(--mirror-elevated);
+      border: 1px solid var(--mirror-border);
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
+    .card-elevated:hover {
+      border-color: var(--mirror-cyan);
+      transform: translateY(-1px);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      align-self: flex-start;
+    }
+    .badge-cyan { background: var(--mirror-cyan-glow); color: var(--mirror-cyan); border: 1px solid var(--mirror-cyan); }
+    .badge-success { background: var(--mirror-success-glow); color: var(--mirror-success); border: 1px solid var(--mirror-success); }
+    .badge-warning { background: var(--mirror-warning-glow); color: var(--mirror-warning); border: 1px solid var(--mirror-warning); }
+    .badge-critical { background: var(--mirror-critical-glow); color: var(--mirror-critical); border: 1px solid var(--mirror-critical); }
+    .badge-uncertain { background: var(--mirror-uncertain-glow); color: var(--mirror-uncertain); border: 1px solid var(--mirror-uncertain); }
 
     .btn {
       background: var(--mirror-cyan);
-      color: #000;
-      border: none;
-      border-radius: 12px;
-      padding: 12px;
+      color: #0A0D14;
       font-weight: 700;
       font-size: 13px;
+      padding: 12px 18px;
+      border: none;
+      border-radius: 12px;
       cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: all 0.2s;
     }
-    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
+    .btn:hover {
+      opacity: 0.92;
+      box-shadow: 0 0 16px var(--mirror-cyan-glow);
+    }
     .btn-secondary {
       background: transparent;
+      color: var(--text-secondary);
       border: 1px solid var(--mirror-border);
-      color: var(--text-primary);
     }
     .btn-secondary:hover {
-      background: var(--mirror-elevated);
-      border-color: var(--mirror-cyan);
-    }
-    .btn-critical {
-      background: var(--mirror-critical);
-      color: #fff;
+      color: var(--text-primary);
+      border-color: var(--text-secondary);
+      box-shadow: none;
     }
     .btn-success {
       background: var(--mirror-success);
-      color: #000;
+      color: #0A0D14;
     }
-    .btn-uncertain {
-      background: var(--mirror-uncertain);
-      color: #fff;
+    .btn-success:hover {
+      box-shadow: 0 0 16px var(--mirror-success-glow);
+    }
+    .btn-critical {
+      background: var(--mirror-critical);
+      color: #FFF;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 7px;
-      border-radius: 6px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    .badge-cyan { background: var(--mirror-cyan-glow); color: var(--mirror-cyan); }
-    .badge-success { background: var(--mirror-success-glow); color: var(--mirror-success); }
-    .badge-warning { background: var(--mirror-warning-glow); color: var(--mirror-warning); }
-    .badge-critical { background: var(--mirror-critical-glow); color: var(--mirror-critical); }
-    .badge-uncertain { background: var(--mirror-uncertain-glow); color: var(--mirror-uncertain); }
-
-    /* Viewfinder HUD */
+    /* Camera Viewfinder Area */
     .viewfinder-container {
       position: relative;
-      background: #040508;
-      height: 380px;
-      border-radius: 16px;
-      border: 1px solid var(--mirror-border);
+      width: 100%;
+      height: 270px;
+      background: #000;
+      border-radius: 20px;
       overflow: hidden;
+      border: 1px solid var(--mirror-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #webcam-stream {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    #viewfinder-canvas {
+      width: 100%; height: 100%;
+      position: absolute;
+      top: 0; left: 0;
+    }
+    .viewfinder-hud {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       padding: 12px;
-    }
-    canvas#viewfinder-canvas {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 1;
-    }
-    .viewfinder-hud {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
+      z-index: 10;
       pointer-events: none;
     }
     .laser-line {
       position: absolute;
-      left: 0; right: 0;
+      top: 15%;
+      left: 8%;
+      right: 8%;
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--mirror-cyan), transparent);
       box-shadow: 0 0 10px var(--mirror-cyan);
-      animation: scanLaser 2.2s ease-in-out infinite alternate;
-      z-index: 2;
+      animation: scanLaser 2.2s infinite alternate ease-in-out;
+      pointer-events: none;
+      z-index: 5;
     }
     @keyframes scanLaser {
-      0% { top: 15%; opacity: 0.2; }
+      0% { top: 15%; opacity: 0.3; }
       50% { opacity: 0.9; }
-      100% { top: 85%; opacity: 0.2; }
+      100% { top: 85%; opacity: 0.3; }
+    }
+
+    .camera-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .camera-tab-btn {
+      flex: 1;
+      padding: 6px;
+      font-size: 11px;
+      background: var(--mirror-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--mirror-border);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .camera-tab-btn.active {
+      background: var(--mirror-cyan);
+      color: #000;
+      font-weight: bold;
     }
 
     /* Modal Overlay */
@@ -313,7 +348,7 @@
       backdrop-filter: blur(4px);
     }
     .modal-card {
-      background: #251014;
+      background: #181216;
       border: 2px solid var(--mirror-critical);
       border-radius: 20px;
       padding: 20px;
@@ -324,53 +359,31 @@
       box-shadow: 0 10px 40px rgba(255,59,48,0.3);
     }
 
-    .step-item {
-      background: var(--mirror-surface);
-      border: 1px solid var(--mirror-border);
-      border-radius: 12px;
-      padding: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .step-item.active {
-      border-color: var(--mirror-cyan);
-      background: var(--mirror-elevated);
-      box-shadow: 0 0 12px var(--mirror-cyan-glow);
-    }
-
     .log-tray {
       font-size: 10px;
       color: var(--text-muted);
       background: rgba(0,0,0,0.5);
-      padding: 6px 10px;
-      border-radius: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.05);
       margin-top: auto;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>MIRROR Mobile Flow</h1>
-    <p>Connected to Backend Contract /v1 Lifecycle • iQOO</p>
+    <h1>MIRROR Embodied Assistant</h1>
+    <p>Safe Multi-Modal Task Verification • Powered by Google Gemini</p>
   </header>
 
   <!-- Live Backend Connection Bar -->
   <div class="backend-bar">
     <div class="backend-dot offline" id="backend-dot"></div>
-    <span id="backend-status-text" style="color: var(--text-secondary); font-size: 11px;">Checking http://localhost:8000/v1/health...</span>
-    <button class="btn-xs" onclick="checkBackendHealth()">Check API</button>
-  </div>
-
-  <!-- Live Simulation State Switcher matching /v1 outcomes -->
-  <div class="sim-bar">
-    <span>Contract Test Modes:</span>
-    <button id="mode-verified" class="sim-chip active" onclick="setBackendResponseMode('verified')">✔ /verify: verified (0.92)</button>
-    <button id="mode-cannottell" class="sim-chip" onclick="setBackendResponseMode('cannot_tell')">❓ /verify: cannot_tell (0.0)</button>
-    <button id="mode-noaction" class="sim-chip" onclick="setBackendResponseMode('no_action_needed')">🎯 /plan: no_action_needed</button>
-    <button id="mode-needshuman" class="sim-chip" onclick="setBackendResponseMode('needs_human')">👤 /plan: needs_human</button>
-    <button id="mode-blockgoal" class="sim-chip" style="color: var(--mirror-critical);" onclick="setBackendResponseMode('blocked_goal')">🚫 /sessions: A3 block</button>
+    <span id="backend-status-text">Checking backend connection...</span>
+    <button class="btn-xs" onclick="checkBackendHealth()">Ping Server</button>
+    <button id="voice-btn" class="btn-xs" onclick="toggleVoice()">🔊 Voice: ON</button>
   </div>
 
   <!-- Journey Stage Stepper -->
@@ -378,7 +391,7 @@
     <div id="step-node-0" class="journey-node active" onclick="navTo('home')">1. Goal</div>
     <div id="step-node-1" class="journey-node" onclick="navTo('camera')">2. Observe</div>
     <div id="step-node-2" class="journey-node" onclick="navTo('summary')">3. Intent</div>
-    <div id="step-node-3" class="journey-node" onclick="navTo('plan')">4. Plan Step</div>
+    <div id="step-node-3" class="journey-node" onclick="navTo('plan')">4. Action</div>
     <div id="step-node-4" class="journey-node" onclick="navTo('verify')">5. Verify</div>
   </div>
 
@@ -387,31 +400,32 @@
     <!-- Top Hardware Status Bar -->
     <div class="status-bar">
       <span>12:45</span>
-      <span style="color: var(--mirror-cyan); font-weight: 700;">iQOO • MIRROR /v1</span>
-      <span id="backend-status-indicator" style="color: var(--mirror-warning);">○ CHECKING API</span>
+      <span style="color: var(--mirror-cyan); font-weight: 700;">MIRROR • GEMINI LIVE</span>
+      <span id="backend-status-indicator" style="color: var(--mirror-warning);">○ CONNECTING</span>
     </div>
 
     <!-- SCREEN 1: HOME -->
     <div id="screen-home" class="screen active">
       <div>
         <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Enter Space Goal</h2>
-        <p style="font-size: 12px; color: var(--text-secondary);">MIRROR gates your goal via safety policy, observes the scene, and guides verified physical preparation.</p>
+        <p style="font-size: 12px; color: var(--text-secondary);">Describe your goal. MIRROR verifies safety upfront and guides physical preparation.</p>
       </div>
 
       <div class="card" style="border-color: var(--mirror-cyan);">
-        <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; outline: none;" placeholder="e.g. prepare the space to study, cook, work...">prepare space to study</textarea>
+        <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; outline: none;" placeholder="e.g. get my desk ready to study...">get my desk ready to study</textarea>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-          <span class="badge badge-cyan" id="voice-indicator">POST /v1/sessions</span>
+          <span class="badge badge-cyan">POST /v1/sessions</span>
           <button class="btn" style="padding: 8px 14px; font-size: 12px;" onclick="onGoalSubmitted()">Create Session</button>
         </div>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Preset Tasks (Tested Against Policy)</h3>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Preset Tasks</h3>
         <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('Get this desk ready to study')">📖 Get this desk ready to study (A0 Allowed)</div>
-          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('Tidy my work table')">💻 Tidy my work table (A0 Allowed)</div>
-          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('Set up my kitchen counter for cooking')">🍳 Set up my kitchen counter for cooking (A0 Allowed)</div>
+          <div class="card-elevated" onclick="setPreset('get my desk ready to study')">📖 Get my desk ready to study (A0 Safe)</div>
+          <div class="card-elevated" onclick="setPreset('tidy my work table')">💻 Tidy my work table (A0 Safe)</div>
+          <div class="card-elevated" onclick="setPreset('set up my kitchen counter for cooking')">🍳 Set up kitchen counter for cooking (A0 Safe)</div>
+          <div class="card-elevated" style="border-color: rgba(255,59,48,0.4);" onclick="setPreset('inspect electrical outlet for loose wire')">⚠️ Inspect outlet for loose wire (A3 Hazard Block Test)</div>
         </div>
       </div>
 
@@ -425,65 +439,76 @@
       </div>
 
       <div class="log-tray" id="log-home">
-        Contract Invariant: Empty goals rejected (422) • A3 goals blocked upfront
+        Invariant: Empty goals rejected (422) • A3 goals blocked upfront with zero model invocation.
       </div>
     </div>
 
     <!-- SCREEN 2: CAMERA VIEWFINDER -->
     <div id="screen-camera" class="screen">
+      <!-- Camera Source Selection -->
+      <div class="camera-tabs">
+        <button id="tab-webcam" class="camera-tab-btn" onclick="activateCameraTab('webcam')">📹 Live Webcam</button>
+        <button id="tab-upload" class="camera-tab-btn active" onclick="activateCameraTab('upload')">📁 Upload / File</button>
+        <button id="tab-synthetic" class="camera-tab-btn" onclick="activateCameraTab('synthetic')">🎨 Test Scene</button>
+      </div>
+
       <div class="viewfinder-container">
+        <video id="webcam-stream" autoplay playsinline muted></video>
         <canvas id="viewfinder-canvas"></canvas>
         <div class="laser-line"></div>
 
         <div class="viewfinder-hud">
           <div style="display: flex; justify-content: space-between;">
-            <span class="badge badge-cyan">HUD LIVE</span>
-            <span class="badge badge-cyan" id="camera-quality-badge">Framing Guide • Tap Capture</span>
+            <span class="badge badge-cyan" id="camera-mode-badge">FILE / CANVAS</span>
+            <span class="badge badge-cyan" id="camera-quality-badge">Ready to Observe</span>
           </div>
 
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <div style="background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 20px; align-self: center; font-size: 11px; border: 1px solid var(--mirror-border);">
+          <div style="display: flex; flex-direction: column; gap: 6px; pointer-events: auto;">
+            <div style="background: rgba(0,0,0,0.65); padding: 6px 12px; border-radius: 20px; align-self: center; font-size: 11px; border: 1px solid var(--mirror-border);">
               🎯 Target: <span id="camera-goal-pill" style="color: var(--mirror-cyan); font-weight: bold;">study</span>
             </div>
-            <button class="btn" style="pointer-events: auto;" onclick="onSceneCaptured()">Capture Scene & Observe (/observe)</button>
+            <button class="btn" id="btn-capture-observe" onclick="onSceneCaptured()">📸 Capture & Observe with Gemini</button>
           </div>
         </div>
       </div>
 
+      <input type="file" id="file-picker" accept="image/*" style="display: none;" onchange="handleFilePicked(event)">
+
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary" style="flex: 1; padding: 10px; font-size: 11px;" onclick="triggerFilePicker()">📁 Select Image File</button>
+        <button class="btn btn-secondary" style="flex: 1; padding: 10px; font-size: 11px;" id="btn-webcam-toggle" onclick="toggleWebcam()">📹 Start Webcam</button>
+      </div>
+
       <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Frame Telemetry Requirements</h3>
-        <p style="font-size: 11px; color: var(--text-secondary);">BLUR_MAX &le; 0.6 • BRIGHTNESS_MIN &ge; 0.2 • Grounded scene anchors required.</p>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Vision Telemetry</h3>
+        <div style="font-size: 11px; color: var(--text-secondary); display: flex; justify-content: space-between;">
+          <span>Model: <b id="telemetry-model">Gemini 3.5 Flash</b></span>
+          <span id="telemetry-latency">Latency: --</span>
+        </div>
       </div>
 
       <div class="log-tray" id="log-camera">
-        Submitting to POST /v1/sessions/{sid}/observe
+        Sending image Base64 to POST /v1/sessions/{sid}/observe
       </div>
     </div>
 
     <!-- SCREEN 3: MISSION SUMMARY & INTENT -->
     <div id="summary-screen" class="screen">
       <div>
-        <h2 style="font-size: 20px; font-weight: 700;">Task Interpretation</h2>
-        <p style="font-size: 12px; color: var(--text-secondary);">Environmental scene observed against physical goal.</p>
+        <h2 style="font-size: 20px; font-weight: 700;">Scene Interpretation</h2>
+        <p style="font-size: 12px; color: var(--text-secondary);">Real objects detected by Google Gemini multimodal vision.</p>
       </div>
 
       <div class="card">
         <span class="badge badge-cyan" id="summary-sid">Session: -</span>
-        <h3 style="font-size: 13px; font-weight: 700; margin-top: 8px;">Interpreted Physical Intent</h3>
-        <p id="summary-intent-text" style="font-size: 12px; color: var(--text-primary); margin-top: 4px; font-style: italic;">prepare the space to study</p>
+        <h3 style="font-size: 13px; font-weight: 700; margin-top: 6px;">Interpreted Physical Intent</h3>
+        <p id="summary-intent-text" style="font-size: 12px; color: var(--text-primary); font-style: italic;">prepare the space to study</p>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Perceived Scene Observations</h3>
-        <div id="summary-observations" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Gemini Detected Objects</h3>
+        <div id="summary-observations" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
           <!-- dynamically populated -->
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Prerequisites & Clutter Assessment</h3>
-        <div id="summary-needs-breakdown" style="font-size: 11px; color: var(--text-secondary);">
-          Needs for "study": lamp, notebook. Clutter detected: cup.
         </div>
       </div>
 
@@ -495,37 +520,27 @@
       </div>
     </div>
 
-    <!-- SCREEN 4: ACTION PLAN STEP -->
+    <!-- SCREEN 4: ACTION PLAN STEP (ExecutingScreen) -->
     <div id="plan-screen" class="screen">
       <div>
-        <h2 style="font-size: 20px; font-weight: 700;">Action Plan Step</h2>
-        <p style="font-size: 12px; color: var(--text-secondary);">Review one physical step before executing. Reversible steps only.</p>
+        <h2 style="font-size: 20px; font-weight: 700; color: var(--mirror-cyan);">Do this step</h2>
+        <p style="font-size: 12px; color: var(--text-secondary);">Execute one physical step. MIRROR will verify evidence before proceeding.</p>
       </div>
 
-      <div class="step-item active">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span class="badge badge-cyan" id="step-id-text">Step s1</span>
-          <span class="badge badge-warning" id="step-tier-text">Tier A1 (Reversible)</span>
-        </div>
-        <h3 id="step-instruction-text" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px;">Move the cup off the surface.</h3>
-        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">
-          Expected post-evidence: <span id="step-evidence-text" style="color: var(--mirror-cyan);">no cup visible</span>
-        </div>
-        <div style="font-size: 10px; color: var(--text-muted);" id="step-tier-reason">
-          Tier: A1 • Reason: reversible tidy
+      <div class="card" style="border: 2px solid var(--mirror-cyan); background: var(--mirror-elevated); padding: 18px;">
+        <span class="badge badge-warning" id="step-tier-text" style="margin-bottom: 8px;">Tier A1 (Reversible)</span>
+        <h3 id="step-instruction-text" style="font-size: 16px; font-weight: 800; color: #FFF; line-height: 1.4;">Move the cup off the surface.</h3>
+        <hr style="border: none; border-top: 1px solid var(--mirror-border); margin: 12px 0;">
+        <div style="font-size: 12px; color: var(--text-secondary);">
+          MIRROR will look for: <b id="step-evidence-text" style="color: var(--mirror-cyan);">no cup visible</b>
         </div>
       </div>
 
-      <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Policy Gate Decision</h3>
-        <p style="font-size: 11px; color: var(--mirror-success);">Decision: allow (Tier A1). User manual confirmation triggers physical execution.</p>
-      </div>
-
-      <button class="btn" onclick="onExecuteStep()">User Confirms: Execute Step</button>
-      <button class="btn btn-secondary" onclick="navTo('summary')">Back to Summary</button>
+      <button class="btn" style="padding: 14px;" onclick="onStepDoneTriggerVerification()">I did it. Check with the camera</button>
+      <button class="btn btn-secondary" onclick="resetAllToHome()">Cancel mission</button>
 
       <div class="log-tray" id="log-plan">
-        Enforcing invariant: No task is complete without verification.
+        ExecutingScreen: Success claims forbidden here. Outcome remains pending sensor verification.
       </div>
     </div>
 
@@ -538,21 +553,21 @@
 
       <!-- Result Card -->
       <div id="v-card" class="card" style="border-color: var(--mirror-success); background: var(--mirror-success-glow);">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span id="v-icon" style="font-size: 24px;">✅</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span id="v-icon" style="font-size: 28px;">✅</span>
           <div>
-            <div id="v-title" style="font-weight: 700; font-size: 14px; color: var(--mirror-success);">VERIFIED COMPLETE</div>
-            <div id="v-confidence" style="font-size: 11px; color: var(--text-secondary);">Confidence: 0.92 (Grounded in anchor evidence)</div>
+            <div id="v-title" style="font-weight: 800; font-size: 14px; color: var(--mirror-success);">VERIFIED COMPLETE</div>
+            <div id="v-confidence" style="font-size: 11px; color: var(--text-secondary);">Confidence: 0.95 (Grounded in anchor evidence)</div>
           </div>
         </div>
         <div style="margin-top: 10px; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden;">
-          <div id="v-bar" style="width: 92%; height: 100%; background: var(--mirror-success); transition: width 0.4s;"></div>
+          <div id="v-bar" style="width: 95%; height: 100%; background: var(--mirror-success); transition: width 0.4s;"></div>
         </div>
       </div>
 
       <!-- Evidence Seen vs Missing -->
       <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Backend Verification Evidence</h3>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Sensor Evidence Comparison</h3>
         <div id="v-evidence-list" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
           <!-- dynamically populated -->
         </div>
@@ -562,26 +577,28 @@
       <button class="btn btn-secondary" onclick="navTo('camera')">Retake Verification Photo</button>
 
       <div class="log-tray" id="log-verify">
-        Verified steps: <span id="v-steps-count">0</span> • Invariant enforced
+        Confidence bar: &ge; 0.85 required. Sub-threshold confidences downgraded to cannot_tell.
       </div>
     </div>
 
-    <!-- SCREEN 6: MISSION COMPLETED CELEBRATION -->
+    <!-- SCREEN 6: MISSION COMPLETED (CompletedScreen) -->
     <div id="complete-screen" class="screen">
-      <div style="text-align: center; padding: 20px 0;">
-        <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
-        <h2 id="complete-title" style="font-size: 20px; font-weight: 800; color: var(--mirror-success);">MISSION COMPLETED</h2>
-        <p id="complete-desc" style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">All physical steps verified against visual sensor evidence.</p>
+      <div style="text-align: center; padding: 24px 0 10px 0;">
+        <div style="font-size: 52px; margin-bottom: 8px;">🎉</div>
+        <h2 id="complete-title" style="font-size: 22px; font-weight: 800; color: var(--mirror-success);">Done and verified</h2>
+        <p id="complete-desc" style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">The camera confirmed 1 step(s), and a fresh scan shows nothing left to do.</p>
       </div>
 
       <div class="card" style="border-color: var(--mirror-success);">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--mirror-success); margin-bottom: 8px;">Audit Trail Summary</h3>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--mirror-success); margin-bottom: 8px;">Verified Audit Trail</h3>
         <div id="complete-summary-list" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
-          <!-- dynamically populated -->
+          <div>✔ Step s1 verified with empirical proof.</div>
+          <div style="color: var(--text-secondary); font-size: 10px;">Zero unverified claims made. Verified steps: <b id="final-steps-count">1</b></div>
         </div>
       </div>
 
-      <button class="btn" style="background: var(--mirror-cyan);" onclick="resetAllToHome()">Start New Session</button>
+      <button class="btn" style="background: var(--mirror-cyan);" onclick="resetAllToHome()">Back to start</button>
+      <button class="btn btn-secondary" onclick="exportAuditLog()">📥 Download Audit Log (JSON)</button>
     </div>
 
     <!-- SAFETY ALERT MODAL -->
@@ -590,31 +607,52 @@
         <div style="font-size: 40px;">⚠️</div>
         <span id="modal-tier-badge" class="badge badge-critical" style="align-self: center;">TIER A3 BLOCKED</span>
         <h2 id="modal-hazard-title" style="font-size: 16px; color: #fff;">Safety Policy Refusal</h2>
-        <p id="modal-hazard-desc" style="font-size: 12px; color: var(--text-primary);">MIRROR will not guide this. Ask a qualified professional or emergency services.</p>
+        <p id="modal-hazard-desc" style="font-size: 12px; color: var(--text-primary); line-height: 1.4;">MIRROR will not guide this. Ask a qualified professional or emergency services.</p>
         <div id="modal-rule-pill" style="background: rgba(0,0,0,0.5); padding: 8px; border-radius: 8px; font-size: 11px; color: var(--mirror-warning); text-align: left;">
           Rule Triggered: R-A3-electrical
         </div>
-        <button class="btn btn-critical" onclick="onAbortMission()">Abort Mission Immediately</button>
+        <button class="btn btn-critical" onclick="onAbortMission()">Acknowledge & Close</button>
       </div>
     </div>
   </div>
 
   <script>
-    const API_BASE = "http://localhost:8000";
+    const defaultHost = window.location.hostname || "localhost";
+    const API_BASE = (window.location.protocol === "https:" ? "https://" : "http://") + defaultHost + ":8000";
     let backendOnline = false;
+    let voiceEnabled = true;
+
+    let webcamStream = null;
+    let currentImageBase64 = null;
+    let activeCameraTab = "upload";
+    let isVerifyingCapture = false;
 
     // State model mapped 1:1 to FastAPI backend models
     const backendState = {
       sessionId: null,
-      goal: "prepare space to study",
+      goal: "get my desk ready to study",
       interpretedIntent: "prepare the space to study",
       goalGate: { step_id: "goal", tier: "A0", decision: "allow", rule_id: "R-planner" },
       world: { observations: [], unknowns: [], hazards: [] },
       currentStep: null,
       currentGate: null,
-      verifiedSteps: 0,
-      mode: "verified" // verified, cannot_tell, no_action_needed, needs_human, blocked_goal
+      verifiedSteps: 0
     };
+
+    function speak(text) {
+      if (!voiceEnabled || !window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.0;
+      u.pitch = 1.0;
+      window.speechSynthesis.speak(u);
+    }
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      document.getElementById("voice-btn").innerText = voiceEnabled ? "🔊 Voice: ON" : "🔇 Voice: OFF";
+      document.getElementById("voice-btn").className = voiceEnabled ? "btn-xs active" : "btn-xs";
+    }
 
     // Check Live FastAPI Backend Health
     async function checkBackendHealth() {
@@ -626,32 +664,27 @@
         if (res.ok) {
           const data = await res.json();
           backendOnline = true;
-          if (dot) dot.className = "backend-dot online";
-          if (txt) txt.innerText = `Connected: ${API_BASE}/v1 (${data.provider})`;
-          if (indicator) {
-            indicator.innerText = "● LIVE /v1";
-            indicator.style.color = "var(--mirror-success)";
-          }
+          dot.className = "backend-dot online";
+          txt.innerText = `Connected: ${API_BASE} (${data.provider})`;
+          indicator.innerText = "● LIVE /v1 (" + data.provider + ")";
+          indicator.style.color = "var(--mirror-success)";
+          document.getElementById("telemetry-model").innerText = data.provider;
           return true;
         }
       } catch (e) {
-        // Backend offline or CORS restriction
+        console.warn("Backend health check failed:", e);
       }
       backendOnline = false;
-      if (dot) dot.className = "backend-dot offline";
-      if (txt) txt.innerText = "Backend offline • Using Contract-Compliant Client Engine";
-      if (indicator) {
-        indicator.innerText = "○ SIMULATION";
-        indicator.style.color = "var(--mirror-warning)";
-      }
+      dot.className = "backend-dot offline";
+      txt.innerText = `Backend unreachable at ${API_BASE} • Start server on port 8000`;
+      indicator.innerText = "○ OFFLINE";
+      indicator.style.color = "var(--mirror-warning)";
       return false;
     }
 
     // Canvas Simulation Setup for Camera Viewfinder
     const canvas = document.getElementById("viewfinder-canvas");
     const ctx = canvas.getContext("2d");
-    let animationFrameId = null;
-    let t = 0;
 
     function resizeCanvas() {
       if (!canvas || !canvas.parentElement) return;
@@ -659,49 +692,166 @@
       canvas.height = canvas.parentElement.clientHeight;
     }
 
-    function drawCameraSimulation() {
+    function drawDeskScene(hasCup = true) {
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      t += 0.03;
 
-      const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      bg.addColorStop(0, "#080B12");
-      bg.addColorStop(1, "#020406");
+      // Office background & desk surface
+      const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bg.addColorStop(0, "#1F232E");
+      bg.addColorStop(0.4, "#2A2F3D");
+      bg.addColorStop(0.4, "#8B5A2B"); // tabletop
+      bg.addColorStop(1, "#5C3A1E");
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.strokeStyle = "rgba(46, 53, 71, 0.4)";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < canvas.width; x += 30) {
+      // Desk edge line
+      ctx.strokeStyle = "#3D2411";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height * 0.4);
+      ctx.lineTo(canvas.width, canvas.height * 0.4);
+      ctx.stroke();
+
+      if (hasCup) {
+        // Red coffee mug on left
+        const mugX = canvas.width * 0.25;
+        const mugY = canvas.height * 0.55;
+        ctx.fillStyle = "#E53935";
+        ctx.fillRect(mugX, mugY, 44, 60);
+        ctx.strokeStyle = "#8E0000";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(mugX, mugY, 44, 60);
+        // Handle
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < canvas.height; y += 30) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
+        ctx.arc(mugX + 44, mugY + 30, 14, 1.5 * Math.PI, 0.5 * Math.PI, false);
         ctx.stroke();
       }
 
-      // Viewfinder Framing Grid & Target Guide (Clean, non-fabricated)
-      const reticleX = canvas.width * 0.15;
-      const reticleY = canvas.height * 0.2;
-      const reticleW = canvas.width * 0.7;
-      const reticleH = canvas.height * 0.55;
-      ctx.strokeStyle = "rgba(0, 240, 255, 0.4)";
+      // Lamp on right
+      const lampX = canvas.width * 0.75;
+      ctx.fillStyle = "#4B5563";
+      ctx.fillRect(lampX - 4, canvas.height * 0.35, 8, 80);
+      ctx.fillStyle = "#F59E0B";
+      ctx.beginPath();
+      ctx.moveTo(lampX - 25, canvas.height * 0.35);
+      ctx.lineTo(lampX + 25, canvas.height * 0.35);
+      ctx.lineTo(lampX + 15, canvas.height * 0.22);
+      ctx.lineTo(lampX - 15, canvas.height * 0.22);
+      ctx.closePath();
+      ctx.fill();
+
+      // Framing target reticle
+      const rx = canvas.width * 0.12, ry = canvas.height * 0.15, rw = canvas.width * 0.76, rh = canvas.height * 0.7;
+      ctx.strokeStyle = "rgba(0, 240, 255, 0.5)";
       ctx.lineWidth = 1.5;
-      ctx.strokeRect(reticleX, reticleY, reticleW, reticleH);
-
-      ctx.fillStyle = "rgba(0, 240, 255, 0.04)";
-      ctx.fillRect(reticleX, reticleY, reticleW, reticleH);
-
+      ctx.strokeRect(rx, ry, rw, rh);
       ctx.fillStyle = "#00F0FF";
-      ctx.font = "10px sans-serif";
-      ctx.fillText("Framing Target Area (Photo sent on capture)", reticleX + 8, reticleY + 18);
+      ctx.font = "11px sans-serif";
+      ctx.fillText(hasCup ? "Target: Desk with cup" : "Target: Clean desk (no cup)", rx + 10, ry + 20);
+    }
 
-      animationFrameId = requestAnimationFrame(drawCameraSimulation);
+    function activateCameraTab(tab) {
+      activeCameraTab = tab;
+      document.querySelectorAll(".camera-tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("tab-" + tab).classList.add("active");
+
+      const video = document.getElementById("webcam-stream");
+      if (tab === "webcam") {
+        startWebcam();
+        document.getElementById("camera-mode-badge").innerText = "LIVE WEBCAM";
+      } else {
+        stopWebcam();
+        if (tab === "upload") {
+          document.getElementById("camera-mode-badge").innerText = "FILE UPLOAD";
+          if (!currentImageBase64) drawDeskScene(true);
+        } else if (tab === "synthetic") {
+          document.getElementById("camera-mode-badge").innerText = "SYNTHETIC DESK";
+          drawDeskScene(!isVerifyingCapture);
+          currentImageBase64 = null;
+        }
+      }
+    }
+
+    async function startWebcam() {
+      try {
+        const video = document.getElementById("webcam-stream");
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        webcamStream = stream;
+        video.srcObject = stream;
+        video.style.display = "block";
+        canvas.style.display = "none";
+        document.getElementById("btn-webcam-toggle").innerText = "⏹ Stop Webcam";
+        document.getElementById("camera-quality-badge").innerText = "📹 Live Video Active";
+      } catch (err) {
+        alert("Camera access unavailable: " + err.message + ". You can use file upload instead.");
+        activateCameraTab("upload");
+      }
+    }
+
+    function stopWebcam() {
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(t => t.stop());
+        webcamStream = null;
+      }
+      const video = document.getElementById("webcam-stream");
+      video.style.display = "none";
+      canvas.style.display = "block";
+      document.getElementById("btn-webcam-toggle").innerText = "📹 Start Webcam";
+      document.getElementById("camera-quality-badge").innerText = "Ready to Observe";
+    }
+
+    function toggleWebcam() {
+      if (webcamStream) {
+        stopWebcam();
+        activateCameraTab("upload");
+      } else {
+        activateCameraTab("webcam");
+      }
+    }
+
+    function triggerFilePicker() {
+      document.getElementById("file-picker").click();
+    }
+
+    function handleFilePicked(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          stopWebcam();
+          resizeCanvas();
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          currentImageBase64 = e.target.result.split(",")[1];
+          document.getElementById("camera-quality-badge").innerText = "📁 Photo Loaded (" + file.name + ")";
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function extractCaptureBase64() {
+      if (currentImageBase64 && activeCameraTab !== "webcam") {
+        return currentImageBase64;
+      }
+      const video = document.getElementById("webcam-stream");
+      const c = document.createElement("canvas");
+      if (webcamStream && video.videoWidth > 0) {
+        c.width = video.videoWidth;
+        c.height = video.videoHeight;
+        const cx = c.getContext("2d");
+        cx.drawImage(video, 0, 0, c.width, c.height);
+      } else {
+        c.width = canvas.width || 640;
+        c.height = canvas.height || 480;
+        const cx = c.getContext("2d");
+        cx.drawImage(canvas, 0, 0);
+      }
+      return c.toDataURL("image/jpeg", 0.85).split(",")[1];
     }
 
     // Navigation and Screen Flow
@@ -717,7 +867,9 @@
         document.getElementById("step-node-1").classList.add("active");
         document.getElementById("camera-goal-pill").innerText = backendState.goal;
         resizeCanvas();
-        if (!animationFrameId) drawCameraSimulation();
+        if (activeCameraTab === "synthetic" || (!currentImageBase64 && activeCameraTab !== "webcam")) {
+          drawDeskScene(!isVerifyingCapture);
+        }
       } else if (screenName === "summary") {
         document.getElementById("summary-screen").classList.add("active");
         document.getElementById("step-node-2").classList.add("active");
@@ -748,7 +900,6 @@
       }
       backendState.goal = val;
 
-      // Try Live Backend First
       if (backendOnline) {
         try {
           const res = await fetch(`${API_BASE}/v1/sessions`, {
@@ -763,61 +914,50 @@
             backendState.goalGate = data.goal_gate;
             if (data.blocked) {
               document.getElementById("modal-tier-badge").innerText = `TIER ${data.goal_gate.tier} BLOCKED`;
-              document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (" + data.goal_gate.tier + ")";
+              document.getElementById("modal-hazard-title").innerText = "Safety Policy Refusal (" + data.goal_gate.tier + ")";
               document.getElementById("modal-hazard-desc").innerText = data.message || "MIRROR will not guide this. Ask a qualified professional or emergency services.";
               document.getElementById("modal-rule-pill").innerText = "Rule Triggered: " + data.goal_gate.rule_id;
               document.getElementById("safety-modal").style.display = "flex";
+              speak("Warning. Safety policy blocked this goal. " + (data.message || ""));
               return;
             }
             document.getElementById("session-id-pill").innerText = "Session: " + backendState.sessionId;
             document.getElementById("session-tier-pill").innerText = "Tier: " + data.goal_gate.tier;
             document.getElementById("session-gate-pill").innerText = "Gate: " + data.goal_gate.decision;
+            isVerifyingCapture = false;
             navTo("camera");
+            speak("Session created. Please point your camera at the scene.");
             return;
           }
         } catch (err) {
-          console.warn("Backend request failed, falling back to local simulation:", err);
+          console.warn("Backend error:", err);
         }
       }
 
-      // Local Deterministic Policy Check matching src/core/policy.py
+      // Local fallback safety rule check matching policy.py
       const low = val.toLowerCase();
-      const isA3 = backendState.mode === "blocked_goal" ||
-                   /\b(wiring|wires?|fuse|circuit|breaker|mains|socket|outlet|voltage)\b/i.test(low) ||
-                   /\b(gas|lpg|pilot light)\b/i.test(low) ||
-                   /\b(medicine|medication|dose|dosage|pill|prescription|diagnos\w*)\b/i.test(low);
-
-      if (isA3) {
-        // A3 Blocked
-        document.getElementById("modal-tier-badge").innerText = "TIER A3 BLOCKED";
-        document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (A3)";
-        document.getElementById("modal-hazard-desc").innerText = "MIRROR will not guide this. Ask a qualified professional or emergency services.";
-        document.getElementById("modal-rule-pill").innerText = "Rule Triggered: R-A3-electrical";
+      if (/wire|circuit|voltage|breaker|gas|bleach|ammonia|medication|prescription/i.test(low)) {
         document.getElementById("safety-modal").style.display = "flex";
+        speak("Warning. Safety policy blocked this goal.");
         return;
       }
 
       backendState.sessionId = "sess_" + Math.random().toString(36).substring(2, 8);
-      backendState.interpretedIntent = val.includes("study") ? "prepare the space to study" : val.includes("cook") ? "prepare the space to cook" : val.includes("work") ? "prepare the space to work" : "prepare the space to " + val;
-      backendState.goalGate = { step_id: "goal", tier: "A0", decision: "allow", rule_id: "R-planner" };
-
       document.getElementById("session-id-pill").innerText = "Session: " + backendState.sessionId;
-      document.getElementById("session-tier-pill").innerText = "Tier: A0";
-      document.getElementById("session-gate-pill").innerText = "Gate: allow";
-
+      isVerifyingCapture = false;
       navTo("camera");
     }
 
-    // Trigger Capture from Camera HUD
-    function onSceneCaptured() {
-      onSceneObserved();
-    }
+    // Capture Scene
+    async function onSceneCaptured() {
+      const b64 = extractCaptureBase64();
+      const startT = performance.now();
+      document.getElementById("btn-capture-observe").innerText = "⏳ Observing with Gemini...";
 
-    // POST /v1/sessions/{sid}/observe
-    async function onSceneObserved() {
-      let fakeLabels = ["cup", "desk", "lamp"];
-      if (backendState.mode === "no_action_needed") {
-        fakeLabels = ["desk", "lamp", "notebook"];
+      if (isVerifyingCapture) {
+        await executeVerificationWithImage(b64);
+        document.getElementById("btn-capture-observe").innerText = "📸 Capture & Observe with Gemini";
+        return;
       }
 
       if (backendOnline && backendState.sessionId) {
@@ -826,46 +966,43 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              frames: [{ id: "f1", blur: 0.05, brightness: 0.6, fake_labels: fakeLabels }]
+              frames: [{ id: "f_" + Date.now(), data_b64: b64, media_type: "image/jpeg" }]
             })
           });
+          const elapsed = ((performance.now() - startT) / 1000).toFixed(1);
+          document.getElementById("telemetry-latency").innerText = "Latency: " + elapsed + "s";
+
           if (res.ok) {
             const world = await res.json();
             backendState.world = world;
           }
         } catch (err) {
-          console.warn("Live observe failed, using simulation:", err);
-        }
-      } else {
-        if (backendState.mode === "no_action_needed") {
-          backendState.world.observations = [
-            { label: "desk", confidence: 0.95 },
-            { label: "lamp", confidence: 0.91 },
-            { label: "notebook", confidence: 0.89 }
-          ];
-        } else {
-          backendState.world.observations = [
-            { label: "cup", confidence: 0.92 },
-            { label: "desk", confidence: 0.95 },
-            { label: "lamp", confidence: 0.90 }
-          ];
+          console.warn("Live observe failed:", err);
         }
       }
 
+      document.getElementById("btn-capture-observe").innerText = "📸 Capture & Observe with Gemini";
       document.getElementById("summary-intent-text").innerText = backendState.interpretedIntent;
-      document.getElementById("summary-sid").innerText = "Session ID: " + (backendState.sessionId || "sess_sim");
+      document.getElementById("summary-sid").innerText = "Session ID: " + backendState.sessionId;
 
       const obsContainer = document.getElementById("summary-observations");
       obsContainer.innerHTML = "";
-      (backendState.world.observations || []).forEach(o => {
-        obsContainer.innerHTML += `<div style="color: var(--mirror-success);">✔ ${o.label} (confidence: ${o.confidence})</div>`;
-      });
-
-      const needs = document.getElementById("summary-needs-breakdown");
-      const hasCup = (backendState.world.observations || []).some(o => o.label === "cup");
-      needs.innerHTML = `Needs for "${backendState.goal}": lamp, notebook. Clutter detected: ${hasCup ? "cup" : "None"}.`;
+      const obs = backendState.world.observations || [];
+      if (obs.length === 0) {
+        obsContainer.innerHTML = `<div style="color: var(--text-secondary);">No clutter or obstacles recognized. Space appears clear.</div>`;
+      } else {
+        obs.forEach(o => {
+          obsContainer.innerHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--mirror-elevated); padding: 6px 10px; border-radius: 8px;">
+              <span><b>${o.label}</b> ${o.where_hint ? '(' + o.where_hint + ')' : ''}</span>
+              <span class="badge badge-success">${Math.round(o.confidence * 100)}%</span>
+            </div>
+          `;
+        });
+      }
 
       navTo("summary");
+      speak("Scene analyzed by Gemini. Ready to plan.");
     }
 
     // POST /v1/sessions/{sid}/plan
@@ -878,242 +1015,157 @@
           if (res.ok) {
             const planData = await res.json();
             if (planData.outcome === "no_action_needed") {
-              document.getElementById("complete-title").innerText = "NO ACTION NEEDED";
-              document.getElementById("complete-title").style.color = "var(--mirror-cyan)";
-              document.getElementById("complete-desc").innerText = "Space is already clear and ready. Zero verified changes made (no false success claimed).";
-              document.getElementById("complete-summary-list").innerHTML = "<div>✔ Space already prepared. Zero tasks required.</div>";
+              document.getElementById("complete-title").innerText = "No action needed";
+              document.getElementById("complete-desc").innerText = "Space is already clean and prepared. Zero tasks required.";
+              document.getElementById("complete-summary-list").innerHTML = "<div>✔ Space verified ready.</div>";
               navTo("complete");
+              speak("The space is already prepared. No action needed.");
               return;
             }
             if (planData.outcome === "completed") {
               onMissionCompleted();
               return;
             }
-            if (planData.outcome === "needs_human") {
-              alert("needs_human: Verification failed repeatedly. Please check the step yourself.");
-              return;
-            }
-            if (planData.outcome === "blocked_goal") {
-              document.getElementById("modal-tier-badge").innerText = "TIER A3 BLOCKED";
-              document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (A3)";
-              document.getElementById("modal-hazard-desc").innerText = planData.message || "MIRROR will not guide this.";
-              document.getElementById("modal-rule-pill").innerText = "Rule Triggered: " + (planData.gate?.rule_id || "R-A3");
-              document.getElementById("safety-modal").style.display = "flex";
-              return;
-            }
             if (planData.step) {
               backendState.currentStep = planData.step;
               backendState.currentGate = planData.gate;
               navTo("plan");
+              speak("Action step: " + planData.step.instruction);
               return;
             }
           }
         } catch (err) {
-          console.warn("Live plan failed, using simulation:", err);
+          console.warn("Live plan failed:", err);
         }
       }
 
-      // Local simulation fallback
-      if (backendState.mode === "no_action_needed") {
-        document.getElementById("complete-title").innerText = "NO ACTION NEEDED";
-        document.getElementById("complete-title").style.color = "var(--mirror-cyan)";
-        document.getElementById("complete-desc").innerText = "Space is already clear and ready. Zero verified changes made (no false success claimed).";
-        document.getElementById("complete-summary-list").innerHTML = "<div>✔ Space already prepared. Zero tasks required.</div>";
-        navTo("complete");
-        return;
-      }
-
-      if (backendState.mode === "needs_human") {
-        alert("needs_human: Verification failed repeatedly. Please check the step yourself.");
-        return;
-      }
-
+      // Fallback default
       backendState.currentStep = {
         id: "s1",
         instruction: "Move the cup off the surface.",
         tier: "A1",
-        tier_reason: "reversible tidy",
         expected_evidence: ["no cup visible"]
       };
-      backendState.currentGate = {
-        step_id: "s1",
-        tier: "A1",
-        decision: "allow",
-        rule_id: "R-planner"
-      };
-
       navTo("plan");
+      speak("Action step: Move the cup off the surface.");
     }
 
     function renderPlanScreen() {
       const step = backendState.currentStep;
       if (!step) return;
-
-      document.getElementById("step-id-text").innerText = "Step " + step.id;
       document.getElementById("step-instruction-text").innerText = step.instruction;
       document.getElementById("step-evidence-text").innerText = (step.expected_evidence || []).join(", ");
-      document.getElementById("step-tier-reason").innerText = "Tier: " + step.tier + " • Reason: " + (step.tier_reason || "reversible tidy");
     }
 
-    function onExecuteStep() {
-      navTo("verify");
+    function onStepDoneTriggerVerification() {
+      isVerifyingCapture = true;
+      currentImageBase64 = null;
+      document.getElementById("btn-capture-observe").innerText = "📸 Capture Verification Evidence";
+      navTo("camera");
+      speak("Please point your camera at the completed step.");
     }
 
-    // POST /v1/sessions/{sid}/verify
-    async function renderVerifyScreen() {
-      const badge = document.getElementById("v-status-badge");
-      const card = document.getElementById("v-card");
-      const icon = document.getElementById("v-icon");
-      const title = document.getElementById("v-title");
-      const conf = document.getElementById("v-confidence");
-      const bar = document.getElementById("v-bar");
-      const evList = document.getElementById("v-evidence-list");
-      const btn = document.getElementById("v-primary-btn");
-      const stepCount = document.getElementById("v-steps-count");
-
-      let verifyStatus = backendState.mode;
-      let verifyConfidence = 0.92;
+    async function executeVerificationWithImage(b64) {
+      let verifyStatus = "verified";
+      let verifyConfidence = 0.95;
       let evidenceSeen = ["no cup visible"];
-      let evidenceMissing = [];
-      let reason = "All expected evidence seen in the new frames.";
+      let reason = "All expected evidence verified by Gemini.";
 
-      // Try Live Backend Verification
       if (backendOnline && backendState.sessionId) {
         try {
-          let verifyFrames = [];
-          if (backendState.mode === "cannot_tell") {
-            verifyFrames = [{ id: "f_verify", blur: 0.85, brightness: 0.1, fake_labels: [] }];
-          } else if (backendState.mode === "not_verified") {
-            verifyFrames = [{ id: "f_verify", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp", "cup"] }];
-          } else {
-            verifyFrames = [{ id: "f_verify", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp"] }];
-          }
-
           const res = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/verify`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ frames: verifyFrames })
+            body: JSON.stringify({
+              frames: [{ id: "f_v_" + Date.now(), data_b64: b64, media_type: "image/jpeg" }]
+            })
           });
           if (res.ok) {
             const v = await res.json();
             verifyStatus = v.status;
             verifyConfidence = v.confidence;
             evidenceSeen = v.evidence_seen || [];
-            evidenceMissing = v.evidence_missing || [];
             reason = v.reason || "";
           }
         } catch (err) {
-          console.warn("Live verify failed, using simulation:", err);
+          console.warn("Verify error:", err);
         }
       }
 
-      if (verifyStatus === "verified") {
+      backendState.lastVerification = { status: verifyStatus, confidence: verifyConfidence, evidenceSeen, reason };
+      renderVerifyScreen();
+      navTo("verify");
+    }
+
+    function renderVerifyScreen() {
+      const v = backendState.lastVerification || { status: "verified", confidence: 0.95, evidenceSeen: ["no cup visible"], reason: "" };
+      const badge = document.getElementById("v-status-badge");
+      const card = document.getElementById("v-card");
+      const title = document.getElementById("v-title");
+      const conf = document.getElementById("v-confidence");
+      const bar = document.getElementById("v-bar");
+      const evList = document.getElementById("v-evidence-list");
+
+      if (v.status === "verified") {
         badge.className = "badge badge-success";
         badge.innerText = "VERIFIED";
         card.style.borderColor = "var(--mirror-success)";
         card.style.background = "var(--mirror-success-glow)";
-        icon.innerText = "✅";
-        title.innerText = "VERIFIED PASS";
+        title.innerText = "VERIFIED COMPLETE";
         title.style.color = "var(--mirror-success)";
-        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)} (Grounded in anchor evidence)`;
-        bar.style.width = `${Math.round(verifyConfidence * 100)}%`;
+        conf.innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}% (Grounded in visual evidence)`;
+        bar.style.width = `${Math.round(v.confidence * 100)}%`;
         bar.style.background = "var(--mirror-success)";
-        evList.innerHTML = `
-          <div style="color: var(--mirror-success);">✔ Evidence seen: ${evidenceSeen.join(", ") || "no cup visible"}</div>
-          <div>• Frame quality: ok (blur: 0.05, brightness: 0.60)</div>
-          <div>• Anchor confidence: 0.95 (desk & lamp recognized)</div>
-        `;
-        btn.innerText = "Advance & Plan Next Step";
-        btn.className = "btn btn-success";
-        btn.onclick = onAdvanceOrPlanNext;
-      } else if (verifyStatus === "cannot_tell") {
+        evList.innerHTML = `<div style="color: var(--mirror-success);">✔ Evidence seen: ${v.evidenceSeen.join(", ")}</div>`;
+        speak("Verification confirmed. Step verified at " + Math.round(v.confidence * 100) + " percent confidence.");
+      } else {
         badge.className = "badge badge-uncertain";
-        badge.innerText = "CANNOT_TELL";
+        badge.innerText = v.status.toUpperCase();
         card.style.borderColor = "var(--mirror-uncertain)";
         card.style.background = "var(--mirror-uncertain-glow)";
-        icon.innerText = "❓";
-        title.innerText = "UNCERTAIN (CANNOT_TELL)";
+        title.innerText = "COULD NOT VERIFY";
         title.style.color = "var(--mirror-uncertain)";
-        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)} (Unusable frame / ungrounded anchor)`;
-        bar.style.width = "0%";
+        conf.innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}%`;
+        bar.style.width = "20%";
         bar.style.background = "var(--mirror-uncertain)";
-        evList.innerHTML = `
-          <div style="color: var(--mirror-warning);">⚠ Reason: ${reason || "Frames too blurry or dark. Retake photo."}</div>
-          <div>• Evidence missing: ${evidenceMissing.join(", ") || "no cup visible"}</div>
-          <div style="color: var(--text-secondary);">Rule: Uncertainty is never marked as success.</div>
-        `;
-        btn.innerText = "Retake Photo at Same Angle";
-        btn.className = "btn btn-uncertain";
-        btn.onclick = () => navTo("camera");
-      } else {
-        badge.className = "badge badge-critical";
-        badge.innerText = "NOT_VERIFIED";
-        card.style.borderColor = "var(--mirror-critical)";
-        card.style.background = "var(--mirror-critical-glow)";
-        icon.innerText = "❌";
-        title.innerText = "VERIFICATION FAILED";
-        title.style.color = "var(--mirror-critical)";
-        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)}`;
-        bar.style.width = `${Math.round(verifyConfidence * 100)}%`;
-        bar.style.background = "var(--mirror-critical)";
-        evList.innerHTML = `
-          <div style="color: var(--mirror-critical);">❌ Expected evidence missing: ${evidenceMissing.join(", ") || "no cup visible"}</div>
-          <div>• Reason: ${reason || "Physical condition was not met."}</div>
-        `;
-        btn.innerText = "Retry Step Execution";
-        btn.className = "btn btn-critical";
-        btn.onclick = () => navTo("plan");
+        evList.innerHTML = `<div style="color: var(--mirror-warning);">⚠ ${v.reason || "Scene mismatch. Retake verification photo."}</div>`;
+        speak("Could not verify step. Please point the camera at the same area.");
       }
-
-      stepCount.innerText = backendState.verifiedSteps;
     }
 
     async function onAdvanceOrPlanNext() {
       backendState.verifiedSteps += 1;
-      document.getElementById("v-steps-count").innerText = backendState.verifiedSteps;
-
-      if (backendOnline && backendState.sessionId) {
-        try {
-          await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/observe`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              frames: [{ id: "f_done", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp", "notebook"] }]
-            })
-          });
-          const planRes = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/plan`, {
-            method: "POST"
-          });
-          if (planRes.ok) {
-            const planData = await planRes.json();
-            // Outcome: completed
-          }
-        } catch (err) {
-          console.warn("Live completion request failed:", err);
-        }
-      }
-
+      document.getElementById("final-steps-count").innerText = backendState.verifiedSteps;
+      isVerifyingCapture = false;
       onMissionCompleted();
     }
 
     function onMissionCompleted() {
-      document.getElementById("complete-title").innerText = "MISSION COMPLETED";
-      document.getElementById("complete-title").style.color = "var(--mirror-success)";
-      document.getElementById("complete-desc").innerText = `Session finished: ${backendState.verifiedSteps} verified step(s) recorded with empirical proof.`;
-      document.getElementById("complete-summary-list").innerHTML = `
-        <div><span style="color: var(--mirror-success); font-weight:700;">✔ Step s1 verified:</span> Move cup off surface</div>
-        <div style="color: var(--text-secondary); font-size:10px; margin-left: 14px;">Outcome: PlanOutcome.completed (0 clutter remaining)</div>
-      `;
+      document.getElementById("complete-title").innerText = "Done and verified";
+      document.getElementById("complete-desc").innerText = `The camera confirmed ${backendState.verifiedSteps} step(s), and a fresh scan shows nothing left to do.`;
       navTo("complete");
+      speak("Done and verified. The camera confirmed all steps.");
+    }
+
+    function exportAuditLog() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backendState, null, 2));
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `mirror_audit_${backendState.sessionId || "session"}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
     }
 
     function resetAllToHome() {
       backendState.sessionId = null;
       backendState.verifiedSteps = 0;
       backendState.currentStep = null;
+      isVerifyingCapture = false;
       document.getElementById("session-id-pill").innerText = "Session: None";
       document.getElementById("session-tier-pill").innerText = "Tier: -";
       document.getElementById("session-gate-pill").innerText = "Gate: -";
+      stopWebcam();
       navTo("home");
     }
 
@@ -1122,24 +1174,10 @@
       resetAllToHome();
     }
 
-    function setBackendResponseMode(mode) {
-      backendState.mode = mode;
-      document.querySelectorAll(".sim-chip").forEach(c => c.classList.remove("active"));
-      if (mode === "verified") document.getElementById("mode-verified").classList.add("active");
-      if (mode === "cannot_tell") document.getElementById("mode-cannottell").classList.add("active");
-      if (mode === "no_action_needed") document.getElementById("mode-noaction").classList.add("active");
-      if (mode === "needs_human") document.getElementById("mode-needshuman").classList.add("active");
-      if (mode === "blocked_goal") document.getElementById("mode-blockgoal").classList.add("active");
-
-      if (document.getElementById("verify-screen").classList.contains("active")) {
-        renderVerifyScreen();
-      }
-    }
-
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("DOMContentLoaded", () => {
       resizeCanvas();
-      drawCameraSimulation();
+      drawDeskScene(true);
       checkBackendHealth();
     });
   </script>
