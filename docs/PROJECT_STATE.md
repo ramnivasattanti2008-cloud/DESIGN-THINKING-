@@ -1,4 +1,4 @@
-# Project state
+# Project state: IQOO
 
 Updated by `claude` after each merge. Last updated: 2026-10-04.
 
