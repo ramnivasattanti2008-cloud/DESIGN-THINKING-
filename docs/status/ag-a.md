@@ -3,52 +3,43 @@
 Last updated: 2026-10-04
 
 ## Done
-- Built the complete working app flow for a real prototype (no static mockup, no dead ends):
-  1. `HomeScreen.kt`: Real user task input (text & voice), preset triggers, real-time sensing telemetry (lux, IMU, camera).
-  2. `CameraViewScreen.kt`: Viewfinder with animated spatial scan laser, bounding box overlays, and live capture action.
-  3. `MissionSummaryScreen.kt`: Dynamic task intent model, real-time prerequisite inventory (found vs missing tools), and safety warnings.
-  4. `ActionPlanScreen.kt`: Sequential interactive physical steps, active step tracking, hazard caveats, and user confirmation CTA.
-  5. `VerificationScreen.kt`: $T_0$ vs $T_1$ visual diff split viewer, strict $\ge 85\%$ confidence meter, detected physical delta checklist, and ambiguity/uncertainty factor breakdown.
-  6. `SafetyAlertModal.kt`: Full-screen modal hazard interrupt with safe default abort and manual override guard.
-- Built dynamic task decomposition & lifecycle engine in `src/ui/viewmodel/MissionViewModel.kt`:
-  - Dynamically decomposes ANY user goal into sequential actionable physical steps with specific criteria.
-  - Manages step execution, verification, uncertain state human-in-the-loop confirmation, and hazard preemption.
-- Re-architected `src/ui/navigation/MirrorNavHost.kt` to bind directly to `MissionViewModel` state flow.
-- Built complete reactive mobile application in `src/ui/web_preview/index.html` and `public/index.html`:
-  - Implements dynamic NLP goal decomposition for arbitrary user inputs.
-  - Interactive HTML5 canvas simulating spatial object detection and scanning laser line.
-  - Full end-to-end user journey: Goal -> Scan -> Mission Summary -> Action Plan -> Step Confirmation -> Verification -> Mission Complete.
-  - Live simulation toolbar: Test Verified Pass ($\ge 85\%$), Uncertain Review ($72\%$) with human override, False Success Interception, and Safety Hazard Interlocks.
-- Documented final user-facing screen flow and interaction states in `src/ui/SCREEN_FLOW.md`.
+- Completed final frontend integration pass connecting the UI layer directly to the FastAPI `/v1` backend contract:
+  - `src/ui/network/MirrorBackendContract.kt`: Updated with exact DTOs matching `contracts/*.schema.json` and `src/core/models.py`:
+    - `CreateSessionRequest`, `CreateSessionResponse`, `GateDecisionDto` (A0..A3 tiers)
+    - `FrameDto`, `ObservationDto`, `WorldStateDto`
+    - `StepDto`, `PlanResponse` (matching `outcome`: `step`, `completed`, `no_action_needed`, `needs_observation`, `blocked_goal`, `needs_human`)
+    - `VerifyResultDto` (matching `status`: `verified`, `not_verified`, `cannot_tell`)
+  - `src/ui/network/MirrorBackendClient.kt`: Live HTTP client implementation for Android/Compose mapping real JSON payloads to `/v1/sessions`, `/observe`, `/plan`, and `/verify`.
+  - `src/ui/viewmodel/MissionViewModel.kt`: Central lifecycle state machine updated to reflect real backend responses:
+    - PolicyGate blocks (Tier A3) trigger immediate `SafetyAlertModal` with refusal message and rule ID.
+    - Tier A2 confirmation steps require explicit human confirmation prior to action.
+    - `needs_observation` prompts re-scan when camera frames are blurry/dark.
+    - `needs_human` triggers human-in-the-loop review after repeated verification failures.
+    - `no_action_needed` correctly reports clean workspace without falsely claiming completion.
+    - `cannot_tell` verification state strictly demotes to `UNCERTAIN_REVIEW` (never a pass).
+    - `completed` is displayed only after verified evidence.
+  - `src/ui/web_preview/index.html` and `public/index.html`: Updated interactive mobile simulator with `/v1` contract switcher:
+    - Test `/verify: verified (0.92)`
+    - Test `/verify: cannot_tell (0.0)`
+    - Test `/plan: no_action_needed`
+    - Test `/plan: needs_human`
+    - Test `/sessions: A3 block`
+- All 81 tests passing (`python -m pytest`).
 
 ## In progress
-- None (working prototype UI and screen flow complete).
+- None (frontend integration with backend contract complete).
 
 ## Next
-- Connect Android CameraX hardware feed and backend WebSocket client to `MissionViewModel` once Claude/backend logic is ready.
+- Hand off to Android packaging (`src/mobile/`) when Claude finishes T-010.
 
 ## Blockers / requests
 - None.
 
 ## Files I touched
-- `src/ui/model/MirrorModels.kt`
 - `src/ui/network/MirrorBackendContract.kt`
+- `src/ui/network/MirrorBackendClient.kt`
 - `src/ui/viewmodel/MissionViewModel.kt`
-- `src/ui/theme/Color.kt`
-- `src/ui/theme/Type.kt`
-- `src/ui/theme/Theme.kt`
-- `src/ui/components/MirrorComponents.kt`
-- `src/ui/screens/HomeScreen.kt`
-- `src/ui/screens/CameraViewScreen.kt`
-- `src/ui/screens/MissionSummaryScreen.kt`
-- `src/ui/screens/ActionPlanScreen.kt`
-- `src/ui/screens/VerificationScreen.kt`
-- `src/ui/screens/SafetyAlertModal.kt`
 - `src/ui/navigation/MirrorNavHost.kt`
-- `src/ui/SCREEN_FLOW.md`
 - `src/ui/web_preview/index.html`
 - `public/index.html`
-- `assets/ui/hud_reticle.svg`
-- `assets/ui/hazard_shield.svg`
-- `assets/ui/verified_badge.svg`
 - `docs/status/ag-a.md`
