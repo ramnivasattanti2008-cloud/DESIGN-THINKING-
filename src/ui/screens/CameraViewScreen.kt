@@ -168,7 +168,7 @@ fun CameraViewScreen(
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterVertically
             ) {
                 // Goal Pill
                 Surface(
