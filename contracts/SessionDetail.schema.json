@@ -1,0 +1,174 @@
+{
+  "$defs": {
+    "Observation": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "where_hint": {
+          "default": "",
+          "title": "Where Hint",
+          "type": "string"
+        },
+        "source_frame": {
+          "title": "Source Frame",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "confidence",
+        "source_frame"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "Step": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "instruction": {
+          "title": "Instruction",
+          "type": "string"
+        },
+        "tier": {
+          "$ref": "#/$defs/Tier"
+        },
+        "tier_reason": {
+          "default": "",
+          "title": "Tier Reason",
+          "type": "string"
+        },
+        "expected_evidence": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Expected Evidence",
+          "type": "array"
+        },
+        "rollback_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rollback Hint"
+        }
+      },
+      "required": [
+        "id",
+        "instruction",
+        "tier"
+      ],
+      "title": "Step",
+      "type": "object"
+    },
+    "Tier": {
+      "enum": [
+        "A0",
+        "A1",
+        "A2",
+        "A3"
+      ],
+      "title": "Tier",
+      "type": "string"
+    },
+    "WorldState": {
+      "properties": {
+        "session_id": {
+          "title": "Session Id",
+          "type": "string"
+        },
+        "observations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Observation"
+          },
+          "title": "Observations",
+          "type": "array"
+        },
+        "unknowns": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Unknowns",
+          "type": "array"
+        },
+        "hazards": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Hazards",
+          "type": "array"
+        }
+      },
+      "required": [
+        "session_id"
+      ],
+      "title": "WorldState",
+      "type": "object"
+    }
+  },
+  "description": "Response of GET /v1/sessions/{id}.",
+  "properties": {
+    "goal": {
+      "title": "Goal",
+      "type": "string"
+    },
+    "world": {
+      "$ref": "#/$defs/WorldState"
+    },
+    "current": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Step"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "log": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Log",
+      "type": "array"
+    },
+    "verified_steps": {
+      "title": "Verified Steps",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "goal",
+    "world",
+    "log",
+    "verified_steps"
+  ],
+  "title": "SessionDetail",
+  "type": "object"
+}

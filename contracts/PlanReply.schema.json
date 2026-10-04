@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "GateDecision": {
+      "properties": {
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        },
+        "tier": {
+          "$ref": "#/$defs/Tier"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step_id",
+        "tier",
+        "decision",
+        "rule_id"
+      ],
+      "title": "GateDecision",
+      "type": "object"
+    },
+    "PlanOutcome": {
+      "enum": [
+        "step",
+        "completed",
+        "no_action_needed",
+        "needs_observation",
+        "blocked_goal",
+        "needs_human"
+      ],
+      "title": "PlanOutcome",
+      "type": "string"
+    },
+    "Step": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "instruction": {
+          "title": "Instruction",
+          "type": "string"
+        },
+        "tier": {
+          "$ref": "#/$defs/Tier"
+        },
+        "tier_reason": {
+          "default": "",
+          "title": "Tier Reason",
+          "type": "string"
+        },
+        "expected_evidence": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Expected Evidence",
+          "type": "array"
+        },
+        "rollback_hint": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rollback Hint"
+        }
+      },
+      "required": [
+        "id",
+        "instruction",
+        "tier"
+      ],
+      "title": "Step",
+      "type": "object"
+    },
+    "Tier": {
+      "enum": [
+        "A0",
+        "A1",
+        "A2",
+        "A3"
+      ],
+      "title": "Tier",
+      "type": "string"
+    }
+  },
+  "description": "Response of POST /v1/sessions/{id}/plan.",
+  "properties": {
+    "outcome": {
+      "$ref": "#/$defs/PlanOutcome"
+    },
+    "done": {
+      "description": "True only for completed and no_action_needed. Not a success flag: only outcome == 'completed' claims success.",
+      "title": "Done",
+      "type": "boolean"
+    },
+    "step": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Step"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "gate": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GateDecision"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "message": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Message"
+    }
+  },
+  "required": [
+    "outcome",
+    "done"
+  ],
+  "title": "PlanReply",
+  "type": "object"
+}

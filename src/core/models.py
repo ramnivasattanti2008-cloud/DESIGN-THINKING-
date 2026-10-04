@@ -1,4 +1,9 @@
-"""Shared data shapes. Mirrors contracts/*.schema.json; change the schema first."""
+"""Shared data shapes, including the response bodies of src/api/main.py.
+
+These models are the source of truth. contracts/*.schema.json are generated from them
+(`python -m contracts.generate` from the repo root), and src/core/tests/test_contract_responses.py
+fails if a committed schema is stale or if an API response stops matching its model.
+"""
 from enum import Enum
 from typing import Optional
 
@@ -65,6 +70,7 @@ class PlanOutcome(str, Enum):
     no_action_needed = "no_action_needed"    # nothing to do and nothing was verified: no success claim
     needs_observation = "needs_observation"  # no usable observation yet
     blocked_goal = "blocked_goal"            # goal refused by policy (A3)
+    needs_human = "needs_human"              # repeated verification failures, ask the person
 
 
 class VerifyResult(BaseModel):
@@ -75,3 +81,41 @@ class VerifyResult(BaseModel):
     frame_quality: str = "ok"  # ok | poor
     confidence: float = Field(0.0, ge=0, le=1, description="heuristic, calibration UNVERIFIED")
     reason: str = ""
+
+
+# ---- API response bodies: exactly what src/api/main.py returns today ----
+# Every key is always present in the JSON; "no value" is an explicit null, never a missing key.
+# POST /v1/sessions/{id}/observe returns a WorldState and POST /v1/sessions/{id}/verify a VerifyResult.
+
+class SessionCreated(BaseModel):
+    """Response of POST /v1/sessions."""
+    session_id: str
+    interpreted_intent: str
+    goal_gate: GateDecision
+    blocked: bool
+    message: Optional[str] = None  # the refusal text when blocked, otherwise null
+
+
+class PlanReply(BaseModel):
+    """Response of POST /v1/sessions/{id}/plan."""
+    outcome: PlanOutcome
+    done: bool = Field(description="True only for completed and no_action_needed. Not a success flag: "
+                                   "only outcome == 'completed' claims success.")
+    step: Optional[Step] = None  # set only for outcome == step
+    gate: Optional[GateDecision] = None  # set for step (the step gate) and blocked_goal (the goal gate)
+    message: Optional[str] = None  # text to show the person, for example a refusal or a retake request
+
+
+class SessionDetail(BaseModel):
+    """Response of GET /v1/sessions/{id}."""
+    goal: str
+    world: WorldState
+    current: Optional[Step] = None
+    log: list[dict]  # event records; the keys depend on "event" and are not typed further
+    verified_steps: int
+
+
+class Health(BaseModel):
+    """Response of GET /v1/health."""
+    ok: bool
+    provider: str  # class name of the model client, for example FakeModelClient
