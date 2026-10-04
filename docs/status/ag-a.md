@@ -15,13 +15,14 @@ Last updated: 2026-10-04
 - **Task B (Follow-up pull request)**:
   - Opened PR #8 from `claude/architecture` into `main` covering post-MVP commits (`f192e26`, `f9fc8c6`, `559e500`).
   - Documented verified numbers (283 backend tests, 30 Android unit tests) and explicit unverified status (Gemini mocked-transport only, nothing on a phone).
-  - Awaiting Ram's explicit command in chat before merging via merge commit.
+  - Received Ram's explicit "yes" in chat and merged PR #8 with merge commit `91e3d27`.
+  - Confirmed `origin/main` received the merge cleanly without direct pushes.
 
 ## Half done
-- None.
+- None. All tasks completed.
 
 ## Next
-- PR `ag-a/ui-components` into `claude/architecture`.
+- Claude review of PR #9 (`ag-a/ui-components` into `claude/architecture`).
 
 ## Files touched
 - `src/ui/screens/ExecutingScreen.kt`
