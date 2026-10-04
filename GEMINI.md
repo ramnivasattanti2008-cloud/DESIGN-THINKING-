@@ -6,7 +6,7 @@ Which seat are you? Ram will tell you at the start of the session. If he hasn't,
 
 - `ag-a`: Antigravity account 1. Frontend and UI.
 - `ag-b`: Antigravity account 2. Tests, CI, bug hunting, security and performance checks.
-- `ag-c`: Antigravity account 3. API glue, database schema and migrations, hosting and deployment config.
+- `ag-c`: Antigravity account 3. Reserve seat with few credits. Small bounded jobs only, and write your handoff before you run out.
 - `studio-a`: AI Studio account 1. Research, data, prompts, experiments, evaluation.
 - `studio-b`: AI Studio account 2. README, report, slides, demo script.
 
