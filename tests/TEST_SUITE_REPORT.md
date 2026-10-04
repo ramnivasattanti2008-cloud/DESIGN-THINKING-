@@ -2,8 +2,8 @@
 
 **Author:** `ag-b` (QA and Reliability Engineer)  
 **Date:** 2026-10-04  
-**Test Pass Rate:** 21 / 21 Tests Passing (100%)  
-**Scope:** Strict Anti-False-Success & Verification Invariants
+**Test Pass Rate:** 54 / 54 Tests Passing in `tests/` (125 / 125 across repository) (100%)  
+**Scope:** Strict Anti-False-Success, Policy Red-Teaming & HTTP Verification Invariants
 
 ---
 
@@ -23,23 +23,28 @@ In conventional LLM-based assistants, agents suffer from optimistic hallucinatio
 
 | Suite | File | Tests | Purpose | Status |
 |---|---|---|---|---|
-| **Empty Prompts** | `test_empty_prompts.py` | 6 | Guards against null, empty, whitespace, and non-actionable prompts | PASS |
-| **Low Confidence** | `test_low_confidence.py` | 3 | Proves demotion to `UNCERTAIN_REVIEW` when $c < 0.85$ or blurred | PASS |
-| **Action Failures** | `test_action_failure.py` | 2 | Guards against unmoved objects and stale/frozen camera buffers | PASS |
-| **False Success** | `test_false_success_prevention.py` | 2 | Intercepts verbal claims of success with zero physical displacement | PASS |
-| **Safety Interlocks** | `test_safety_guardrails.py` | 3 | Verifies immediate halt upon detecting physical hazards | PASS |
-| **Uncertain States** | `test_uncertain_state_transitions.py` | 2 | Proves uncertain states require explicit human confirmation | PASS |
-| **Contract Compliance** | `test_backend_contract_compliance.py` | 2 | Proves backend payload claims cannot bypass the verification rule | PASS |
-| **Formal Invariant** | `test_verification_invariant.py` | 1 (150 runs) | Fuzzing proof that no execution path marks `COMPLETED` falsely | PASS |
+| **Empty Prompts** | `smoke/test_empty_prompts.py` | 6 | Guards against null, empty, whitespace, and non-actionable prompts | PASS |
+| **Low Confidence** | `smoke/test_low_confidence.py` | 3 | Proves demotion to `UNCERTAIN_REVIEW` when $c < 0.85$ or blurred | PASS |
+| **Action Failures** | `smoke/test_action_failure.py` | 2 | Guards against unmoved objects and stale/frozen camera buffers | PASS |
+| **False Success** | `smoke/test_false_success_prevention.py` | 2 | Intercepts verbal claims of success with zero physical displacement | PASS |
+| **Safety Interlocks** | `smoke/test_safety_guardrails.py` | 3 | Verifies immediate halt upon detecting physical hazards | PASS |
+| **Uncertain States** | `smoke/test_uncertain_state_transitions.py` | 2 | Proves uncertain states require explicit human confirmation | PASS |
+| **Contract Compliance** | `smoke/test_backend_contract_compliance.py` | 2 | Proves backend payload claims cannot bypass the verification rule | PASS |
+| **Formal Invariant** | `smoke/test_verification_invariant.py` | 1 (150 runs) | Fuzzing proof that no execution path marks `COMPLETED` falsely | PASS |
+| **Adversarial Policy** | `policy/test_adversarial_policy.py` | 26 | Red-team suite for jailbreak pretexts and dangerous goal blocking | PASS |
+| **End-to-End HTTP Loop** | `e2e/test_http_loop.py` | 7 | Drives live uvicorn subprocess over real HTTP enforcing all invariants | PASS |
 
 ---
 
 ## 3. How to Run the Test Suite Locally
 
 ```bash
-# Run the entire test suite
-python -m unittest discover -s tests -p "test_*.py" -v
+# Run the entire test suite via pytest
+pytest -v
+
+# Run the HTTP E2E subprocess loop test
+pytest tests/e2e/test_http_loop.py -v
 
 # Run the invariant proof directly
-python -m unittest tests/smoke/test_verification_invariant.py -v
+pytest tests/smoke/test_verification_invariant.py -v
 ```
