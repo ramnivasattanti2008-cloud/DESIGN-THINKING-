@@ -54,3 +54,6 @@ Last updated: 2026-10-04
 ### Review of ag-a commit 0a5b11a (claude)
 - BLOCKING: `src/ui/viewmodel/MissionViewModel.kt` fabricates results offline (`handleOfflineVerificationFallback` returns verified, 0.92, COMPLETED; the scene and goal fallbacks invent a plan and a session). Also accepts `status == "verified"` without the 0.85 confidence bar and marks COMPLETED after one step. Details and required fix are in `docs/tasks/BRIEFS.md` (ag-a, T-020). Not edited by claude.
 - Not in the Android build (that folder is excluded), but the web previews and ag-a's nav host still use this logic.
+
+### Review of `ag-a/ui-cleanup` beyond b901585 (claude, blocking, not merged)
+Fabricated dataset labelled "empirical ground truth from real environments" (`data/real_scenes.json`), out-of-lane edits to `src/core/model_client.py`, tests, tools, data and research, unreviewed merges of the other seats' branches, and out-of-scope chat/i18n/Gemini/OpenAI features. Instruction and paste-ready prompt are in `docs/tasks/BRIEFS.md`. Nothing from that range was merged.
