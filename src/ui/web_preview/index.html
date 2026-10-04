@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIRROR Mobile UI Simulator</title>
+  <title>MIRROR Mobile UI & Interaction Simulator</title>
   <style>
     :root {
       --mirror-obsidian: #0F1117;
@@ -33,7 +33,7 @@
     }
     header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     header h1 {
       font-size: 24px;
@@ -45,6 +45,34 @@
       color: var(--text-secondary);
       margin-top: 4px;
     }
+
+    /* Simulation Control Toolbar */
+    .sim-toolbar {
+      display: flex;
+      gap: 8px;
+      background: var(--mirror-surface);
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--mirror-border);
+      margin-bottom: 16px;
+      font-size: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .sim-btn {
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: var(--mirror-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--mirror-border);
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+    .sim-btn:hover { border-color: var(--mirror-cyan); color: var(--mirror-cyan); }
+    .sim-btn.active { background: var(--mirror-cyan); color: #000; font-weight: bold; border-color: var(--mirror-cyan); }
+
     /* Journey stepper */
     .journey-stepper {
       display: flex;
@@ -72,11 +100,11 @@
     /* Mobile Phone Shell */
     .phone-frame {
       width: 375px;
-      height: 760px;
+      height: 770px;
       background: var(--mirror-obsidian);
       border-radius: 40px;
       border: 8px solid #232734;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 20px rgba(0, 240, 255, 0.1);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 25px rgba(0, 240, 255, 0.12);
       position: relative;
       display: flex;
       flex-direction: column;
@@ -147,6 +175,7 @@
     .badge-success { background: rgba(0,230,118,0.15); color: var(--mirror-success); }
     .badge-warning { background: rgba(255,184,0,0.15); color: var(--mirror-warning); }
     .badge-critical { background: rgba(255,59,48,0.15); color: var(--mirror-critical); }
+    .badge-uncertain { background: rgba(158,0,255,0.15); color: var(--mirror-uncertain); }
 
     /* Camera View HUD */
     .viewfinder {
@@ -160,6 +189,14 @@
       flex-direction: column;
       justify-content: space-between;
       padding: 12px;
+    }
+    .reticle-overlay {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 140px; height: 140px;
+      pointer-events: none;
+      opacity: 0.8;
     }
     .bbox {
       position: absolute;
@@ -176,7 +213,7 @@
     .modal-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0,0,0,0.88);
       display: none;
       align-items: center;
       justify-content: center;
@@ -198,9 +235,18 @@
 <body>
 
   <header>
-    <h1>MIRROR UI PROTOTYPE</h1>
-    <p>Journey: User Gives Goal → App Interprets Task → App Shows Plan → User Confirms → App Verifies Result</p>
+    <h1>MIRROR UI SIMULATOR</h1>
+    <p>Journey: User gives goal → App interprets task → App shows plan → User confirms → App verifies result</p>
   </header>
+
+  <!-- Simulation Control Toolbar -->
+  <div class="sim-toolbar">
+    <span style="color: var(--text-muted); font-size: 11px;">Backend Mock Response:</span>
+    <button class="sim-btn active" onclick="setBackendMode('verified')">✔ Verified (94%)</button>
+    <button class="sim-btn" onclick="setBackendMode('false_success')">⚠ False Success Gate</button>
+    <button class="sim-btn" onclick="setBackendMode('uncertain')">❓ Uncertain (74%)</button>
+    <button class="sim-btn" onclick="triggerModal(true)">🚨 Safety Hazard Interlock</button>
+  </div>
 
   <!-- Journey Step Nav -->
   <div class="journey-stepper">
@@ -223,7 +269,7 @@
     <div id="screen-home" class="screen-container visible">
       <div>
         <h2 style="font-size: 20px; margin-bottom: 4px;">What's your physical goal?</h2>
-        <p style="font-size: 12px; color: var(--text-secondary);">Point camera at any room or setup. MIRROR will interpret the scene and verify your results.</p>
+        <p style="font-size: 12px; color: var(--text-secondary);">Point camera at any room or object. MIRROR will interpret the scene and verify your results.</p>
       </div>
 
       <div class="card" style="border-color: var(--mirror-cyan);">
@@ -235,7 +281,7 @@
       </div>
 
       <div class="card">
-        <h3 style="font-size: 13px; margin-bottom: 8px;">Quick Presets</h3>
+        <h3 style="font-size: 13px; margin-bottom: 8px;">Quick Task Presets</h3>
         <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
           <div style="padding: 8px; background: var(--mirror-elevated); border-radius: 8px; cursor: pointer;" onclick="setGoal('Inspect wall outlet for loose wire')">⚡ Inspect wall outlet for loose wire</div>
           <div style="padding: 8px; background: var(--mirror-elevated); border-radius: 8px; cursor: pointer;" onclick="setGoal('Assemble bookshelf hardware alignment')">🛠️ Assemble bookshelf hardware alignment</div>
@@ -244,7 +290,7 @@
       </div>
 
       <div class="card">
-        <h3 style="font-size: 13px; margin-bottom: 6px;">Environmental Sensor Health</h3>
+        <h3 style="font-size: 13px; margin-bottom: 6px;">Device Sensing Telemetry</h3>
         <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary);">
           <span>Camera: 1080p 60fps</span>
           <span>Lux: 380 lx (Good)</span>
@@ -266,6 +312,15 @@
           <span>EXPOSURE: LOCKED</span>
           <span>TORCH: AUTO</span>
         </div>
+
+        <!-- HUD Reticle -->
+        <svg class="reticle-overlay" viewBox="0 0 200 200">
+          <path d="M 20 50 L 20 20 L 50 20" stroke="#00F0FF" stroke-width="3" fill="none" />
+          <path d="M 150 20 L 180 20 L 180 50" stroke="#00F0FF" stroke-width="3" fill="none" />
+          <path d="M 180 150 L 180 180 L 150 180" stroke="#00F0FF" stroke-width="3" fill="none" />
+          <path d="M 50 180 L 20 180 L 20 150" stroke="#00F0FF" stroke-width="3" fill="none" />
+          <circle cx="100" cy="100" r="14" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="4 2" fill="none" />
+        </svg>
 
         <!-- Bounding boxes -->
         <div class="bbox" style="top: 70px; left: 30px; width: 150px; height: 90px;">
@@ -350,19 +405,19 @@
     <div id="screen-verify" class="screen-container">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 style="font-size: 16px;">Result Verification</h2>
-        <span class="badge badge-success">VERIFIED PASS</span>
+        <span id="v-status-badge" class="badge badge-success">VERIFIED PASS</span>
       </div>
 
-      <div class="card" style="border-color: var(--mirror-success); background: rgba(0,230,118,0.1);">
+      <div id="v-card" class="card" style="border-color: var(--mirror-success); background: rgba(0,230,118,0.1);">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 20px;">✅</span>
+          <span id="v-icon" style="font-size: 20px;">✅</span>
           <div>
-            <div style="font-weight: bold; font-size: 14px; color: var(--mirror-success);">VERIFIED COMPLETE</div>
-            <div style="font-size: 11px; color: var(--text-secondary);">Confidence: 94% (Threshold: 85%)</div>
+            <div id="v-title" style="font-weight: bold; font-size: 14px; color: var(--mirror-success);">VERIFIED COMPLETE</div>
+            <div id="v-confidence" style="font-size: 11px; color: var(--text-secondary);">Confidence: 94% (Threshold: 85%)</div>
           </div>
         </div>
         <div style="margin-top: 10px; height: 6px; background: #333; border-radius: 3px; overflow: hidden;">
-          <div style="width: 94%; height: 100%; background: var(--mirror-success);"></div>
+          <div id="v-bar" style="width: 94%; height: 100%; background: var(--mirror-success); transition: width 0.4s;"></div>
         </div>
       </div>
 
@@ -370,20 +425,20 @@
         <h3 style="font-size: 13px; margin-bottom: 8px;">Before / After Visual Diff</h3>
         <div style="display: flex; gap: 8px;">
           <div style="flex: 1; height: 80px; background: #111; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); border: 1px solid var(--mirror-border);">T₀ Initial (Loose)</div>
-          <div style="flex: 1; height: 80px; background: #111; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--mirror-success); border: 1px solid var(--mirror-success);">T₁ Post (Bundled)</div>
+          <div id="v-after-frame" style="flex: 1; height: 80px; background: #111; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--mirror-success); border: 1px solid var(--mirror-success);">T₁ Post (Bundled)</div>
         </div>
       </div>
 
       <div class="card">
         <h3 style="font-size: 13px; margin-bottom: 6px;">Verified Evidence Breakdown</h3>
-        <div style="font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: var(--text-primary);">
+        <div id="v-breakdown" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: var(--text-primary);">
           <div>✔ Power switch physically depressed to OFF</div>
           <div>✔ Cable bundle diameter reduced from 14cm to 3.8cm</div>
           <div>✔ Zip-tie fastener locked and tensioned</div>
         </div>
       </div>
 
-      <button class="btn" style="background: var(--mirror-success); color: #000;" onclick="showScreen('screen-home', 0)">Complete Mission & Return Home</button>
+      <button id="v-primary-btn" class="btn" style="background: var(--mirror-success); color: #000;" onclick="showScreen('screen-home', 0)">Complete Mission & Return Home</button>
       <button class="btn btn-secondary" onclick="showScreen('screen-camera', 1)">Retake Verification Frame</button>
     </div>
 
@@ -426,6 +481,75 @@
 
     function triggerModal(show) {
       document.getElementById('safety-modal').style.display = show ? 'flex' : 'none';
+    }
+
+    function setBackendMode(mode) {
+      document.querySelectorAll('.sim-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const badge = document.getElementById('v-status-badge');
+      const card = document.getElementById('v-card');
+      const icon = document.getElementById('v-icon');
+      const title = document.getElementById('v-title');
+      const conf = document.getElementById('v-confidence');
+      const bar = document.getElementById('v-bar');
+      const breakdown = document.getElementById('v-breakdown');
+      const afterFrame = document.getElementById('v-after-frame');
+      const btn = document.getElementById('v-primary-btn');
+
+      if (mode === 'verified') {
+        badge.className = 'badge badge-success';
+        badge.innerText = 'VERIFIED PASS';
+        card.style.borderColor = 'var(--mirror-success)';
+        card.style.background = 'rgba(0,230,118,0.1)';
+        icon.innerText = '✅';
+        title.innerText = 'VERIFIED COMPLETE';
+        title.style.color = 'var(--mirror-success)';
+        conf.innerText = 'Confidence: 94% (Threshold: 85%)';
+        bar.style.width = '94%';
+        bar.style.background = 'var(--mirror-success)';
+        afterFrame.style.borderColor = 'var(--mirror-success)';
+        afterFrame.style.color = 'var(--mirror-success)';
+        afterFrame.innerText = 'T₁ Post (Bundled)';
+        breakdown.innerHTML = '<div>✔ Power switch physically depressed to OFF</div><div>✔ Cable bundle diameter reduced from 14cm to 3.8cm</div><div>✔ Zip-tie fastener locked and tensioned</div>';
+        btn.innerText = 'Complete Mission & Return Home';
+        btn.style.background = 'var(--mirror-success)';
+      } else if (mode === 'false_success') {
+        badge.className = 'badge badge-critical';
+        badge.innerText = 'FALSE SUCCESS BLOCKED';
+        card.style.borderColor = 'var(--mirror-critical)';
+        card.style.background = 'rgba(255,59,48,0.15)';
+        icon.innerText = '🚫';
+        title.innerText = 'COMPLETION REJECTED';
+        title.style.color = 'var(--mirror-critical)';
+        conf.innerText = 'Model claimed done, but Visual Delta: 0.02 (< 0.70 required)';
+        bar.style.width = '10%';
+        bar.style.background = 'var(--mirror-critical)';
+        afterFrame.style.borderColor = 'var(--mirror-critical)';
+        afterFrame.style.color = 'var(--mirror-critical)';
+        afterFrame.innerText = 'T₁ (Unchanged Frame)';
+        breakdown.innerHTML = '<div style="color: var(--mirror-critical);">✖ Visual state shows zero measurable displacement.</div><div>⚠ Invariant 2 triggered: Linguistic completion ignored without visual proof.</div>';
+        btn.innerText = 'Retake Camera Verification';
+        btn.style.background = 'var(--mirror-cyan)';
+      } else if (mode === 'uncertain') {
+        badge.className = 'badge badge-uncertain';
+        badge.innerText = 'UNCERTAIN REVIEW';
+        card.style.borderColor = 'var(--mirror-uncertain)';
+        card.style.background = 'rgba(158,0,255,0.15)';
+        icon.innerText = '❓';
+        title.innerText = 'HUMAN INSPECTION REQUIRED';
+        title.style.color = 'var(--mirror-uncertain)';
+        conf.innerText = 'Confidence: 74% (Below 85% safety threshold)';
+        bar.style.width = '74%';
+        bar.style.background = 'var(--mirror-uncertain)';
+        afterFrame.style.borderColor = 'var(--mirror-uncertain)';
+        afterFrame.style.color = 'var(--mirror-uncertain)';
+        afterFrame.innerText = 'T₁ (Motion Blurred)';
+        breakdown.innerHTML = '<div style="color: var(--mirror-warning);">⚠ Camera motion stability: 0.58 (blurred frame)</div><div>• Ambient shadow detected across target cable bundle</div>';
+        btn.innerText = 'Confirm Manually or Retake Frame';
+        btn.style.background = 'var(--mirror-uncertain)';
+        btn.style.color = '#fff';
+      }
     }
   </script>
 </body>

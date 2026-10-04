@@ -3,7 +3,7 @@
 Order matters. Tick items only when done and verified, and note the PR next to each.
 
 ## 0. Decisions needed from Ram
-- [ ] D-002: cloud-first inference for the MVP (proposed) vs on-device first
+- [x] D-002: cloud-first inference for the MVP (decided by claude on Ram's delegation, reversible)
 - [ ] Which model provider, and a budget cap per test session
 - [ ] Opt-in wording for sending frames to a cloud model
 - [ ] MVP success targets (S1-S6 in `OVERVIEW.md`)

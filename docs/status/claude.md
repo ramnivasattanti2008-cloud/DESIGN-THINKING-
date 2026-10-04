@@ -16,7 +16,9 @@ Last updated: 2026-10-04
 - T-010 Android Gradle skeleton. Review the other seats' local work when it arrives as PRs.
 
 ## Blockers / requests
-- Ram: D-002, model provider and budget, frame opt-in wording, success targets.
+- Ram: model provider, API key and budget (claude cannot create these), frame opt-in wording, success targets. D-002 decided cloud-first.
+- Mismatch for ag-a: the UI preset "Inspect wall outlet for loose wire" and the default goal about desk wiring would be blocked (A3 electrical) by the policy gate. Presets should match what the MVP will guide.
+- Ran the backend (`uvicorn`, port 8000) and the UI preview (`http://localhost:8080/src/ui/web_preview/index.html`) in Chrome. The preview is a mock; it does not call the backend yet (T-011).
 - Not verified: uvicorn server start, anything on a real phone, any real model.
 
 ## Files I touched

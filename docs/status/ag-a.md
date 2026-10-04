@@ -10,24 +10,31 @@ Last updated: 2026-10-04
   4. `ActionPlanScreen.kt`: Interactive decomposed action steps with hazard warnings and user confirmation CTA.
   5. `VerificationScreen.kt`: Before/after visual diff viewer, confidence meter (>=85% rule), detected changes, uncertainty factors.
   6. `SafetyAlertModal.kt`: Full-screen modal hazard interrupt with safe default abort and manual override guard.
-- Built design system & components:
+- Connected screen states to backend responses:
+  - `src/ui/network/MirrorBackendContract.kt`: Network response DTOs mapping perception, planning, hazards, and verification directly to screen states.
+  - `src/ui/viewmodel/MissionViewModel.kt`: Central StateFlow managing state transitions, hazard interrupts, and verification gates.
+- Built design system, components & assets:
   - `src/ui/theme/` (`Color.kt`, `Type.kt`, `Theme.kt` with dark high-contrast palette)
   - `src/ui/model/MirrorModels.kt` (Domain & UI state models)
   - `src/ui/components/MirrorComponents.kt` (`MirrorTopBar`, `StepCard`, `ConfidenceMeter`, `SafetyWarningBanner`)
   - `src/ui/navigation/MirrorNavHost.kt` (Full user journey orchestrator)
-- Created interactive web simulator in `src/ui/web_preview/index.html` and `public/index.html` for instant browser testing.
+  - `assets/ui/` (`hud_reticle.svg`, `hazard_shield.svg`, `verified_badge.svg`)
+- Documented final user-facing screen flow and interaction states in `src/ui/SCREEN_FLOW.md`.
+- Upgraded interactive simulator in `src/ui/web_preview/index.html` with interactive mock backend response toggles (Verified, False Success Blocked, Uncertain Review, Safety Interlock).
 
 ## In progress
-- None (core screen milestone complete).
+- None (UI screens, user flow, and backend response mappings complete).
 
 ## Next
-- Integrate with live Android CameraX viewfinder and backend WebSocket API when `claude` scaffolds core inference endpoints.
+- Wire Android CameraX output texture and WebSocket client to `MissionViewModel` once Claude/backend logic is ready.
 
 ## Blockers / requests
-- None. Ready for QA validation (`ag-b`).
+- None.
 
 ## Files I touched
 - `src/ui/model/MirrorModels.kt`
+- `src/ui/network/MirrorBackendContract.kt`
+- `src/ui/viewmodel/MissionViewModel.kt`
 - `src/ui/theme/Color.kt`
 - `src/ui/theme/Type.kt`
 - `src/ui/theme/Theme.kt`
@@ -39,6 +46,10 @@ Last updated: 2026-10-04
 - `src/ui/screens/VerificationScreen.kt`
 - `src/ui/screens/SafetyAlertModal.kt`
 - `src/ui/navigation/MirrorNavHost.kt`
+- `src/ui/SCREEN_FLOW.md`
 - `src/ui/web_preview/index.html`
 - `public/index.html`
+- `assets/ui/hud_reticle.svg`
+- `assets/ui/hazard_shield.svg`
+- `assets/ui/verified_badge.svg`
 - `docs/status/ag-a.md`
