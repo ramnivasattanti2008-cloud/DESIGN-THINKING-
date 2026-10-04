@@ -225,15 +225,15 @@ Wording that must stay (the meaning is part of the safety policy):
 - `ServerSettingsDialog`: two fields (server address, API key hidden), the error text under them, a note "For development. A key stored in the app can be extracted.", Save and Cancel.
 Do not touch `src/mobile`, `src/core`, `src/api`, repo root or `tests/`. Check that it compiles with `./gradlew :app:assembleDebug` (Windows note in `docs/architecture/RUNNING.md`) or push the branch and read the GitHub Android CI result; never write "compiles" without one of those.
 
-B. Pull request #4 into `main`.
-1. Replace its description with the verified numbers from `docs/architecture/VALIDATION.md` (the current ones, not the old "216 tests / tip 074251d" text) and the current head commit.
+B. Follow-up pull request. PR #4 was merged into `main` by Ram (merge commit `dd10c5e`, head `ef1faf2`). Later commits exist only on `claude/architecture` (at least `f192e26`: Gemini provider, one-photo check script and in-app server settings; and `f9fc8c6`: phone test guide and briefs). See `git log origin/main..origin/claude/architecture`.
+1. Open a pull request from `claude/architecture` into `main` for them. Description: what the commits add, the current verified numbers from `docs/architecture/VALIDATION.md`, and what is NOT verified (the live Gemini API and a real phone have never been used).
 2. Wait for Ram's explicit "yes" in chat. Then merge with "Create a merge commit" (not squash). Nobody merges to `main` any other way.
 3. Do not merge any other branch. Write what you did in `docs/status/ag-a.md`.
 
 Paste-ready prompt:
 
 ```
-You are ag-a (frontend and UI) on the MIRROR repo. First run: git fetch origin && git checkout -b ag-a/ui-components origin/claude/architecture. Read AGENTS.md and docs/tasks/BRIEFS.md, section "Round 3", part ag-a. Task A: create five themed Compose components as NEW files in src/ui/screens/ with exactly the signatures and wording in that section (ExecutingScreen, CompletedScreen, PhotoConsentDialog, ServerSettingsDialog, NoticeBanner). Only touch src/ui/screens, src/ui/components, src/ui/theme and docs/status/ag-a.md. No fake data, no imports from navigation/network/viewmodel, success wording only on CompletedScreen. Do not claim it compiles unless you ran ./gradlew :app:assembleDebug or read a green GitHub Android CI run. Open a PR into claude/architecture. Task B: update the description of PR #4 (claude/architecture into main) with the current numbers from docs/architecture/VALIDATION.md and the current head commit, then WAIT for Ram to say yes in chat before pressing Merge, and use "Create a merge commit". Never push to main directly.
+You are ag-a (frontend and UI) on the MIRROR repo. First run: git fetch origin && git checkout -b ag-a/ui-components origin/claude/architecture. Read AGENTS.md and docs/tasks/BRIEFS.md, section "Round 3", part ag-a. Task A: create five themed Compose components as NEW files in src/ui/screens/ with exactly the signatures and wording in that section (ExecutingScreen, CompletedScreen, PhotoConsentDialog, ServerSettingsDialog, NoticeBanner). Only touch src/ui/screens, src/ui/components, src/ui/theme and docs/status/ag-a.md. No fake data, no imports from navigation/network/viewmodel, success wording only on CompletedScreen. Do not claim it compiles unless you ran ./gradlew :app:assembleDebug or read a green GitHub Android CI run. Open a PR into claude/architecture. Task B: PR #4 is already merged. Open a NEW pull request from claude/architecture into main for the commits that are not in main yet (git log origin/main..origin/claude/architecture), describe them with the current numbers from docs/architecture/VALIDATION.md and say plainly that the live Gemini API and a real phone have never been used, then WAIT for Ram to say yes in chat before pressing Merge, and use "Create a merge commit". Never push to main directly.
 ```
 
 ### ag-b (QA and bug hunting): T-034
@@ -253,7 +253,7 @@ Nothing needed now.
 
 ### Ram (not Antigravity)
 - T-032, the phone test: follow `docs/architecture/DEVICE_TEST.md` (a free Gemini key from Google AI Studio, one photo through `tools/check_model.py`, then three scenes on the phone) and send back the results table. This is the only way to learn whether the real loop works.
-- Say "yes" in chat when you want PR #4 merged.
+- Say "yes" in chat when you want the follow-up pull request merged (PR #4, the MVP, is already merged).
 - Paste the fix prompts for studio-a, studio-b and Copilot (sections above) when you can.
 
 ## About the extra models Ram added

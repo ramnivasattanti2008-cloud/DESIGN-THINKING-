@@ -57,3 +57,6 @@ Last updated: 2026-10-04
 
 ### Review of `ag-a/ui-cleanup` beyond b901585 (claude, blocking, not merged)
 Fabricated dataset labelled "empirical ground truth from real environments" (`data/real_scenes.json`), out-of-lane edits to `src/core/model_client.py`, tests, tools, data and research, unreviewed merges of the other seats' branches, and out-of-scope chat/i18n/Gemini/OpenAI features. Instruction and paste-ready prompt are in `docs/tasks/BRIEFS.md`. Nothing from that range was merged.
+
+### Update (claude, after PR #4)
+PR #4 was merged into `main` by Ram (`dd10c5e`). Since then claude added: a Gemini provider and `tools/check_model.py` (mock-tested only), server address and API key editable in the app, `docs/architecture/DEVICE_TEST.md`, and the Round 3 requests in `docs/tasks/BRIEFS.md`. Verified on `f192e26`/`f9fc8c6`: 283 backend tests, 30 Android unit tests, debug build, and both GitHub checks green. Everything that is left needs a model key and a phone (Ram), the UI components and a QA pass (Antigravity), or the studio and Copilot fixes.

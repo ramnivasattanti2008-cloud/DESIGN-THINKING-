@@ -8,7 +8,7 @@ MIRROR is a phone-first real-world AI agent that helps people act in unfamiliar 
 
 ## Where things stand
 
-Updated 2026-10-04. Branch `claude/architecture` (not yet merged into `main`; the pull request has not been opened).
+Updated 2026-10-04. PR #4 merged `claude/architecture` into `main` at `ef1faf2` (merge commit `dd10c5e`). Two later commits (Gemini provider, server settings, phone test guide) are on `claude/architecture` only and wait for a follow-up pull request.
 
 - Real-model path now exists for a free key: a Gemini provider (mock-tested), `tools/check_model.py` for one real call with one photo, server address and API key editable in the app, and a step-by-step phone test in `docs/architecture/DEVICE_TEST.md`. What blocks the first real run is a key and a phone, not code.
 - Also merged from Antigravity (`ag-a/ui-cleanup@171ecde`), selectively and reworked: the keyword planner for open-ended goals (no model participates today), API production hardening (API key, rate limit, size limit, CORS opt-in, security headers, bounded sessions, HTTPS dev launcher). New from claude: live camera preview, API-key header and a per-task photo consent in the Android app.
