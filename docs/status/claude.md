@@ -35,12 +35,17 @@ Last updated: 2026-10-04
 - Your camera screen draws sample detection boxes and sensor numbers. The photo actually sent to the backend is a separate real capture.
 
 
-## Handoff 2026-10-04 (usage limit reached; read this first)
-**Verified:** Android unit tests 21/21 pass and `:app:assembleDebug` builds, on commit 0a5b11a plus a LOCAL one-token fix of `CameraViewScreen.kt:171` (not committed). Without that fix the committed 0a5b11a does not compile. Backend: 81 pytest pass.
-**Not verified:** `ag-a`'s committed fix is on branch `ag-a/ui-cleanup` (b901585, includes d72b012 and claude commit 4758ad6). It has NOT been build-checked. `dist/*.apk` (git-ignored) were built from the patched 0a5b11a and the two files are currently identical (a failed rebuild copied the same file twice); rebuild from the final commit before installing. A phone run needs a real model key (`MIRROR_MODEL_PROVIDER=anthropic`, `MIRROR_MODEL_API_KEY`): the fake provider cannot see real photos.
-**Incident:** the other tools run `git checkout` in the SHARED folder `C:\Users\Ram Nivas\Documents\IQOO`, so the branch there changes under everyone. claude lost uncommitted edits once and one claude commit landed on `ag-a/ui-cleanup`. claude now works only in its own worktree `C:\Users\Ram Nivas\Documents\IQOO-claude` (branch `claude/architecture`). Every seat should use its own worktree (`IQOO-ag-a`, `IQOO-ag-b`, `IQOO-ag-c` already exist).
-**In flight, unmerged, not pushed:** three claude sub-agents in `IQOO\.claude\worktrees\agent-*` (policy-gate gaps T-016, session-log wiring T-017, API contract schemas). Their commits sit on `worktree-agent-*` branches; review and merge them. The policy agent's worktree started from `main`, so check it picked up `src/core`.
-**Branches to review and merge into `claude/architecture`:** `ag-a/ui-cleanup` (T-020), `studio-a/scenes` (T-013), `studio-b/readme` (T-007/T-014). Fast-forward is possible for `ag-a/ui-cleanup`. Not yet delivered: ag-b CI (T-021/T-022), ag-c session log (T-024), copilot demo client (T-026). T-018 (real model call) is blocked on a key. PR into `main` was clicked in Chrome but never confirmed; check https://github.com/ramnivasattanti2008-cloud/DESIGN-THINKING-/pulls
+## Handoff 2026-10-04 (current)
+**Verified on `8a6a185`** (the pushed tip before this docs commit): pytest 186 passed, 3 skipped; Android `:app:testDebugUnitTest` 21/21 pass and `:app:assembleDebug` builds; the APKs in `dist/` (git-ignored) were rebuilt from it (`mirror-debug-emulator.apk`, `mirror-debug-phone-wifi.apk` pointing at 172.20.244.128:8000).
+**Not verified:** nothing has run on a phone; no real model has been called (needs `MIRROR_MODEL_PROVIDER=anthropic` and a key; the fake provider cannot see real photos).
+**Merged into `claude/architecture`:** contracts completion, audit-log sink wiring, policy-gap fixes (T-016), `ag-a` T-020 up to `b901585`. **Not merged:** `5ff5bcd` (Sara chat, out of MVP scope); `studio-a/scenes`, `studio-b/readme`, `copilot/demo-client` (under review).
+**Open:** T-018 (key), T-021/T-022 (`ag-b`), T-024 (`ag-c`), pull request into `main` (`gh` not logged in).
+**Process:** other tools switch branches in the shared folder, so claude works only in the worktree `C:\Users\Ram Nivas\Documents\IQOO-claude`. Sub-agent worktrees under `IQOO\.claude\worktrees\` can be removed with `git worktree remove` once their branches are merged.
+
+### Notes to the other seats
+- ag-a: T-020 items are done and build. Do not build a chat persona without a backend endpoint; propose it in your status file first.
+- ag-b: your two gap tests in `tests/policy/test_adversarial_policy.py` were flipped to the fixed behaviour (commit `cceb011`); the policy now allows plastic wire ties, hard drives, alarm clocks and "pay attention", and blocks chemicals via `R-A3-chemical`. Your Android CI job (T-021) is the next most useful thing.
+
 ### Review of ag-a commit 0a5b11a (claude)
 - BLOCKING: `src/ui/viewmodel/MissionViewModel.kt` fabricates results offline (`handleOfflineVerificationFallback` returns verified, 0.92, COMPLETED; the scene and goal fallbacks invent a plan and a session). Also accepts `status == "verified"` without the 0.85 confidence bar and marks COMPLETED after one step. Details and required fix are in `docs/tasks/BRIEFS.md` (ag-a, T-020). Not edited by claude.
 - Not in the Android build (that folder is excluded), but the web previews and ag-a's nav host still use this logic.
