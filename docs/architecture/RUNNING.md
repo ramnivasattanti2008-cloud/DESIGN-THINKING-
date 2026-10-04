@@ -49,7 +49,7 @@ export GRADLE_OPTS="-Xmx2g -Dfile.encoding=UTF-8"
 
 ## Success rules (enforced in both layers)
 
-1. A step passes only when the backend status is `verified` and confidence >= 0.85. `not_verified`, `cannot_tell` and any unknown status never pass.
+1. A step passes only when the backend status is `verified` and confidence >= 0.85. The backend itself downgrades a lower-confidence `verified` to `cannot_tell`, and the app checks again. `not_verified`, `cannot_tell` and any unknown status never pass.
 2. The mission screen "Done and verified" is reachable only from a backend `completed` outcome, which needs at least one verified step and a fresh scan with nothing left to do.
 3. "Nothing to change" is reported as such, never as success.
 4. Unsafe goals are refused before any scan. Hazards seen in the scene stop the flow; there is no override.

@@ -5,6 +5,7 @@ The planner here is a rule template, not a model. Scope matches docs/architectur
 
 Success rules (never relax these):
 - A step is only ever reported verified by Session.verify(), from evidence in new frames.
+- Verified also needs confidence >= VERIFIED_CONFIDENCE_MIN; otherwise it is cannot_tell.
 - The mission is only "completed" after at least one verified step AND a fresh observation
   that leaves nothing to do. "Nothing to do" with zero verified steps is "no_action_needed".
 - With no usable observation the answer is "needs_observation", never "done".
@@ -30,6 +31,7 @@ SEEN = 0.6  # confidence at or above which something counts as seen
 BLUR_MAX = 0.6
 BRIGHTNESS_MIN = 0.2
 MAX_RETRIES = 2
+VERIFIED_CONFIDENCE_MIN = 0.85  # below this a step is never reported verified (heuristic, not calibrated)
 HAZARDS = {"smoke", "fire", "exposed wiring", "spill near socket", "sharp object"}
 CLUTTER = {"cup", "plate", "trash", "wrapper", "bottle"}
 NEEDS = {"study": ["lamp", "notebook"], "work": ["laptop", "lamp"], "cook": ["cutting board"]}
@@ -234,6 +236,11 @@ class Session:
         else:
             status = VerifyStatus.verified
             reason = "All expected evidence seen in the new frames."
+        if status == VerifyStatus.verified and confidence < VERIFIED_CONFIDENCE_MIN:
+            # The evidence looks right, but the view is not clear or sure enough to call it verified.
+            status = VerifyStatus.cannot_tell
+            reason = (f"The expected evidence looks right, but confidence {confidence:.2f} is below the "
+                      f"{VERIFIED_CONFIDENCE_MIN:.2f} needed to call it verified. Retake a clearer photo.")
         self.retries = 0 if status == VerifyStatus.verified else self.retries + 1
         if status == VerifyStatus.verified:
             self.verified_steps += 1

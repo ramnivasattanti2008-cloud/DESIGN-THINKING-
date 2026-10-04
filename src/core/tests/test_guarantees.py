@@ -72,8 +72,8 @@ def test_confidence_reflects_frame_quality_and_evidence():
     s.observe([fr("desk", "cup", "lamp", "notebook")])
     s.plan()
     res = s.verify([fr("desk:0.8", "lamp:0.9", brightness=0.5, blur=0.3)])
-    assert res.status == VerifyStatus.verified
     assert res.confidence == pytest.approx(0.7)  # capped by frame quality (1 - blur); best anchor is 0.9
+    assert res.status == VerifyStatus.cannot_tell  # right evidence, but below the 0.85 bar
 
 
 def test_anthropic_client_parses_and_sends_images():

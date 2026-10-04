@@ -20,6 +20,7 @@ Verification is what makes MIRROR more than a chatbot with a camera. A step coun
 ## Rules
 
 - `verified` requires evidence per item, not an overall impression.
+- `verified` also requires confidence of at least 0.85 (`VERIFIED_CONFIDENCE_MIN` in `src/core/engine.py`). Evidence that looks right but is below the bar is reported as `cannot_tell`, so no client can be told "verified" at low confidence.
 - The verifier does not see the planner's reasoning, only the evidence list, so it cannot just agree with the planner.
 - A step that failed verification is logged, not hidden.
 - The user can override ("it's fine"), and the log records `user_override`.
