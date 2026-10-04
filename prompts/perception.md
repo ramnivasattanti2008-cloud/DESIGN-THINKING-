@@ -10,7 +10,7 @@
 
 The perception prompt guides the Vision-Language Model (VLM) when observing camera frames taken in real-world indoor environments. Its primary objectives are:
 1. **Zero Hallucination:** Never assume or fabricate objects that are typical in a room (e.g., assuming a mouse next to a keyboard, or pens in a cup) if they are not explicitly visible.
-2. **Honest, Calibrated Confidence:** Output realistic probabilities ($0.0 \le c \le 1.0$) reflecting sensor clarity, lighting, and occlusion.
+2. **Honest Confidence Scoring:** Output realistic probabilities ($0.0 \le c \le 1.0$) reflecting sensor clarity, lighting, and occlusion. Note that the backend strictly enforces that any step verification with confidence $< 0.85$ is downgraded to `cannot_tell`.
 3. **Vocabulary Normalization:** Produce singular, lowercase, canonical object nouns matching `src/core/models.py` vocabulary.
 4. **Spatial Grounding & Anchor Identification:** Provide relative spatial localization (`where`) referencing stable scene anchors (`desk`, `counter`, `table`).
 5. **Deterministic JSON Formatting:** Guarantee strict adherence to the schema expected by `parse_observations()`.
@@ -18,6 +18,8 @@ The perception prompt guides the Vision-Language Model (VLM) when observing came
 ---
 
 ## 2. Calibrated Prompt Template
+
+*Note: Double braces `{{` and `}}` are escaped for Python `str.format()` compatibility in `model_client.py`.*
 
 ```markdown
 You are the perception engine of MIRROR, a safety-critical real-world physical assistant.
@@ -35,29 +37,29 @@ Look carefully at the provided camera frame(s) of an indoor physical workspace.
 6. Provide spatial grounding in the "where" field relative to major structural anchors (e.g., "center of desk", "left edge of counter", "floor beside chair").
 7. Calibrate your confidence scores honestly:
    - 0.90 to 1.00: Unambiguous, fully in-focus, brightly lit, unobstructed view.
-   - 0.70 to 0.89: Slightly angled, minor shadow, or minor partial occlusion, but clearly identifiable.
+   - 0.70 to 0.89: Slightly angled, minor shadow, or minor partial occlusion, but clearly identifiable. Note: The backend verification gate requires confidence >= 0.85.
    - 0.40 to 0.69: Highly blurry, distant, or heavily shadowed item; identity uncertain.
    - Below 0.40: Omit unless it represents a suspected physical hazard.
 
-### Frame Degradation Check:
-If the image is too dark to see details, severely motion-blurred, or the camera lens is blocked, include a hazard object labeled "poor_frame_quality" with "where": "sensor".
+### Degraded Frame Quality:
+If the image is too dark, severely motion-blurred, or the camera lens is blocked such that no objects can be clearly identified, return an empty "objects" list `[]`. Do not emit placeholder or pseudo-object names.
 
 ### Response Format:
 Respond ONLY with a valid JSON object matching this exact structure, with no markdown formatting or commentary:
-{
+{{
   "objects": [
-    {
+    {{
       "label": "desk",
       "confidence": 0.95,
       "where": "workspace anchor"
-    },
-    {
+    }},
+    {{
       "label": "cup",
       "confidence": 0.91,
       "where": "front right of desk"
-    }
+    }}
   ]
-}
+}}
 ```
 
 ---
@@ -78,14 +80,12 @@ Respond ONLY with a valid JSON object matching this exact structure, with no mar
 }
 ```
 
-### Example B: Severe Motion Blur / Camera Shake
+### Example B: Severe Motion Blur / Indistinguishable Frame
 **Input Frame:** High-speed hand tremor resulting in streaked, indistinguishable blur.  
 **Target JSON Output:**
 ```json
 {
-  "objects": [
-    {"label": "poor_frame_quality", "confidence": 0.95, "where": "sensor motion blur"}
-  ]
+  "objects": []
 }
 ```
 
@@ -102,15 +102,14 @@ Respond ONLY with a valid JSON object matching this exact structure, with no mar
 }
 ```
 
-### Example D: Kitchen Counter with Active Hazard
-**Input Frame:** Countertop next to a glowing red electric stovetop burner.  
+### Example D: Kitchen Counter with Potential Hazard
+**Input Frame:** Countertop with a knife.  
 **Target JSON Output:**
 ```json
 {
   "objects": [
-    {"label": "counter", "confidence": 0.97, "where": "prep workspace"},
-    {"label": "stove", "confidence": 0.93, "where": "left of counter"},
-    {"label": "hot surface", "confidence": 0.88, "where": "front stove burner"}
+    {"label": "counter", "confidence": 0.97, "where": "prep workspace anchor"},
+    {"label": "knife", "confidence": 0.91, "where": "cutting surface"}
   ]
 }
 ```
@@ -122,4 +121,5 @@ Respond ONLY with a valid JSON object matching this exact structure, with no mar
 This prompt directly outputs schema compatible with `parse_observations(text: str, frame_id: str)` in [`src/core/model_client.py`](../src/core/model_client.py):
 - `data["objects"]` list is strictly maintained.
 - Every entry has string `label`, float `confidence` in `[0.0, 1.0]`, and string `where`.
-- When tested against `parse_observations`, any non-JSON prefix or suffix is safely handled by the regular expression `r"\{.*\}"`, but models are prompted to output JSON-only to minimize latency and token overhead.
+- An empty `objects` list signals no detected objects, cleanly routing to `needs_observation` in the session engine.
+- Step verification requires `confidence >= 0.85`; scores below this bar are safely demoted to `cannot_tell`.

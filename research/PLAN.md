@@ -2,7 +2,7 @@
 
 **Task:** T-004  
 **Author:** `studio-a` (Google AI Studio seat)  
-**Status:** Complete  
+**Status:** In Progress (Sample benchmark designed; empirical evaluation pending real model API calls)  
 **Last Updated:** 2026-10-04  
 
 ---
@@ -22,36 +22,38 @@ MIRROR investigates an embodied, phone-first AI architecture that bridges this g
 
 * **RQ1 (Verification Accuracy & False Success Prevention)**:  
   Does multi-modal post-condition verification eliminate false completion claims compared to open-loop generative agents?
-  * *Hypothesis:* Requiring explicit visual evidence tokens with confidence $\ge 0.85$ will reduce False Success Rate to $\le 1\%$, compared to $>20\%$ in open-loop VLMs.
+  * *Investigation:* Compare verification outcomes requiring explicit visual evidence tokens with confidence $\ge 0.85$ against unverified open-loop models. Baselines and empirical targets will be measured once real models are evaluated (per `VERIFICATION.md`: no target until measured).
 
 * **RQ2 (Safety Governor Efficacy)**:  
   How effective is a rule-based regex and keyword classifier (`PolicyGate`) compared to prompt-based LLM self-censorship when facing adversarial prompt injections?
-  * *Hypothesis:* Rule-based gating halts 100% of defined critical hazards (electrical, gas, medical, structural) even when adversarial pretexts (roleplay, hypothetical emergencies) are used.
+  * *Investigation:* Measure refusal rates of critical hazards (electrical, gas, medical, structural) across adversarial pretexts.
 
 * **RQ3 (Uncertainty Calibration & Degraded Perception)**:  
   How gracefully does the system handle degraded perception (sensor blur, extreme darkness, lens occlusion, perspective shift)?
-  * *Hypothesis:* Calibrated heuristic quality thresholds ($\text{blur} \le 0.60, \text{brightness} \ge 0.20$) will accurately route ambiguous scenes to `cannot_tell` with zero false passes.
+  * *Investigation:* Test whether heuristic quality thresholds ($\text{blur} \le 0.60, \text{brightness} \ge 0.20$) correctly route ambiguous scenes to `cannot_tell` without false verification passes.
 
 ---
 
 ## 3. Experimental Methodology
 
 ### 3.1 Benchmark Dataset (`data/scenes.json`)
-A curated dataset of 25 before/after physical scene pairs across three everyday preparation scenarios:
-1. **Study Space Preparation**: Desk clutter, textbook retrieval, task lamp arrangement.
-2. **Kitchen Workspace Preparation**: Food prep surface clearing, cutting board placement, hot stove hazard detection.
-3. **Office Workstation Organization**: Laptop positioning, cable management, lighting adjustment.
+A curated set of 12 sample before/after scene pairs (synthetic label descriptions and metadata; no raw camera images or bounding boxes are stored in the repository):
+1. **Study Space Preparation**: Desk clutter, notebook retrieval, task lamp arrangement.
+2. **Kitchen Workspace Preparation**: Food prep surface clearing, cutting board placement, knife hazard confirmation.
+3. **Degraded & Adversarial Cases**: Dark frame, severe blur, blocked lens, perspective shift, clean ready space, electrical hazard refusal.
 
-### 3.2 Evaluation Metrics
+### 3.2 Evaluation Metrics (Planned)
 
-| Metric | Formula / Definition | Target |
-|---|---|---|
-| **False Success Rate (FSR)** | $\frac{\text{False Positives}}{\text{Total Uncompleted Actions}}$ | **0.0%** (Absolute Invariant) |
-| **Verification Precision** | $\frac{\text{True Verified}}{\text{True Verified} + \text{False Verified}}$ | $\ge 95.0\%$ |
-| **Verification Recall** | $\frac{\text{True Verified}}{\text{Total Truly Completed Actions}}$ | $\ge 90.0\%$ |
-| **Cannot-Tell Accuracy (CTA)** | Correct classification of blurred, dark, or ungrounded frames | $\ge 98.0\%$ |
-| **Policy Refusal Rate (PRR)** | Block rate on adversarial/hazardous goals | **100.0%** |
-| **End-to-End Latency** | Time from frame capture to verified step output | $\le 2500\text{ ms}$ (Cloud VLM) |
+| Metric | Definition |
+|---|---|
+| **False Success Rate (FSR)** | False positives / Total uncompleted actions (must be 0 in verified code) |
+| **Verification Precision** | True verified / (True verified + False verified) |
+| **Verification Recall** | True verified / Total truly completed actions |
+| **Cannot-Tell Accuracy (CTA)** | Correct classification of blurred, dark, or ungrounded frames |
+| **Policy Refusal Rate (PRR)** | Block rate on adversarial and hazardous goals |
+| **End-to-End Latency** | Time from frame capture to verified step output |
+
+*Note: Per `docs/architecture/VERIFICATION.md`, exact target thresholds are deferred until live benchmarks are run on real models.*
 
 ---
 
@@ -60,16 +62,16 @@ A curated dataset of 25 before/after physical scene pairs across three everyday 
 1. **Phase 1: Deterministic Test Double Baseline (Complete)**  
    - Exercised using `FakeModelClient` over synthetic frame labels.
    - Proves state transitions, policy decisions, retry limits, and `cannot_tell` demotions.
-   - Automated via `pytest` (81 unit and red-team tests).
+   - Automated via `pytest` backend test suite.
 
 2. **Phase 2: Annotated Benchmark Scenes (T-013, Complete)**  
-   - 25 labelled before/after image pairs annotated with object bboxes, illumination, and expected verification verdicts.
+   - 12 sample scenes specified with before/after labels, engine-compatible evidence tokens, and expected outcomes.
    - Stored in `data/scenes.json` and documented in `data/scenes.md`.
 
-3. **Phase 3: Live Multimodal Validation (T-018, Pending Ram's API Key)**  
-   - Real Claude 3.5 Sonnet / Gemini 1.5 Flash multimodal vision calls.
+3. **Phase 3: Live Multimodal Validation (T-018, Pending Model API Key)**  
+   - Real vision model calls.
    - Measure real latency, token consumption, and precision on physical room photos.
 
-4. **Phase 4: Physical Device Trials (T-010 / Mobile Integration)**  
-   - Real Android APK run on test hardware (iQOO phone).
+4. **Phase 4: Physical Device Trials (Mobile Integration)**  
+   - Real Android APK run on test hardware.
    - Evaluate camera autofocus, rolling shutter blur, ambient lux metering, and battery consumption.
