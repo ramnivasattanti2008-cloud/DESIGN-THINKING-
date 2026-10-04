@@ -27,9 +27,9 @@
 
 ## Slide 3: The Golden Invariant
 ### "Never Claim Success Without Empirical Verification"
-* **The Non-Negotiable Rule:** A step passes *if and only if* fresh sensor observations confirm the required state change with calibrated confidence $\ge 0.85$.
+* **The Non-Negotiable Rule:** A step passes *if and only if* fresh sensor observations confirm the required state change with heuristic confidence $\ge 0.85$.
 * **Zero False Success:** If evidence is missing, partial, or wrong object is moved $\rightarrow$ `not_verified`.
-* **Honest Uncertainty:** If frames are blurry ($blur > 0.70$), dark ($brightness < 0.10$), or occluded $\rightarrow$ `cannot_tell` ($c = 0.0$).
+* **Honest Uncertainty:** If frames are blurry ($blur > 0.60$), dark ($brightness < 0.20$), or occluded $\rightarrow$ `cannot_tell` ($c = 0.0$).
 * **Clean State Respect:** If space is already prepared $\rightarrow$ `no_action_needed` (zero fake work).
 
 ---
@@ -37,8 +37,8 @@
 ## Slide 4: System Architecture
 ### Clean Modular Separation & Defense-in-Depth
 * **Android Client (Kotlin + Jetpack Compose):**
-  - CameraX real-time frame capture and framing reticle.
-  - Reactive `MissionViewModel` decoupled from UI layout screens.
+  - CameraX frame capture, preview host, and reticle.
+  - Reactive `MissionController` state machine and `HttpURLConnection` client.
 * **Backend Core (Python + FastAPI):**
   - `PolicyGate`: Deterministic pre-screening of goals and proposed steps.
   - `One-Step Planner`: Single-step affordance planning grounded in visible objects.
@@ -64,34 +64,33 @@
 ### Why Safety Cannot Be Delegated to Probabilistic Models
 * **Tier A0 (Pure Info):** Autonomous informational guidance (lighting checks).
 * **Tier A1 (Reversible Physical):** Low-risk workspace tidying (moving cups/notebooks).
-* **Tier A2 (Human Confirmation):** Moderate hazard; requires explicit confirmation modal (hot stovetop, step-stools).
+* **Tier A2 (Human Confirmation):** Moderate hazard; requires warning line and explicit Begin step confirmation (knife handling, hot surfaces).
 * **Tier A3 (Default Deny Refusal):** Hard refusal before model call (electrical sockets, wiring, chemical hazards, structural demo).
-* **Deterministic Enforcement:** Hard-coded regular expression rules in `src/core/policy.py`. Zero prompt jailbreak risk.
+* **Deterministic Enforcement:** Hard-coded regular expression rules in `src/core/policy.py`. First-draft rule list; blocks defined hazard patterns; untested against dedicated red-team.
 
 ---
 
 ## Slide 7: Verification Benchmark & Uncertainty Handling
 ### Testing Edge Cases with the MIRROR-12 Dataset
-* **Curated 12-Scene Benchmark (`data/scenes.json`):**
-  - Nominal verification: Desk clutter clearing, tool retrieval.
-  - False success traps: Cup left behind, notebook moved instead of cup.
-  - Environmental degradations: Darkness (< 0.10), high motion blur (> 0.75), lens occlusion, camera pointing at floor.
+* **Curated 12-Scene Sample Benchmark (`data/scenes.json`):**
+  - Nominal verification: Desk clutter clearing, notebook retrieval.
+  - False success traps: Clutter left behind.
+  - Environmental degradations: Darkness (< 0.20), motion blur (> 0.60), lens occlusion, camera pointing at floor.
   - Clean workspaces: `no_action_needed` baseline.
   - Hazard interventions: Electrical wiring refusal.
 * **Handling Uncertainty:** MIRROR refuses to guess on degraded inputs, protecting user trust.
 
 ---
 
-## Slide 8: Validation Status & Future Roadmap
-### What is Verified vs. Future Milestones
+## Slide 8: Validation Status & Known Limitations
+### What is Verified vs. Known Boundaries
 * **Verified Facts (Proven in Repo):**
-  - 81 / 81 backend pytest tests passing across policy, engine, and API.
-  - Full loop tested over live HTTP (`uvicorn` + `httpx`).
-  - Kotlin UI compiles with AGP 8.5.2 / JDK 17.
+  - 268 backend pytest tests passing (0 skipped) across policy, engine, and API.
+  - 27 Android unit tests passing on CI (Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17).
+  - Android debug APK builds (`dist/`).
+  - Full loop tested over live HTTP (`uvicorn` + scripted client).
 * **Honest Limitations (Disclosed per AGENTS.md):**
+  - Nothing has run on a physical phone or emulator yet.
   - Tested with `FakeModelClient`; live API calls marked `UNVERIFIED` until key provisioned.
-  - Android unit tests verified on CI runner, not locally due to Windows loopback issue.
-  - Rule-based planner to be replaced by trained multimodal agent model.
-* **Next Steps:**
-  - On-device edge VLM deployment (Gemini Nano).
-  - ARCore spatial mesh anchoring for real-time 3D tracking.
+  - Planner is currently a rule template (study / work / cook).
+  - Blur, brightness, confidence formula, and 0.85 bar are heuristics, not calibrated.

@@ -5,8 +5,8 @@
 **Total Run Time:** 3 minutes (180 seconds)  
 **Technical Prerequisites:**
 - Backend running on `http://127.0.0.1:8000` via `python -m uvicorn src.api.main:app`
-- Web preview open at `http://localhost:8080/src/ui/web_preview/index.html` (or demo client `python tools/demo_client.py`)
-- Test labels simulated via test harness (FakeModelClient provider)
+- Web preview open at `http://localhost:8080/src/ui/web_preview/index.html` (note: web preview is a mock reference and does not call the backend directly)
+- Test labels simulated via test harness or demo client (`python tools/demo_client.py`) using `FakeModelClient`
 
 ---
 
@@ -40,12 +40,12 @@
 * **Action:** Click "I have completed this step" -> Camera captures new photo (`POST /v1/sessions/{id}/verify`).
 * **Visual on Screen:** Verification Screen appears with a green badge:
   - *Status:* **`verified`**
-  - *Confidence:* **`0.94`** (above the 0.85 threshold)
+  - *Confidence:* **`0.94`** (illustrative sample confidence, above the 0.85 bar)
   - *Reason:* "All expected evidence seen in new frames."
 * **Presenter Speaks:**
-  > "Notice what happened: the system did not take the user's word for it. It captured a post-action photo, performed differential analysis against the desk anchor, and confirmed the cup was physically removed with 94% confidence.
+  > "Notice what happened: the system did not take the user's word for it. It captured a post-action photo, performed differential analysis against the desk anchor, and confirmed the cup was physically removed.
   >
-  > The engine calls `/plan` again, detects all study criteria are satisfied, and safely transitions to **Mission Completed**."
+  > After verification, a fresh scan is taken. The planner evaluates the updated scene: once all clutter is resolved and study items are present, the backend returns **completed**."
 
 ---
 
@@ -56,16 +56,16 @@
   > "Now, what happens if sensor conditions fail? What if the room is too dark, the lens is blocked, or the camera suffers severe motion blur?
   >
   > A traditional chatbot might guess or congratulate the user anyway. Watch how MIRROR handles uncertainty."
-* **Action:** Trigger verification with a blurry frame (`blur: 0.88`, exceeding the 0.70 threshold) or an unanchored frame where the camera is pointed at the floor.
+* **Action:** Trigger verification with a blurry frame (`blur: 0.75`, exceeding the 0.60 engine limit) or an unanchored frame where the camera is pointed at the floor.
 * **Backend Call:** `POST /v1/sessions/{id}/verify` returns `status: "cannot_tell"`, `confidence: 0.0`.
 * **Visual on Screen:** The UI transitions into an amber warning state (`UNCERTAIN_REVIEW`):
   - *Banner:* **"Verification Uncertain (`cannot_tell`)"**
-  - *Notice:* "Frames too blurry or dark. Hold camera steady and retake photo."
+  - *Notice:* "Photo too blurry to verify (blur > 0.60 limit). Hold camera steady and retake photo."
   - *Confidence:* `0.00`
 * **Presenter Speaks:**
   > "Because the sensor evidence was degraded, MIRROR explicitly returns `cannot_tell` with zero confidence. It halts state progression and instructs the user to stabilize the camera.
   >
-  > It is mathematically impossible for MIRROR to claim success when sensor evidence is missing."
+  > The engine design blocks success transitions whenever sensor evidence is degraded or missing."
 
 ---
 
@@ -81,21 +81,22 @@
 * **Presenter Speaks:**
   > "Safety cannot rely on probabilistic language models that can be jailbroken or confused.
   >
-  > MIRROR uses a hard deterministic `PolicyGate` at the very front door. High-voltage wiring, structural demolition, and chemical handling are intercepted at Tier `A3` and refused immediately. The system will never guide dangerous physical actions."
+  > MIRROR uses a hard deterministic `PolicyGate` at the very front door. High-voltage wiring, structural demolition, and chemical hazards are intercepted at Tier `A3` and refused immediately. The system will never guide dangerous physical actions."
 
 ---
 
 ### [02:40 - 03:00] Wrap-Up & Transparent Disclosure
 
 * **Visual on Screen:** Summary Slide showing:
-  - 81 / 81 Backend Tests Passed
+  - 268 Backend Tests Passed (0 skipped)
+  - 27 Android Unit Tests Passed
   - Deterministic PolicyGate (Tiers A0–A3)
-  - 12-Scene Physical Verification Benchmark
-  - Transparent AI Co-Development Model
+  - 12-Scene Sample Benchmark
+  - Transparent Multi-Seat AI Co-Development
 * **Presenter Speaks:**
   > "To summarize: MIRROR grounds AI in physical reality by coupling deterministic safety gates, one-step affordance planning, and empirical sensor verification.
   >
-  > In accordance with our integrity rules: the backend engine and safety guarantees are fully verified with 81 passing tests; real model calls and on-device Android builds are managed through continuous integration.
+  > In accordance with our integrity rules: 268 backend tests pass; 27 Android unit tests pass on CI; nothing has run on a physical phone yet; no real model has been called.
   >
   > Thank you."
 
@@ -104,7 +105,7 @@
 ## Backup FAQs for Q&A
 
 1. **Q: Why not use a 10-step plan up front?**  
-   *A:* In physical spaces, step 1 frequently alters subsequent affordances (e.g. moving an object exposes another problem). One-step planning with sensor re-observation prevents cascading plan failures.
+   *A:* In physical spaces, step 1 frequently alters subsequent affordances. One-step planning with sensor re-observation prevents cascading plan failures.
 
 2. **Q: What if the model client loses network connection?**  
-   *A:* As fixed in our review pass, the viewmodel halts with an explicit error state. It never uses offline mock fallbacks to fake a session, plan, or verification.
+   *A:* The controller halts with an explicit error state. It never uses offline mock fallbacks to fake a session, plan, or verification.

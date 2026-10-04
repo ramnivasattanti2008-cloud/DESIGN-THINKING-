@@ -1,12 +1,10 @@
 # MIRROR: Multimodal Interactive Reality Reasoning & Observation Routine
 
-[![Backend Tests](https://img.shields.io/badge/backend%20tests-81%20passed-brightgreen.svg)]()
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)]()
+[![Backend Tests](https://img.shields.io/badge/backend%20tests-268%20passed-brightgreen.svg)]()
 [![Platform](https://img.shields.io/badge/platform-Android%20%7C%20FastAPI-orange.svg)]()
-[![Integrity](https://img.shields.io/badge/unverified%20claims-zero-red.svg)]()
 
 > **The One Rule of MIRROR:**  
-> **MIRROR must never claim success without verification.** A physical action is verified *only* when fresh sensor observations confirm the required state change with calibrated confidence $\ge 0.85$. If sensor frames are blurry, dark, occluded, or ungrounded, the system halts with `cannot_tell` rather than hallucinating success.
+> **MIRROR must never claim success without verification.** A physical action is verified *only* when fresh sensor observations confirm the required state change with heuristic confidence $\ge 0.85$. If sensor frames are blurry, dark, occluded, or ungrounded, the system halts with `cannot_tell` rather than hallucinating success.
 
 ---
 
@@ -31,7 +29,7 @@ Unlike conventional conversational AI assistants that output multi-step instruct
 flowchart TD
     A["1. User Submits Goal"] --> B{"2. PolicyGate Pre-Screen"}
     B -- Tier A3 Refusal --> R["Halt & Warn User (Electrical / Structural Hazard)"]
-    B -- Tier A2 Confirm --> C["Request User Confirmation"]
+    B -- Tier A2 Confirm --> C["Warning Line & Begin Step Confirmation"]
     B -- Tier A0/A1 Allowed --> D["3. Multi-Frame Camera Observation"]
     C --> D
     D --> E{"Frame Quality Check"}
@@ -42,7 +40,7 @@ flowchart TD
     H --> I["6. Post-Action Camera Capture"]
     I --> J{"7. Verification Engine"}
     J -- "cannot_tell (blurry / unanchored)" --> K["UNCERTAIN_REVIEW: Re-aim / steady camera"]
-    J -- "not_verified (cup still there)" --> L["Retain Step: Action not confirmed"]
+    J -- "not_verified (clutter still there)" --> L["Retain Step: Action not confirmed"]
     J -- "verified (conf >= 0.85)" --> M{"All Goals Met?"}
     M -- More Steps --> G
     M -- All Clean --> N["Mission Completed (Empirically Verified)"]
@@ -60,12 +58,14 @@ MIRROR governs physical safety through a deterministic, regex-based policy gate 
 |---|---|---|---|
 | **A0** | Pure Information | Autonomous advice; no physical state modification. | "How much light is in this room?" |
 | **A1** | Reversible Physical | Simple reversible tidying; low kinetic risk. | "Move coffee cup off desk", "Tidy notebooks" |
-| **A2** | Human Confirmation | Moderate hazard; requires explicit confirmation dialog. | "Switch off hot stove burner before food prep" |
+| **A2** | Human Confirmation | Moderate hazard; warning line plus explicit Begin step confirmation. | "Move knife into block before food prep" |
 | **A3** | Default Deny (Refusal) | Hard refusal; never guided; directs to professional. | "Fix loose wall socket wiring", "Chemical handling" |
 
 ---
 
 ## 4. Running the Project
+
+Refer to [`docs/architecture/RUNNING.md`](docs/architecture/RUNNING.md) for full setup instructions.
 
 ### Prerequisites
 - Python 3.11+ (tested on Python 3.13)
@@ -77,29 +77,27 @@ MIRROR governs physical safety through a deterministic, regex-based policy gate 
    ```bash
    # Windows PowerShell:
    .\.venv\Scripts\Activate.ps1
-   pip install -e .
+   pip install -e ".[dev]"
    ```
 
-2. **Run Pytest Suite (81 Backend Tests):**
+2. **Run Pytest Suite (268 Backend Tests):**
    ```bash
    python -m pytest
    ```
-   *Verifies policy gate rules, loop state transitions, false success prevention, low-confidence rejection, and API contracts.*
+   *Verifies policy gate rules, loop state transitions, false success prevention, low-confidence rejection, session logging, and API contracts.*
 
 3. **Start the FastAPI Backend:**
    ```bash
+   # Local only:
    python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000 --reload
+   # Accessible from mobile phone on the same Wi-Fi network:
+   python -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000
    ```
    *Endpoints: `GET /v1/health`, `POST /v1/sessions`, `POST /v1/sessions/{id}/observe`, `POST /v1/sessions/{id}/plan`, `POST /v1/sessions/{id}/verify`.*
 
-4. **Run the Interactive Demo Client:**
-   ```bash
-   python tools/demo_client.py --url http://127.0.0.1:8000 --goal "get my desk ready to study"
-   ```
-
 ### B. Standalone Web & UI Preview
 
-To inspect the user interface and screen flow in any browser without Android Studio:
+To inspect the user interface and screen flow in any browser without Android Studio (mock preview, does not call the backend):
 ```bash
 python -m http.server 8080
 ```
@@ -118,7 +116,7 @@ The Android client is built with Kotlin 2.0 and Jetpack Compose (`app/` module):
 If you encounter `java.io.IOException: Unable to establish loopback connection` during Gradle runs on Windows (due to short paths or spaces in `C:\Users\...`), set a clean temp directory:
 ```bash
 mkdir C:\mirror-tmp
-$env:GRADLE_OPTS="-Xmx2g -Dfile.encoding=UTF-8 -Djdk.net.unixdomain.tmpdir=C:/mirror-tmp"
+$env:JAVA_TOOL_OPTIONS="-Djdk.net.unixdomain.tmpdir=C:/mirror-tmp"
 .\gradlew :app:testDebugUnitTest --no-daemon
 ```
 
@@ -129,15 +127,18 @@ $env:GRADLE_OPTS="-Xmx2g -Dfile.encoding=UTF-8 -Djdk.net.unixdomain.tmpdir=C:/mi
 Per the project integrity rules in `AGENTS.md` and [`docs/architecture/VALIDATION.md`](docs/architecture/VALIDATION.md), nothing is estimated or exaggerated:
 
 ### Verified Facts
-- **81 / 81 backend tests pass** (`python -m pytest`), verifying the policy gate, loop invariants, schema compliance, and false success prevention.
-- **Full HTTP loop verified**: Verified over real HTTP using `uvicorn` and the test client (refusal on electrical hazard, `needs_observation` before capture, `not_verified` on missing evidence, `cannot_tell` on blur, and `completed` after verified action).
-- **Kotlin source compiles**: `src/ui/screens/` and Compose components compile with JDK 17 / AGP 8.5.2 after fixing `CameraViewScreen.kt:171`.
+- **268 backend tests pass, 0 skipped** (`python -m pytest`), verifying the policy gate, loop invariants, schema compliance, false success prevention, session logging, and production hardening.
+- **27 Android unit tests pass** (`./gradlew :app:testDebugUnitTest`, Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17), covering controller state machine transitions, photo-consent rules, JSON parsing, API key header, and frame metrics.
+- **Android debug build succeeds**: `./gradlew :app:assembleDebug` produces APKs in git-ignored `dist/`.
+- **Full HTTP loop verified**: Tested over real HTTP using `uvicorn` and a scripted client (refusal on electrical hazard, `needs_observation` before capture, `not_verified` on missing evidence, `cannot_tell` on blur, and `completed` after verified action).
+- **Independent CI on GitHub Actions**: Both Android CI (JDK 17, SDK 34, `:app:testDebugUnitTest`, `:app:assembleDebug`) and MIRROR CI (`pytest`) pass green on clean Linux runners.
 
 ### Explicit Limitations (Marked UNVERIFIED)
-- **Real Vision Model Not Called in Production:** The backend currently defaults to `FakeModelClient` for deterministic test isolation. `AnthropicModelClient` exists in `src/core/model_client.py` and is unit-tested against mocked transport, but has **not** been exercised with a live API key in this repo.
-- **Android Unit Tests Not Run Locally:** Android unit tests (`MissionControllerTest`, `ParsingAndMetricsTest`) could not be run on the local development machine due to a Windows loopback socket restriction in Java. They are verified on GitHub Actions CI runners (`.github/workflows/android.yml`).
-- **No Physical Phone Deployment:** No APK has been installed or exercised on physical phone hardware. CameraX captures and hardware sensor bindings are unexercised on physical silicon.
-- **Planner is a Rule Template:** The current action planner uses a deterministic rule template for study/kitchen spaces; it is not yet an unconstrained agentic LLM planner.
+- **Nothing has run on a phone or emulator:** CameraX capture, permissions, and the app's HTTP client against a live server are unexercised on physical silicon.
+- **Never run on a device:** The live camera preview, the camera-permission flow, and the photo-consent dialog have unit-tested logic, but the physical screens have not run on a device.
+- **No real model has been called:** The backend defaults to `FakeModelClient`. `AnthropicModelClient` is tested only with a mocked transport. No API key exists in this repo. The fake provider cannot read real photos, so the phone app cannot get past "scan again" until a provider key is set.
+- **Thresholds are heuristic:** Blur limit (0.60), brightness minimum (0.20), the confidence formula, and the 0.85 bar are heuristics, not calibrated against empirical data.
+- **Planner is a rule template:** The planner uses deterministic templates for study, work, and cook spaces; it is not a generative AI planner.
 
 ---
 
@@ -149,40 +150,40 @@ MIRROR is developed through a structured multi-agent pair programming model with
 |---|---|---|
 | `claude` | Lead Engineer | Architecture, core logic, safety policy, PR code reviews. |
 | `ag-a` | Frontend & UI | Jetpack Compose screens, UI flow, web preview, decoupling. |
-| `ag-b` | QA & Reliability | Smoke test suites, CI workflows (`android.yml`), E2E HTTP loop tests. |
-| `ag-c` | Reserve Support | Bounded database logging (`src/core/session_log.py`). |
+| `ag-b` | QA & Reliability | Test suites, CI workflows (`android.yml`, `ci.yml`), E2E HTTP loop tests. |
+| `ag-c` | Reserve Support | SQLite session audit log writer (`src/core/session_log.py`). |
 | `studio-a` | Research & Datasets | Literature review, benchmark scenes (`data/scenes.json`), perception prompts. |
 | `studio-b` | Docs & Presentation | `README.md`, report outline, demo script, presentation deck. |
-| `copilot` | Standalone Tools | Interactive CLI client (`tools/demo_client.py`). |
+| `copilot` | Standalone Tools | Interactive CLI demo client (`tools/demo_client.py`). |
 
 ---
 
 ## 7. Repository Structure
 
 ```
-├── .github/workflows/     # CI automation (Android build & test pipeline)
+├── .github/workflows/     # CI automation (android.yml, ci.yml)
 ├── contracts/             # JSON schemas for sessions, observations, plans, verifications
-├── data/                  # Standardized physical verification benchmark (12 scenes)
+├── data/                  # Standardized physical verification benchmark (12 sample scenes)
 │   ├── scenes.json        # Machine-readable benchmark scenes (all marked sample)
 │   └── scenes.md          # Human-readable benchmark documentation and taxonomy
 ├── db/                    # SQLite database schema (schema.sql)
 ├── docs/                  # Architecture, decisions, tasks, status, and reports
-│   ├── architecture/      # System design, verification engine, safety policy
+│   ├── architecture/      # System design, verification engine, safety policy, validation notes
 │   ├── report/            # Academic report outline and 3-minute demo script
 │   ├── slides/            # 8-slide presentation deck outline
 │   └── status/            # Individual status handoff files for each seat
-├── prompts/               # Calibrated VLM perception prompt specifications
+├── prompts/               # VLM perception prompt specifications
 ├── research/              # Literature citations (sources.md) and empirical plan (PLAN.md)
 ├── src/
-│   ├── api/               # FastAPI HTTP routing (/v1/sessions)
-│   ├── core/              # Engine, PolicyGate, Verifier, ModelClient, Models
-│   ├── mobile/            # Android CameraX, OkHttp, and controller implementation
+│   ├── api/               # FastAPI HTTP routing (/v1/sessions), production security
+│   ├── core/              # Engine, PolicyGate, Verifier, ModelClient, Planner, SessionLog
+│   ├── mobile/            # Android CameraX, HttpURLConnection, and controller implementation
 │   └── ui/                # Jetpack Compose UI screens, components, theme, web preview
-└── tools/                 # Standalone demo client (demo_client.py)
+└── tools/                 # Standalone demo client and secure server runner
 ```
 
 ---
 
 ## 8. License & Attribution
 
-Distributed under the MIT License. Created by Ram Nivas with multi-agent AI pair programming assistance. All AI contributions and benchmark samples are disclosed honestly in accordance with coursework and open-source publication standards.
+Repository owned by Ram Nivas (`ramnivasattanti2008@gmail.com`). License to be determined by owner. Developed with multi-agent AI pair programming assistance. All AI contributions and benchmark samples are disclosed honestly.
