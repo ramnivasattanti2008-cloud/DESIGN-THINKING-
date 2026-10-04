@@ -6,7 +6,7 @@ What was run, what passed, and what was not checked. Nothing here is estimated.
 
 | Check | Command / method | Result |
 |---|---|---|
-| Backend and policy tests | `python -m pytest` (Python 3.13) | 197 passed, 3 skipped. The skips wait for `ag-c`'s session-log writer. Uses the fake provider, so this proves policy and loop logic, not real perception |
+| Backend and policy tests | `python -m pytest` (Python 3.13) | 216 passed, 0 skipped (includes 7 end-to-end tests that start a real uvicorn process and the session-log writer). Uses the fake provider, so this proves policy and loop logic, not real perception |
 | Android unit tests | `./gradlew :app:testDebugUnitTest` on commit `8a6a185` (Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17) | 21 passed, 0 failed (12 controller state machine, 9 parsing and photo-quality) |
 | Android debug build | `./gradlew :app:assembleDebug` on commit `8a6a185` | Builds. APKs for the emulator address and the Wi-Fi address were produced (git-ignored `dist/`) |
 | Full loop over real HTTP | uvicorn on port 8000, scripted client, fake provider (run earlier in the session) | Blocked goal refused; plan before any observation returned `needs_observation`; failed check `not_verified`; blurry frame `cannot_tell`; cup removed `verified`; final plan `completed`. Every outcome is also driven through `TestClient` in `src/core/tests/test_contract_responses.py` |
@@ -22,7 +22,7 @@ History worth knowing: the commit before `8a6a185` (`0a5b11a`) did not compile b
 - **No real model has been called.** `AnthropicModelClient` is tested only with a mocked transport. There is no API key in this repo. The default model name was taken from the session environment, not checked against the live API. The fake provider cannot read real photos, so the phone app cannot get past "scan again" until a provider key is set.
 - **No latency or accuracy numbers exist.** Blur, brightness, the confidence formula and the 0.85 bar are heuristics, not calibrated.
 - The planner is a rule template (study / work / cook, clutter, hazards). It is not a model.
-- There is no Android job in CI yet (T-021, `ag-b`). The real session-log writer (T-024, `ag-c`) is not delivered, so its integration tests are skipped.
+- The Android CI job (`.github/workflows/android.yml`) has been merged but its first GitHub run had not been checked when this was written; treat CI as unverified until a run is green.
 
 ## How the success rules are checked
 

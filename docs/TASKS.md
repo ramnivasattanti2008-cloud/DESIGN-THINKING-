@@ -22,13 +22,13 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-014 | README with how to run the backend and tests (see `docs/architecture/`) (on `studio-b/readme`, being reviewed) | studio-b | review | `README.md` | |
 | T-015 | CI workflow: install `.[dev]`, run `pytest` | ag-b | done | `.github/workflows/` | |
 | T-016 | Policy gaps from ag-b's red-team report: wire-tie over-block, add chemical rule, with tests (closed on `claude/architecture`; ag-b's two gap tests flipped to the fixed behaviour) | claude | review | `src/core/policy.py`, `src/core/tests/` | |
-| T-017 | Wire the session log into the engine once T-024 lands (sink wired and tested with a fake; the real-writer tests are skipped until T-024 lands) | claude | review | `src/core/engine.py`, `src/api/` | |
+| T-017 | Wire the session log into the engine once T-024 lands (sink wired; the real session-log writer tests now pass) | claude | done | `src/core/engine.py`, `src/api/` | |
 | T-018 | First real model call and measured latency, once Ram supplies a provider key (needs a provider key from Ram) | claude | blocked | `src/core/model_client.py` | |
 | T-020 | UI cleanup: fix CameraViewScreen.kt:171 compile bug, remove or label fake HUD data, MVP-safe presets, optional hazard-simulation button. See `docs/tasks/BRIEFS.md` (merged up to `b901585`; the later "Sara chat" commit `5ff5bcd` is NOT merged (out of MVP scope, backend has no chat)) | ag-a | review | `src/ui/screens/`, `src/ui/components/`, `src/ui/theme/`, `src/ui/model/`, `src/ui/web_preview/`, `public/`, `assets/` | `ag-a/ui-cleanup` |
-| T-021 | Android CI job: Gradle unit tests and debug build on GitHub Actions | ag-b | todo | `.github/workflows/android.yml` | `ag-b/android-ci` |
-| T-022 | HTTP end-to-end loop test against a real uvicorn process | ag-b | todo | `tests/e2e/` | `ag-b/android-ci` |
+| T-021 | Android CI job: Gradle unit tests and debug build on GitHub Actions (workflow merged; its first run is on GitHub Actions) | ag-b | review | `.github/workflows/android.yml` | `ag-b/android-ci` |
+| T-022 | HTTP end-to-end loop test against a real uvicorn process (7 HTTP end-to-end tests pass; claude fixed a flaky server wait) | ag-b | review | `tests/e2e/` | `ag-b/android-ci` |
 | T-026 | Build `tools/demo_client.py`, a CLI that drives the real backend loop, plus its pytest file. See `docs/tasks/BRIEFS.md` (on `copilot/demo-client`, being reviewed) | copilot | review | `tools/`, `docs/status/copilot.md` | `copilot/demo-client` |
-| T-024 | SQLite session-log writer using `db/schema.sql`, with tests (small, one session) | ag-c | todo | `src/core/session_log.py`, `src/core/tests/test_session_log.py` | `ag-c/session-log` |
+| T-024 | SQLite session-log writer using `db/schema.sql`, with tests (small, one session) (merged; 12 writer tests pass) | ag-c | review | `src/core/session_log.py`, `src/core/tests/test_session_log.py` | `ag-c/session-log` |
 
 Detailed briefs and paste-ready prompts for each seat are in `docs/tasks/BRIEFS.md`. T-013 (studio-a) and T-007/T-014 (studio-b) stand as listed.
 
