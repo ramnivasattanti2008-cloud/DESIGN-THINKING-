@@ -1,0 +1,29 @@
+name: MIRROR Reliability & Verification CI
+
+on:
+  push:
+    branches: [ main, "ag-*", "claude/*" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  reliability-guardrails:
+    name: Verification Invariants & Smoke Guardrails
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run MIRROR Smoke Test Guardrails
+        run: |
+          python -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Enforce Golden Rule (No Completion Without Verification)
+        run: |
+          python -m unittest tests/smoke/test_verification_invariant.py -v
