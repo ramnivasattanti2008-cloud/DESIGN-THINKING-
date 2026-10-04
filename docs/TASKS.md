@@ -21,5 +21,14 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-013 | Labelled before/after scene set for verification (`cannot_tell` cases included), every item marked real or sample | studio-a | todo | `data/`, `research/` | |
 | T-014 | README with how to run the backend and tests (see `docs/architecture/`) | studio-b | todo | `README.md` | |
 | T-015 | CI workflow: install `.[dev]`, run `pytest` | ag-b | todo | `.github/workflows/` | |
+| T-016 | Policy gaps from ag-b's red-team report: wire-tie over-block, add chemical rule, with tests | claude | todo | `src/core/policy.py`, `src/core/tests/` | |
+| T-017 | Wire the session log into the engine once T-024 lands | claude | todo | `src/core/engine.py`, `src/api/` | |
+| T-018 | First real model call and measured latency, once Ram supplies a provider key | claude | blocked | `src/core/model_client.py` | |
+| T-020 | UI cleanup: fix CameraViewScreen.kt:171 compile bug, remove or label fake HUD data, MVP-safe presets, optional hazard-simulation button. See `docs/tasks/BRIEFS.md` | ag-a | todo | `src/ui/screens/`, `src/ui/components/`, `src/ui/theme/`, `src/ui/model/`, `src/ui/web_preview/`, `public/`, `assets/` | `ag-a/ui-cleanup` |
+| T-021 | Android CI job: Gradle unit tests and debug build on GitHub Actions | ag-b | todo | `.github/workflows/android.yml` | `ag-b/android-ci` |
+| T-022 | HTTP end-to-end loop test against a real uvicorn process | ag-b | todo | `tests/e2e/` | `ag-b/android-ci` |
+| T-024 | SQLite session-log writer using `db/schema.sql`, with tests (small, one session) | ag-c | todo | `src/core/session_log.py`, `src/core/tests/test_session_log.py` | `ag-c/session-log` |
+
+Detailed briefs and paste-ready prompts for each seat are in `docs/tasks/BRIEFS.md`. T-013 (studio-a) and T-007/T-014 (studio-b) stand as listed.
 
 Every task needs one owner and a list of files, so nothing overlaps.
