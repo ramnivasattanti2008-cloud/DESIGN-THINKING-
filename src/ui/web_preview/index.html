@@ -3,35 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MIRROR • Apple Intelligence Vision Assistant</title>
+  <title>MIRROR • Apple HIG Vision Assistant</title>
   <style>
     :root {
-      /* Apple iOS 18 Design Tokens */
-      --apple-bg: #000000;
-      --apple-surface: rgba(28, 28, 30, 0.65);
-      --apple-surface-elevated: rgba(44, 44, 46, 0.75);
-      --apple-card: rgba(30, 30, 32, 0.70);
-      --apple-border: rgba(255, 255, 255, 0.12);
-      --apple-border-strong: rgba(255, 255, 255, 0.22);
-      --apple-blue: #007AFF;
-      --apple-blue-pressed: #0062CC;
-      --apple-teal: #30B0C7;
-      --apple-green: #34C759;
-      --apple-green-bg: rgba(52, 199, 89, 0.15);
-      --apple-yellow: #FFCC00;
-      --apple-orange: #FF9500;
-      --apple-red: #FF3B30;
-      --apple-red-bg: rgba(255, 59, 48, 0.18);
-      --apple-purple: #AF52DE;
-      --apple-text-primary: #FFFFFF;
-      --apple-text-secondary: rgba(235, 235, 245, 0.60);
-      --apple-text-tertiary: rgba(235, 235, 245, 0.38);
-      --apple-glass-blur: blur(35px) saturate(190%);
-      --apple-radius-sm: 10px;
-      --apple-radius-md: 16px;
-      --apple-radius-lg: 24px;
-      --apple-radius-xl: 38px;
-      --apple-spring: cubic-bezier(0.16, 1, 0.3, 1);
+      /* Apple iOS 18 Light Mode Design Tokens */
+      --ios-bg: #F2F2F7;
+      --ios-surface: #FFFFFF;
+      --ios-surface-elevated: #FFFFFF;
+      --ios-surface-secondary: #F8F9FA;
+      --ios-card: #FFFFFF;
+      --ios-border: rgba(60, 60, 67, 0.08);
+      --ios-border-strong: rgba(60, 60, 67, 0.16);
+      --ios-blue: #007AFF;
+      --ios-blue-light: rgba(0, 122, 255, 0.10);
+      --ios-blue-pressed: #0062CC;
+      --ios-teal: #30B0C7;
+      --ios-green: #34C759;
+      --ios-green-light: rgba(52, 199, 89, 0.12);
+      --ios-orange: #FF9500;
+      --ios-orange-light: rgba(255, 149, 0, 0.12);
+      --ios-red: #FF3B30;
+      --ios-red-light: rgba(255, 59, 48, 0.12);
+      --ios-purple: #AF52DE;
+      --ios-text-primary: #000000;
+      --ios-text-secondary: #8E8E93;
+      --ios-text-tertiary: #C7C7CC;
+      --ios-radius-sm: 10px;
+      --ios-radius-md: 16px;
+      --ios-radius-lg: 22px;
+      --ios-radius-xl: 32px;
+      --ios-radius-phone: 52px;
+      --ios-glass-blur: blur(28px) saturate(180%);
+      --ios-spring: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
@@ -44,8 +47,8 @@
     }
 
     body {
-      background: #000000;
-      color: var(--apple-text-primary);
+      background: #E5E5EA;
+      color: var(--ios-text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -55,66 +58,39 @@
       overflow-x: hidden;
     }
 
-    /* Ambient Apple Intelligence Aura in background */
-    .ambient-glow {
+    /* Ambient Soft Lighting */
+    .ambient-backdrop {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 600px;
-      height: 900px;
-      background: radial-gradient(circle at 50% 30%, rgba(0, 122, 255, 0.12), rgba(175, 82, 222, 0.08) 50%, transparent 70%);
-      filter: blur(80px);
-      z-index: 0;
+      inset: 0;
+      background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.95), rgba(229, 229, 234, 0.8) 70%);
       pointer-events: none;
+      z-index: 0;
     }
 
-    /* iPhone 16 Pro Max Hardware Container */
+    /* iPhone 16 Pro Hardware Shell - Silver / Natural Titanium */
     .iphone-device {
       width: 412px;
       max-width: 96vw;
       height: 870px;
-      background: #000000;
-      border-radius: 54px;
+      background: var(--ios-bg);
+      border-radius: var(--ios-radius-phone);
       position: relative;
       box-shadow: 
-        0 0 0 4px #262628,
-        0 0 0 6px #121214,
-        0 25px 80px rgba(0, 0, 0, 0.95),
-        0 0 50px rgba(0, 122, 255, 0.12);
+        0 0 0 5px #D1D1D6,
+        0 0 0 8px #E5E5EA,
+        0 25px 70px rgba(0, 0, 0, 0.15),
+        0 10px 30px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       z-index: 1;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    /* Apple Intelligence Luminescent Border Glow */
-    .iphone-device::before {
-      content: "";
-      position: absolute;
-      inset: -2px;
-      border-radius: 56px;
-      padding: 2px;
-      background: conic-gradient(from 180deg at 50% 50%, #007AFF, #30B0C7, #AF52DE, #FF2D55, #FF9500, #007AFF);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0.35;
-      animation: rotateGlow 8s linear infinite;
-      pointer-events: none;
-      z-index: 99;
-    }
-
-    @keyframes rotateGlow {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      border: 1px solid rgba(255, 255, 255, 0.8);
     }
 
     /* Dynamic Island */
     .dynamic-island-container {
       position: absolute;
-      top: 12px;
+      top: 11px;
       left: 50%;
       transform: translateX(-50%);
       width: 124px;
@@ -126,8 +102,8 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-      transition: all 0.4s var(--apple-spring);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      transition: all 0.4s var(--ios-spring);
       cursor: pointer;
     }
     .dynamic-island-container:hover {
@@ -146,8 +122,8 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--apple-green);
-      box-shadow: 0 0 6px var(--apple-green);
+      background: var(--ios-green);
+      box-shadow: 0 0 6px var(--ios-green);
       animation: pulseSens 2s infinite;
     }
     @keyframes pulseSens {
@@ -157,7 +133,7 @@
     .island-text {
       font-size: 11px;
       font-weight: 600;
-      color: #FFF;
+      color: #FFFFFF;
       letter-spacing: -0.2px;
       opacity: 0;
       transition: opacity 0.3s;
@@ -177,6 +153,7 @@
       font-size: 14px;
       font-weight: 600;
       letter-spacing: -0.3px;
+      color: var(--ios-text-primary);
       z-index: 90;
     }
     .status-icons {
@@ -188,7 +165,7 @@
     .battery-pill {
       width: 24px;
       height: 12px;
-      border: 1.5px solid #FFF;
+      border: 1.5px solid var(--ios-text-primary);
       border-radius: 4px;
       padding: 1.5px;
       display: flex;
@@ -197,7 +174,7 @@
     .battery-level {
       width: 80%;
       height: 100%;
-      background: #FFF;
+      background: var(--ios-text-primary);
       border-radius: 1.5px;
     }
 
@@ -209,7 +186,7 @@
       position: relative;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 16px 20px 24px 20px;
+      padding: 14px 18px 90px 18px; /* Extra bottom padding for floating dock */
       scrollbar-width: none;
     }
     .screen-viewport::-webkit-scrollbar { display: none; }
@@ -219,46 +196,46 @@
       display: none;
       flex-direction: column;
       gap: 16px;
-      animation: iosFadeIn 0.35s var(--apple-spring);
+      animation: iosFadeIn 0.3s var(--ios-spring);
     }
     .ios-screen.active {
       display: flex;
     }
 
     @keyframes iosFadeIn {
-      0% { opacity: 0; transform: scale(0.98) translateY(6px); }
+      0% { opacity: 0; transform: scale(0.985) translateY(6px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    /* Apple Navigation Bar */
+    /* Apple Navigation Header */
     .ios-nav-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .ios-large-title {
       font-size: 28px;
       font-weight: 700;
       letter-spacing: -0.6px;
-      color: #FFFFFF;
+      color: var(--ios-text-primary);
     }
     .ios-subtitle {
       font-size: 13px;
-      color: var(--apple-text-secondary);
+      color: var(--ios-text-secondary);
       letter-spacing: -0.2px;
       margin-top: 2px;
     }
 
-    /* iOS Segmented Pill Stepper */
+    /* Segmented Capsule Control */
     .ios-segmented-control {
-      background: rgba(118, 118, 128, 0.24);
-      backdrop-filter: var(--apple-glass-blur);
+      background: rgba(118, 118, 128, 0.12);
+      backdrop-filter: var(--ios-glass-blur);
       border-radius: 14px;
       padding: 3px;
       display: flex;
       gap: 2px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     .ios-segment {
       flex: 1;
@@ -267,34 +244,33 @@
       font-size: 12px;
       font-weight: 600;
       letter-spacing: -0.2px;
-      color: var(--apple-text-secondary);
+      color: var(--ios-text-secondary);
       border-radius: 11px;
       cursor: pointer;
-      transition: all 0.25s var(--apple-spring);
+      transition: all 0.25s var(--ios-spring);
     }
     .ios-segment.active {
-      background: rgba(255, 255, 255, 0.22);
-      color: #FFFFFF;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      background: #FFFFFF;
+      color: var(--ios-text-primary);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     }
 
-    /* iOS Cupertino Inset Glass Card */
+    /* Pure White Cupertino Inset Card */
     .ios-card {
-      background: var(--apple-card);
-      backdrop-filter: var(--apple-glass-blur);
-      border: 0.5px solid var(--apple-border);
-      border-radius: var(--apple-radius-lg);
+      background: var(--ios-surface);
+      border: 0.5px solid var(--ios-border);
+      border-radius: var(--ios-radius-lg);
       padding: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-      transition: transform 0.2s, background 0.2s;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    /* iOS Buttons */
+    /* Primary System Blue Button */
     .ios-btn-primary {
-      background: var(--apple-blue);
+      background: var(--ios-blue);
       color: #FFFFFF;
       border: none;
-      border-radius: var(--apple-radius-md);
+      border-radius: var(--ios-radius-md);
       padding: 14px 20px;
       font-size: 16px;
       font-weight: 600;
@@ -304,21 +280,21 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: all 0.2s var(--apple-spring);
-      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.35);
+      transition: all 0.2s var(--ios-spring);
+      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.25);
       width: 100%;
     }
     .ios-btn-primary:active {
       transform: scale(0.97);
-      background: var(--apple-blue-pressed);
+      background: var(--ios-blue-pressed);
     }
 
+    /* Secondary Soft Button */
     .ios-btn-secondary {
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: var(--apple-glass-blur);
-      color: #FFFFFF;
-      border: 0.5px solid var(--apple-border);
-      border-radius: var(--apple-radius-md);
+      background: rgba(118, 118, 128, 0.08);
+      color: var(--ios-blue);
+      border: 0.5px solid rgba(0, 122, 255, 0.15);
+      border-radius: var(--ios-radius-md);
       padding: 12px 18px;
       font-size: 14px;
       font-weight: 600;
@@ -333,29 +309,29 @@
     }
     .ios-btn-secondary:active {
       transform: scale(0.97);
-      background: rgba(255, 255, 255, 0.18);
+      background: rgba(118, 118, 128, 0.14);
     }
 
-    /* iOS Inset Group List Item */
+    /* List Row Item */
     .ios-list-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 12px 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: var(--apple-radius-md);
-      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      background: var(--ios-surface-secondary);
+      border-radius: var(--ios-radius-md);
+      border: 0.5px solid var(--ios-border);
       cursor: pointer;
       transition: all 0.2s;
     }
     .ios-list-row:hover {
-      background: rgba(255, 255, 255, 0.09);
+      background: #EFEFF4;
     }
     .ios-list-row:active {
       transform: scale(0.98);
     }
 
-    /* Apple Switch Toggle */
+    /* Apple Switch Toggle (Light Mode Green) */
     .ios-switch {
       position: relative;
       display: inline-block;
@@ -367,8 +343,8 @@
       position: absolute;
       cursor: pointer;
       inset: 0;
-      background-color: rgba(120, 120, 128, 0.35);
-      transition: 0.3s var(--apple-spring);
+      background-color: #E5E5EA;
+      transition: 0.3s var(--ios-spring);
       border-radius: 26px;
     }
     .ios-slider:before {
@@ -379,26 +355,26 @@
       left: 2px;
       bottom: 2px;
       background-color: white;
-      transition: 0.3s var(--apple-spring);
+      transition: 0.3s var(--ios-spring);
       border-radius: 50%;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     input:checked + .ios-slider {
-      background-color: var(--apple-green);
+      background-color: var(--ios-green);
     }
     input:checked + .ios-slider:before {
       transform: translateX(18px);
     }
 
-    /* Apple Camera Viewfinder */
+    /* Camera Viewport */
     .apple-camera-viewport {
       width: 100%;
       height: 380px;
-      background: #000;
-      border-radius: 28px;
+      background: #000000;
+      border-radius: 26px;
       position: relative;
       overflow: hidden;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
     #webcam-stream {
       width: 100%;
@@ -413,12 +389,12 @@
       display: block;
     }
 
-    /* Apple Reticle Brackets */
+    /* Clean Corner Reticles */
     .camera-corner {
       position: absolute;
       width: 18px;
       height: 18px;
-      border: 2px solid rgba(255, 255, 255, 0.65);
+      border: 2.5px solid rgba(255, 255, 255, 0.85);
       pointer-events: none;
     }
     .tl { top: 20px; left: 20px; border-right: none; border-bottom: none; border-top-left-radius: 8px; }
@@ -435,42 +411,42 @@
     }
     .spatial-box {
       position: absolute;
-      border: 2px solid var(--apple-teal);
-      background: rgba(48, 176, 199, 0.18);
+      border: 2px solid var(--ios-blue);
+      background: rgba(0, 122, 255, 0.16);
       border-radius: 8px;
-      box-shadow: 0 0 16px rgba(48, 176, 199, 0.35);
+      box-shadow: 0 0 16px rgba(0, 122, 255, 0.3);
       animation: appleBoxGlow 2.5s infinite ease-in-out;
     }
     @keyframes appleBoxGlow {
-      0%, 100% { border-color: var(--apple-teal); }
-      50% { border-color: #FFF; box-shadow: 0 0 24px rgba(48, 176, 199, 0.6); }
+      0%, 100% { border-color: var(--ios-blue); }
+      50% { border-color: #FFF; box-shadow: 0 0 24px rgba(0, 122, 255, 0.5); }
     }
     .box-tag {
       position: absolute;
       top: -24px; left: 0;
-      background: var(--apple-teal);
-      color: #000;
+      background: var(--ios-blue);
+      color: #FFFFFF;
       font-size: 10px;
       font-weight: 700;
-      padding: 3px 7px;
+      padding: 3px 8px;
       border-radius: 6px;
       white-space: nowrap;
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
 
-    /* Apple Camera Shutter Button */
+    /* Light Mode Shutter Button */
     .apple-shutter-wrap {
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 10px 0;
+      padding: 8px 0;
     }
     .apple-shutter-btn {
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      border: 4px solid #FFFFFF;
+      border: 4px solid var(--ios-blue);
       padding: 4px;
       background: transparent;
       cursor: pointer;
@@ -485,40 +461,30 @@
     .shutter-inner {
       width: 100%;
       height: 100%;
-      background: #FFFFFF;
+      background: var(--ios-blue);
       border-radius: 50%;
       transition: background 0.2s;
     }
     .apple-shutter-btn:active .shutter-inner {
-      background: rgba(255, 255, 255, 0.7);
+      background: var(--ios-blue-pressed);
     }
 
-    /* Siri / Voice Agent Pill Bar */
+    /* Siri Voice Assistant Bar (Light Mode) */
     .siri-voice-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, rgba(175, 82, 222, 0.18), rgba(0, 122, 255, 0.18));
-      backdrop-filter: var(--apple-glass-blur);
-      border: 0.5px solid rgba(175, 82, 222, 0.35);
-      border-radius: var(--apple-radius-lg);
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(175, 82, 222, 0.08));
+      border: 0.5px solid rgba(0, 122, 255, 0.22);
+      border-radius: var(--ios-radius-lg);
       padding: 12px 16px;
       cursor: pointer;
       transition: all 0.3s;
     }
     .siri-voice-bar.listening {
-      border-color: var(--apple-teal);
-      background: linear-gradient(135deg, rgba(0, 122, 255, 0.28), rgba(48, 176, 199, 0.28));
-      box-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
-    }
-
-    /* Bottom Home Indicator Bar */
-    .ios-home-indicator {
-      width: 138px;
-      height: 5px;
-      background: rgba(255, 255, 255, 0.5);
-      border-radius: 3px;
-      margin: 12px auto 6px auto;
+      border-color: var(--ios-blue);
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.16), rgba(52, 199, 89, 0.16));
+      box-shadow: 0 0 18px rgba(0, 122, 255, 0.2);
     }
 
     /* Badges */
@@ -529,35 +495,93 @@
       border-radius: 8px;
       letter-spacing: -0.1px;
     }
-    .badge-blue { background: rgba(0, 122, 255, 0.15); color: var(--apple-blue); }
-    .badge-green { background: var(--apple-green-bg); color: var(--apple-green); }
-    .badge-orange { background: rgba(255, 149, 0, 0.15); color: var(--apple-orange); }
-    .badge-red { background: var(--apple-red-bg); color: var(--apple-red); }
+    .badge-blue { background: var(--ios-blue-light); color: var(--ios-blue); }
+    .badge-green { background: var(--ios-green-light); color: var(--ios-green); }
+    .badge-orange { background: var(--ios-orange-light); color: var(--ios-orange); }
+    .badge-red { background: var(--ios-red-light); color: var(--ios-red); }
 
-    /* Modal Sheet */
+    /* FLOATING PILL DOCK (Bottom Navigation) */
+    .floating-pill-dock {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(30px) saturate(190%);
+      border: 0.5px solid rgba(0, 0, 0, 0.08);
+      border-radius: 36px;
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.10),
+        0 4px 10px rgba(0, 0, 0, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 8px;
+      z-index: 150;
+    }
+    .dock-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s var(--ios-spring);
+      color: var(--ios-text-secondary);
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .dock-item.active {
+      color: var(--ios-blue);
+      background: rgba(0, 122, 255, 0.09);
+    }
+    .dock-icon {
+      font-size: 18px;
+    }
+    .dock-center-action {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--ios-blue);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .dock-center-action:active {
+      transform: scale(0.92);
+    }
+
+    /* Modal Bottom Sheet */
     .ios-modal-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(20px);
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(14px);
       display: none;
       align-items: flex-end;
       z-index: 200;
-      border-radius: 54px;
+      border-radius: var(--ios-radius-phone);
       overflow: hidden;
     }
     .ios-modal-sheet {
       width: 100%;
-      background: #1C1C1E;
+      background: #FFFFFF;
       border-top-left-radius: 28px;
       border-top-right-radius: 28px;
       padding: 16px 20px 32px 20px;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
-      border-top: 0.5px solid var(--apple-border);
-      animation: sheetUp 0.3s var(--apple-spring);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+      border-top: 0.5px solid var(--ios-border);
+      animation: sheetUp 0.3s var(--ios-spring);
     }
     @keyframes sheetUp {
       0% { transform: translateY(100%); }
@@ -566,7 +590,7 @@
     .sheet-handle {
       width: 36px;
       height: 5px;
-      background: rgba(255, 255, 255, 0.3);
+      background: #D1D1D6;
       border-radius: 3px;
       align-self: center;
       margin-bottom: 6px;
@@ -575,7 +599,7 @@
 </head>
 <body>
 
-  <div class="ambient-glow"></div>
+  <div class="ambient-backdrop"></div>
 
   <!-- iPhone 16 Pro Hardware Shell -->
   <div class="iphone-device">
@@ -624,7 +648,7 @@
 
         <!-- Inset Text Input Card -->
         <div class="ios-card">
-          <textarea id="goal-input" style="width: 100%; height: 70px; background: transparent; border: none; color: #FFF; font-size: 16px; letter-spacing: -0.3px; outline: none; resize: none;" placeholder="What space would you like to prepare?">get my desk ready to study</textarea>
+          <textarea id="goal-input" style="width: 100%; height: 70px; background: transparent; border: none; color: #000; font-size: 16px; letter-spacing: -0.3px; outline: none; resize: none;" placeholder="What space would you like to prepare?">get my desk ready to study</textarea>
           <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
             <button class="ios-btn-primary" style="width: auto; padding: 10px 18px; font-size: 14px;" onclick="onGoalSubmitted()">
               Start Mission →
@@ -634,7 +658,7 @@
 
         <!-- Presets Group -->
         <div class="ios-card" style="padding: 12px;">
-          <div style="font-size: 12px; font-weight: 600; color: var(--apple-text-secondary); text-transform: uppercase; margin-bottom: 8px; padding-left: 4px;">
+          <div style="font-size: 12px; font-weight: 600; color: var(--ios-text-secondary); text-transform: uppercase; margin-bottom: 8px; padding-left: 4px;">
             Suggested Tasks
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -643,7 +667,7 @@
                 <span style="font-size: 18px;">📖</span>
                 <div>
                   <div style="font-size: 14px; font-weight: 600;">Study Desk Setup</div>
-                  <div style="font-size: 11px; color: var(--apple-text-secondary);">Clear clutter, set lighting</div>
+                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Clear clutter, set lighting</div>
                 </div>
               </div>
               <span class="ios-badge badge-green">A0 Safe</span>
@@ -654,7 +678,7 @@
                 <span style="font-size: 18px;">🍳</span>
                 <div>
                   <div style="font-size: 14px; font-weight: 600;">Kitchen Prep</div>
-                  <div style="font-size: 11px; color: var(--apple-text-secondary);">Sanitize surface & cutting board</div>
+                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Sanitize surface & cutting board</div>
                 </div>
               </div>
               <span class="ios-badge badge-green">A0 Safe</span>
@@ -665,7 +689,7 @@
                 <span style="font-size: 18px;">💻</span>
                 <div>
                   <div style="font-size: 14px; font-weight: 600;">Work Table Organization</div>
-                  <div style="font-size: 11px; color: var(--apple-text-secondary);">Laptop & cable management</div>
+                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Laptop & cable management</div>
                 </div>
               </div>
               <span class="ios-badge badge-green">A0 Safe</span>
@@ -675,8 +699,8 @@
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span style="font-size: 18px;">⚠️</span>
                 <div>
-                  <div style="font-size: 14px; font-weight: 600; color: var(--apple-red);">Inspect Loose Wire</div>
-                  <div style="font-size: 11px; color: var(--apple-text-secondary);">Safety policy interlock test</div>
+                  <div style="font-size: 14px; font-weight: 600; color: var(--ios-red);">Inspect Loose Wire</div>
+                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Safety policy interlock test</div>
                 </div>
               </div>
               <span class="ios-badge badge-red">A3 Hazard</span>
@@ -686,9 +710,9 @@
 
         <!-- Telemetry Card -->
         <div class="ios-card" style="display: flex; justify-content: space-between; font-size: 12px;">
-          <div>Session: <b id="session-id-pill" style="color: var(--apple-teal);">-</b></div>
+          <div>Session: <b id="session-id-pill" style="color: var(--ios-blue);">-</b></div>
           <div>Tier: <b id="session-tier-pill">A0</b></div>
-          <div>Policy Gate: <b id="session-gate-pill" style="color: var(--apple-green);">Allow</b></div>
+          <div>Policy Gate: <b id="session-gate-pill" style="color: var(--ios-green);">Allow</b></div>
         </div>
       </div>
 
@@ -722,7 +746,7 @@
             </label>
             <div>
               <div style="font-size: 13px; font-weight: 600;">Privacy Shield</div>
-              <div style="font-size: 11px; color: var(--apple-text-secondary);">On-Device Face/PII Masking</div>
+              <div style="font-size: 11px; color: var(--ios-text-secondary);">On-Device Face/PII Masking</div>
             </div>
           </div>
           <span class="ios-badge badge-green">Protected</span>
@@ -749,7 +773,7 @@
             <span style="font-size: 20px;">🎙️</span>
             <div>
               <div style="font-size: 13px; font-weight: 600;" id="voice-agent-title">Apple Voice Guidance</div>
-              <div style="font-size: 11px; color: var(--apple-text-secondary);" id="voice-agent-subtitle">Tap to speak or listen hands-free</div>
+              <div style="font-size: 11px; color: var(--ios-text-secondary);" id="voice-agent-subtitle">Tap to speak or listen hands-free</div>
             </div>
           </div>
           <span class="ios-badge badge-blue">Siri Audio</span>
@@ -769,12 +793,12 @@
         </div>
 
         <div class="ios-card">
-          <div style="font-size: 11px; color: var(--apple-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Interpreted Physical Goal</div>
-          <div id="summary-intent-text" style="font-size: 17px; font-weight: 700; color: #FFF;">prepare the space to study</div>
+          <div style="font-size: 11px; color: var(--ios-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Interpreted Physical Goal</div>
+          <div id="summary-intent-text" style="font-size: 17px; font-weight: 700; color: var(--ios-text-primary);">prepare the space to study</div>
         </div>
 
         <div class="ios-card">
-          <div style="font-size: 11px; color: var(--apple-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Identified Workspace Objects</div>
+          <div style="font-size: 11px; color: var(--ios-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Identified Workspace Objects</div>
           <div id="summary-observations" style="display: flex; flex-direction: column; gap: 8px;">
             <!-- dynamically inserted -->
           </div>
@@ -798,13 +822,13 @@
           <span class="ios-badge badge-orange" id="step-tier-text">Tier A1</span>
         </div>
 
-        <div class="ios-card" style="border: 1px solid var(--apple-blue); background: rgba(0, 122, 255, 0.08);">
-          <div style="font-size: 11px; color: var(--apple-blue); text-transform: uppercase; font-weight: 700; margin-bottom: 6px;">Instruction</div>
-          <div id="step-instruction-text" style="font-size: 19px; font-weight: 700; line-height: 1.35; color: #FFF; margin-bottom: 12px;">
+        <div class="ios-card" style="border: 1px solid var(--ios-blue); background: var(--ios-blue-light);">
+          <div style="font-size: 11px; color: var(--ios-blue); text-transform: uppercase; font-weight: 700; margin-bottom: 6px;">Instruction</div>
+          <div id="step-instruction-text" style="font-size: 19px; font-weight: 700; line-height: 1.35; color: var(--ios-text-primary); margin-bottom: 12px;">
             Move the cup off the surface.
           </div>
-          <div style="border-top: 0.5px solid var(--apple-border); padding-top: 10px; font-size: 12px; color: var(--apple-text-secondary);">
-            Expected Evidence: <b id="step-evidence-text" style="color: #FFF;">no cup visible</b>
+          <div style="border-top: 0.5px solid var(--ios-border); padding-top: 10px; font-size: 12px; color: var(--ios-text-secondary);">
+            Expected Evidence: <b id="step-evidence-text" style="color: var(--ios-text-primary);">no cup visible</b>
           </div>
         </div>
 
@@ -826,24 +850,24 @@
           <span class="ios-badge badge-green" id="v-status-badge">VERIFIED</span>
         </div>
 
-        <!-- Apple Health / Rings Style Verification Card -->
-        <div class="ios-card" id="v-card" style="border-color: var(--apple-green);">
+        <!-- Apple Health Style Verification Card -->
+        <div class="ios-card" id="v-card" style="border-color: var(--ios-green);">
           <div style="display: flex; align-items: center; gap: 14px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--apple-green-bg); display: flex; align-items: center; justify-content: center; font-size: 24px;" id="v-icon">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--ios-green-light); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--ios-green);" id="v-icon">
               ✓
             </div>
             <div>
-              <div id="v-title" style="font-size: 17px; font-weight: 700; color: var(--apple-green);">Step Verified</div>
-              <div id="v-confidence" style="font-size: 12px; color: var(--apple-text-secondary);">Confidence: 95%</div>
+              <div id="v-title" style="font-size: 17px; font-weight: 700; color: var(--ios-green);">Step Verified</div>
+              <div id="v-confidence" style="font-size: 12px; color: var(--ios-text-secondary);">Confidence: 95%</div>
             </div>
           </div>
-          <div style="margin-top: 14px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-            <div id="v-bar" style="width: 95%; height: 100%; background: var(--apple-green); transition: width 0.5s var(--apple-spring);"></div>
+          <div style="margin-top: 14px; height: 6px; background: rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden;">
+            <div id="v-bar" style="width: 95%; height: 100%; background: var(--ios-green); transition: width 0.5s var(--ios-spring);"></div>
           </div>
         </div>
 
         <div class="ios-card">
-          <div style="font-size: 11px; color: var(--apple-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Sensor Evidence</div>
+          <div style="font-size: 11px; color: var(--ios-text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Sensor Evidence</div>
           <div id="v-evidence-list" style="font-size: 13px; display: flex; flex-direction: column; gap: 6px;"></div>
         </div>
 
@@ -859,12 +883,12 @@
       <div id="complete-screen" class="ios-screen">
         <div style="text-align: center; padding: 24px 0 10px 0;">
           <div style="font-size: 56px; margin-bottom: 8px;">🎉</div>
-          <h1 class="ios-large-title" style="color: var(--apple-green);" id="complete-title">Space Ready</h1>
+          <h1 class="ios-large-title" style="color: var(--ios-green);" id="complete-title">Space Ready</h1>
           <p class="ios-subtitle" id="complete-desc" style="margin-top: 4px;">Verified by camera with zero unverified claims.</p>
         </div>
 
         <div class="ios-card">
-          <div style="font-size: 11px; color: var(--apple-green); text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Verified Audit Record</div>
+          <div style="font-size: 11px; color: var(--ios-green); text-transform: uppercase; font-weight: 700; margin-bottom: 8px;">Verified Audit Record</div>
           <div id="complete-summary-list" style="font-size: 13px; display: flex; flex-direction: column; gap: 6px;">
             <div>✔ Physical step verified with visual proof.</div>
           </div>
@@ -885,23 +909,42 @@
       <div class="ios-modal-sheet">
         <div class="sheet-handle"></div>
         <div style="font-size: 32px; align-self: center;">🛑</div>
-        <div style="font-size: 19px; font-weight: 700; color: var(--apple-red); text-align: center;" id="modal-hazard-title">
+        <div style="font-size: 19px; font-weight: 700; color: var(--ios-red); text-align: center;" id="modal-hazard-title">
           Safety Policy Interlock
         </div>
-        <p style="font-size: 13px; color: var(--apple-text-secondary); text-align: center; line-height: 1.4;" id="modal-hazard-desc">
+        <p style="font-size: 13px; color: var(--ios-text-secondary); text-align: center; line-height: 1.4;" id="modal-hazard-desc">
           MIRROR will not guide this. Ask a qualified professional or emergency services.
         </p>
         <div style="display: flex; justify-content: center;">
           <span class="ios-badge badge-red" id="modal-rule-pill">Rule: Hazardous Task</span>
         </div>
-        <button class="ios-btn-primary" style="background: var(--apple-red);" onclick="onAbortMission()">
+        <button class="ios-btn-primary" style="background: var(--ios-red);" onclick="onAbortMission()">
           Acknowledge & Abort
         </button>
       </div>
     </div>
 
-    <!-- iOS Home Indicator -->
-    <div class="ios-home-indicator"></div>
+    <!-- FLOATING PILL DOCK (Apple iOS Bottom Navigation) -->
+    <div class="floating-pill-dock">
+      <div class="dock-item active" id="dock-home" onclick="navTo('home')">
+        <span class="dock-icon">🏠</span>
+        <span>Home</span>
+      </div>
+
+      <div class="dock-center-action" onclick="navTo('camera')" title="Open Vision Camera">
+        <span style="font-size: 20px;">📸</span>
+      </div>
+
+      <div class="dock-item" id="dock-plan" onclick="navTo('plan')">
+        <span class="dock-icon">📋</span>
+        <span>Plan</span>
+      </div>
+
+      <div class="dock-item" id="dock-audit" onclick="exportAuditLog()" title="Download Audit JSON">
+        <span class="dock-icon">⚙️</span>
+        <span>Audit</span>
+      </div>
+    </div>
 
   </div>
 
@@ -920,7 +963,6 @@
     };
 
     let backendOnline = false;
-    let activeCameraTab = "upload";
     let webcamStream = null;
     let isVerifyingCapture = false;
     let currentImageBase64 = null;
@@ -936,13 +978,13 @@
         if (res.ok) {
           const data = await res.json();
           backendOnline = true;
-          document.getElementById("island-led").style.background = "var(--apple-green)";
+          document.getElementById("island-led").style.background = "var(--ios-green)";
           document.getElementById("island-status-label").innerText = "Gemini Vision Active";
           document.getElementById("home-status-badge").innerText = "Apple & Gemini Live";
         }
       } catch (err) {
         backendOnline = false;
-        document.getElementById("island-led").style.background = "var(--apple-orange)";
+        document.getElementById("island-led").style.background = "var(--ios-orange)";
         document.getElementById("island-status-label").innerText = "Local Fallback";
         document.getElementById("home-status-badge").innerText = "Local Mode";
       }
@@ -967,18 +1009,18 @@
     }
 
     function drawDeskScene(hasCup = true) {
-      ctx.fillStyle = "#12141C";
+      ctx.fillStyle = "#1E2029";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#222533";
+      ctx.fillStyle = "#2D3142";
       ctx.fillRect(20, canvas.height * 0.45, canvas.width - 40, canvas.height * 0.45);
 
-      ctx.fillStyle = "#374151";
+      ctx.fillStyle = "#4F5D75";
       ctx.fillRect(canvas.width * 0.35, canvas.height * 0.48, canvas.width * 0.35, canvas.height * 0.22);
       ctx.fillStyle = "#111827";
       ctx.fillRect(canvas.width * 0.37, canvas.height * 0.50, canvas.width * 0.31, canvas.height * 0.17);
 
-      ctx.fillStyle = "#E5E7EB";
+      ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(canvas.width * 0.10, canvas.height * 0.55, canvas.width * 0.18, canvas.height * 0.22);
 
       if (hasCup) {
@@ -1170,10 +1212,12 @@
     function navTo(screenName) {
       document.querySelectorAll(".ios-screen").forEach(s => s.classList.remove("active"));
       document.querySelectorAll(".ios-segment").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".dock-item").forEach(d => d.classList.remove("active"));
 
       if (screenName === "home") {
         document.getElementById("screen-home").classList.add("active");
         document.getElementById("seg-0").classList.add("active");
+        document.getElementById("dock-home")?.classList.add("active");
       } else if (screenName === "camera") {
         document.getElementById("screen-camera").classList.add("active");
         document.getElementById("seg-1").classList.add("active");
@@ -1188,6 +1232,7 @@
       } else if (screenName === "plan") {
         document.getElementById("plan-screen").classList.add("active");
         document.getElementById("seg-3").classList.add("active");
+        document.getElementById("dock-plan")?.classList.add("active");
         renderPlanScreen();
       } else if (screenName === "verify") {
         document.getElementById("verify-screen").classList.add("active");
@@ -1295,11 +1340,11 @@
       obsContainer.innerHTML = "";
       const obs = backendState.world.observations || [];
       if (obs.length === 0) {
-        obsContainer.innerHTML = `<div style="color: var(--apple-text-secondary); font-size: 13px;">No clutter or obstacles found. Space appears ready.</div>`;
+        obsContainer.innerHTML = `<div style="color: var(--ios-text-secondary); font-size: 13px;">No clutter or obstacles found. Space appears ready.</div>`;
       } else {
         obs.forEach(o => {
           obsContainer.innerHTML += `
-            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.06); padding: 8px 12px; border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ios-surface-secondary); padding: 8px 12px; border-radius: 12px; border: 0.5px solid var(--ios-border);">
               <span><b>${o.label}</b> ${o.where_hint ? '(' + o.where_hint + ')' : ''}</span>
               <span class="ios-badge badge-green">${Math.round(o.confidence * 100)}%</span>
             </div>
@@ -1413,24 +1458,24 @@
       if (v.status === "verified") {
         badge.className = "ios-badge badge-green";
         badge.innerText = "VERIFIED";
-        card.style.borderColor = "var(--apple-green)";
+        card.style.borderColor = "var(--ios-green)";
         title.innerText = "Step Verified";
-        title.style.color = "var(--apple-green)";
+        title.style.color = "var(--ios-green)";
         conf.innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}% (Visual proof confirmed)`;
         bar.style.width = `${Math.round(v.confidence * 100)}%`;
-        bar.style.background = "var(--apple-green)";
-        evList.innerHTML = `<div style="color: var(--apple-green);">✔ Evidence confirmed: ${v.evidenceSeen.join(", ")}</div>`;
+        bar.style.background = "var(--ios-green)";
+        evList.innerHTML = `<div style="color: var(--ios-green);">✔ Evidence confirmed: ${v.evidenceSeen.join(", ")}</div>`;
         speak("Verification confirmed at " + Math.round(v.confidence * 100) + " percent confidence.");
       } else {
         badge.className = "ios-badge badge-orange";
         badge.innerText = v.status.toUpperCase();
-        card.style.borderColor = "var(--apple-orange)";
+        card.style.borderColor = "var(--ios-orange)";
         title.innerText = "Could Not Verify";
-        title.style.color = "var(--apple-orange)";
+        title.style.color = "var(--ios-orange)";
         conf.innerText = `Confidence: ${(v.confidence * 100).toFixed(0)}%`;
         bar.style.width = "25%";
-        bar.style.background = "var(--apple-orange)";
-        evList.innerHTML = `<div style="color: var(--apple-orange);">⚠ ${v.reason || "Scene mismatch. Retake photo."}</div>`;
+        bar.style.background = "var(--ios-orange)";
+        evList.innerHTML = `<div style="color: var(--ios-orange);">⚠ ${v.reason || "Scene mismatch. Retake photo."}</div>`;
         speak("Could not verify step. Point the camera at the same area.");
       }
     }
