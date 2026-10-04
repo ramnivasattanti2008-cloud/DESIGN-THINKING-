@@ -115,6 +115,24 @@ Paste-ready prompt (Copilot Chat, with `src/api/main.py`, `src/core/engine.py`, 
 You are the copilot seat on the MIRROR repo. Read AGENTS.md and docs/tasks/BRIEFS.md (section "copilot: T-026"). Build tools/demo_client.py (a command-line client that drives the MIRROR backend /v1 loop: create session, observe, plan, verify, repeating until the backend returns completed, no_action_needed, blocked_goal or needs_human) and tools/test_demo_client.py (pytest using FastAPI TestClient: blocked goal, full verified loop ending in completed, failed verification, no_action_needed). Use only httpx and the standard library. Print a loud "NOT A REAL RESULT: fake provider" when /v1/health says FakeModelClient. Never print success or done unless the backend returned "completed"; print no_action_needed as "nothing to change, nothing verified". Touch only the tools/ folder and docs/status/copilot.md. Run python -m pytest tools/test_demo_client.py and paste the real output; do not claim it passes unless you ran it. Ram will put your files in a branch copilot/demo-client and open a PR into claude/architecture. Never push to main.
 ```
 
+## copilot: blocking fixes from claude's review of `copilot/demo-client` (ba0389a)
+
+The branch is NOT merged yet. Review result: the client and its 5 tests run and pass (`5 passed`), the fake-provider banner and the "completed only" rule work, but it can still show success when it should not, and the tests would not catch that. Files you may touch stay `tools/` and `docs/status/copilot.md` only.
+
+1. `tools/demo_client.py:156-172`: when the plan's `gate.decision` is `block` (for example the hazard step "exposed wiring"), print the refusal and STOP. Do not call verify and never reach `completed` from a blocked step. (The backend now also answers 409 for that verify.) Use a non-zero exit code for blocked goal, blocked step and `needs_human`; exit 0 only for `completed` and `no_action_needed`.
+2. `:176`: print a `verified` with confidence below 0.85 as NOT verified. The backend now downgrades it to `cannot_tell` itself; keep the client guard anyway.
+3. `:72`: catch `httpx.InvalidURL` and print one `ERROR:` line (`--url http://127.0.0.1:abc` currently prints a traceback).
+4. `:40`: read `--script` files with encoding `utf-8-sig` (Windows PowerShell writes a BOM).
+5. `gate.decision == "confirm"`: ask the person to confirm before verifying, or at least print that confirmation is required.
+6. Tests (`tools/test_demo_client.py:54,63` are too weak: a client mutated to print `completed` after a failed verify, or `done` on `no_action_needed`, still passed). Assert that no bare `completed`, `done` or `success` line appears before the first verified result, and none at all on `no_action_needed`. Add tests for: a blocked step (no verify call is made), `needs_human` (three failed verifies), an invalid URL, a BOM script.
+7. Do not edit `pyproject.toml`; claude adds `tools` to `testpaths` after merge.
+
+Paste-ready prompt (Copilot Chat, with `tools/demo_client.py`, `tools/test_demo_client.py`, `src/api/main.py` and `src/core/engine.py` attached):
+
+```
+You are the copilot seat on the MIRROR repo. A reviewer ran your demo client and tests (5 passed) and found these problems. Fix only files in tools/ and docs/status/copilot.md. (1) When the plan gate.decision is "block" (e.g. hazard step "exposed wiring"), print the refusal and STOP: never call verify, never reach "completed". Exit code non-zero for blocked goal, blocked step and needs_human; 0 only for completed and no_action_needed. (2) Print a verified result with confidence below 0.85 as NOT verified. (3) Catch httpx.InvalidURL and print one "ERROR:" line instead of a traceback. (4) Read --script files with encoding utf-8-sig. (5) For gate.decision "confirm", ask the person to confirm before verifying. (6) Strengthen tests/test_demo_client.py: assert no bare "completed", "done" or "success" line appears before the first verified result and none on no_action_needed; add tests for a blocked step (no verify call), needs_human (three failed verifies), an invalid URL, and a BOM script. Run python -m pytest tools/test_demo_client.py -q and paste the real output; do not claim a pass you did not run. Do not edit pyproject.toml. Ram will put your files in branch copilot/demo-client and open a PR into claude/architecture.
+```
+
 ## studio-a: blocking fixes from claude's review of `studio-a/scenes` (2a2fd0c)
 
 The branch is NOT merged yet. A read-only review found invented source details, a plan that contradicts the repo, and scenes that do not match the real engine. Inventing citations is an integrity-rule violation (`AGENTS.md`), so this must be fixed before anything merges. Facts about the engine come from `src/core/engine.py`, `src/core/policy.py` and `docs/architecture/VERIFICATION.md` on `claude/architecture`.

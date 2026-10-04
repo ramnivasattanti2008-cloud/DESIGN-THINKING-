@@ -17,7 +17,7 @@ Updated 2026-10-04. Branch `claude/architecture` (not yet merged into `main`; th
 
 ## What works (measured 2026-10-04)
 
-- `python -m pytest`: 186 passed, 3 skipped (the skips wait for `ag-c`'s writer). Fake provider only, so this proves the policy and loop logic, not real perception.
+- `python -m pytest`: 197 passed, 3 skipped (the skips wait for `ag-c`'s writer). Fake provider only, so this proves the policy and loop logic, not real perception.
 - Android, commit `8a6a185` (Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17): `:app:testDebugUnitTest` 21 tests pass (12 controller state machine, 9 parsing and photo-quality) and `:app:assembleDebug` builds. Debug APKs for the emulator and for the Wi-Fi address were built from it (git-ignored `dist/`).
 - The full loop over real HTTP with the fake provider (refusal, no view yet, not verified, cannot tell, verified, completed) was run against uvicorn earlier in the session and is covered by the contract tests.
 

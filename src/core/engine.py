@@ -153,7 +153,9 @@ class Session:
             self._record("plan", payload={"outcome": outcome.value})
             return None, None, outcome
         decision = gate(step, self.goal)
-        self.current = step
+        # A step the policy blocks is shown as a refusal and is never held as the current step,
+        # so a client cannot verify it and walk on to "completed".
+        self.current = None if decision.decision == "block" else step
         self._before_labels = labels
         self._record("plan", entry={"event": "plan", "step": step.instruction,
                                     "tier": decision.tier.value, "rule": decision.rule_id,
