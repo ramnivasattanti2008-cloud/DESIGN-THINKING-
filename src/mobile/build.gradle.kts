@@ -16,6 +16,10 @@ android {
         versionName = "0.1.0"
         val backend = providers.gradleProperty("mirrorBackendUrl").getOrElse("http://10.0.2.2:8000")
         buildConfigField("String", "BACKEND_URL", "\"$backend\"")
+        // Development only: a key baked into an APK can be extracted. Pass -PmirrorApiKey=... when the
+        // server sets MIRROR_API_KEY. Empty by default and never committed.
+        val apiKey = providers.gradleProperty("mirrorApiKey").getOrElse("")
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildFeatures {
@@ -56,6 +60,7 @@ dependencies {
     implementation("androidx.camera:camera-core:1.3.4")
     implementation("androidx.camera:camera-camera2:1.3.4")
     implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 

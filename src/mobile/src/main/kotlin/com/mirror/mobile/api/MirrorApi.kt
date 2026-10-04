@@ -9,7 +9,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /** HTTP client for the MIRROR backend. Every failure becomes an [ApiException]. */
-class MirrorApi(private val baseUrl: String) : Backend {
+class MirrorApi(private val baseUrl: String, private val apiKey: String = "") : Backend {
 
     override suspend fun createSession(goal: String): SessionInfo =
         JsonParsing.session(call("POST", "/v1/sessions", JSONObject().put("goal", goal)))
@@ -32,6 +32,7 @@ class MirrorApi(private val baseUrl: String) : Backend {
                 conn.readTimeout = 90_000 // a model call can be slow
                 conn.setRequestProperty("Content-Type", "application/json")
                 conn.setRequestProperty("Accept", "application/json")
+                headersFor(apiKey).forEach { (k, v) -> conn.setRequestProperty(k, v) }
                 if (body != null) {
                     conn.doOutput = true
                     conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
@@ -49,4 +50,10 @@ class MirrorApi(private val baseUrl: String) : Backend {
                 conn.disconnect()
             }
         }
+
+    companion object {
+        /** Extra headers every request carries. The key is sent only when one is configured. */
+        internal fun headersFor(apiKey: String): Map<String, String> =
+            if (apiKey.isBlank()) emptyMap() else mapOf("X-API-Key" to apiKey.trim())
+    }
 }

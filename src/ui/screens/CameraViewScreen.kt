@@ -30,7 +30,8 @@ fun CameraViewScreen(
     onSceneCaptured: () -> Unit,
     onBackClick: () -> Unit,
     onEmergencyStop: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    cameraPreview: (@Composable () -> Unit)? = null
 ) {
     var isTorchOn by remember { mutableStateOf(false) }
 
@@ -50,12 +51,34 @@ fun CameraViewScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Simulated Camera Feed Background (Dark gradient viewfinder area)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFF0A0C10))
-            )
+            // Camera Feed: Live CameraX preview composable if provided, otherwise clean dark viewfinder background
+            if (cameraPreview != null) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    cameraPreview()
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xFF0A0C10)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = "Camera Active",
+                            tint = MirrorCyan.copy(alpha = 0.4f),
+                            modifier = Modifier.size(36.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Camera Active • Align Surface in Reticle",
+                            color = TextMuted,
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+            }
 
             // Spatial Crosshair / Perception Grid
             Box(

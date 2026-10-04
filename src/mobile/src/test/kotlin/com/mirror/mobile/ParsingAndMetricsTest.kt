@@ -1,6 +1,7 @@
 package com.mirror.mobile
 
 import com.mirror.mobile.api.JsonParsing
+import com.mirror.mobile.api.MirrorApi
 import com.mirror.mobile.api.VerifyReply
 import com.mirror.mobile.capture.FrameMetrics
 import com.mirror.mobile.integration.BackendAdapter
@@ -83,5 +84,12 @@ class ParsingAndMetricsTest {
         assertEquals(0.5f, FrameMetrics.brightness(flat), 0.01f)
         assertEquals(0f, FrameMetrics.brightness(IntArray(0)), 0f)
         assertEquals(1f, FrameMetrics.blur(IntArray(4), 2, 2), 0f)     // too small to judge
+    }
+
+    @Test
+    fun apiKeyHeaderIsSentOnlyWhenAKeyIsConfigured() {
+        assertTrue(MirrorApi.headersFor("").isEmpty())
+        assertTrue(MirrorApi.headersFor("   ").isEmpty())
+        assertEquals(mapOf("X-API-Key" to "abc"), MirrorApi.headersFor("  abc "))
     }
 }

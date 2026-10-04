@@ -30,11 +30,13 @@ private class ScriptedBackend(
     var failWith: ApiException? = null
 ) : Backend {
     var verifyCalls = 0
+    var observeCalls = 0
     override suspend fun createSession(goal: String): SessionInfo {
         failWith?.let { throw it }
         return SessionInfo("sid", "tidy the space", blocked, if (blocked) "refused" else null)
     }
     override suspend fun observe(sessionId: String, frames: List<FrameUpload>): WorldInfo {
+        observeCalls++
         failWith?.let { throw it }
         return world
     }
@@ -47,7 +49,9 @@ private class ScriptedBackend(
 }
 
 private class FakeFrames(var fail: Boolean = false) : FrameSource {
+    var captures = 0
     override suspend fun capture(id: String): FrameUpload {
+        captures++
         if (fail) throw CaptureException("no camera")
         return FrameUpload(id, 0f, 0.5f, "AAAA")
     }
@@ -68,6 +72,9 @@ class MissionControllerTest {
         val b = ScriptedBackend(plans = ArrayDeque(listOf(stepReply, PlanReply("completed", null, null, null))), verify = verified(0.9f))
         val c = controller(b)
         c.startGoal("tidy my desk")
+        assertEquals(AppScreen.HOME, c.app.value.screen) // photos are not allowed yet
+        assertTrue(c.app.value.awaitingConsent)
+        c.grantConsent()
         assertEquals(AppScreen.CAMERA, c.app.value.screen)
         c.captureScene()
         assertEquals(AppScreen.SUMMARY, c.app.value.screen)
@@ -85,7 +92,7 @@ class MissionControllerTest {
     fun notVerifiedStepCannotBeAccepted() = runBlocking {
         val b = ScriptedBackend(plans = ArrayDeque(listOf(stepReply)), verify = verified(0.9f, "not_verified"))
         val c = controller(b)
-        c.startGoal("tidy"); c.captureScene(); c.proceedToPlan(); c.beginStep(); c.verifyStep()
+        c.startGoal("tidy"); c.grantConsent(); c.captureScene(); c.proceedToPlan(); c.beginStep(); c.verifyStep()
         assertFalse(c.app.value.stepVerified)
         c.acceptVerification() // must not advance or call plan again (plans queue is empty)
         assertEquals(AppScreen.VERIFICATION, c.app.value.screen)
@@ -97,7 +104,7 @@ class MissionControllerTest {
     fun verifiedButLowConfidenceIsNotAccepted() = runBlocking {
         val b = ScriptedBackend(plans = ArrayDeque(listOf(stepReply)), verify = verified(0.6f))
         val c = controller(b)
-        c.startGoal("tidy"); c.captureScene(); c.proceedToPlan(); c.beginStep(); c.verifyStep()
+        c.startGoal("tidy"); c.grantConsent(); c.captureScene(); c.proceedToPlan(); c.beginStep(); c.verifyStep()
         assertFalse(c.app.value.stepVerified)
         assertTrue(c.data.value.latestVerification!!.isVerified.not())
     }
@@ -107,7 +114,7 @@ class MissionControllerTest {
         for (status in listOf("cannot_tell", "something_new")) {
             val b = ScriptedBackend(plans = ArrayDeque(listOf(stepReply)), verify = verified(0.95f, status))
             val c = controller(b)
-            c.startGoal("tidy"); c.captureScene(); c.proceedToPlan(); c.beginStep(); c.verifyStep()
+            c.startGoal("tidy"); c.grantConsent(); c.captureScene(); c.proceedToPlan(); c.beginStep(); c.verifyStep()
             assertFalse(status, c.app.value.stepVerified)
             assertTrue(status, c.data.value.latestVerification?.isVerified == false)
         }
@@ -126,7 +133,7 @@ class MissionControllerTest {
     fun hazardInSceneStopsBeforePlanning() = runBlocking {
         val b = ScriptedBackend(world = WorldInfo(listOf("cup"), listOf("smoke"), emptyList()))
         val c = controller(b) // plans queue empty: calling plan would throw
-        c.startGoal("tidy"); c.captureScene()
+        c.startGoal("tidy"); c.grantConsent(); c.captureScene()
         assertEquals(AppScreen.CAMERA, c.app.value.screen)
         assertNotNull(c.data.value.activeAlert)
         assertTrue(c.data.value.planSteps.isEmpty())
@@ -136,7 +143,7 @@ class MissionControllerTest {
     fun nothingToDoIsNotReportedAsSuccess() = runBlocking {
         val b = ScriptedBackend(plans = ArrayDeque(listOf(PlanReply("no_action_needed", null, null, null))))
         val c = controller(b)
-        c.startGoal("tidy"); c.captureScene()
+        c.startGoal("tidy"); c.grantConsent(); c.captureScene()
         assertEquals(AppScreen.HOME, c.app.value.screen)
         assertNotEquals(AppScreen.COMPLETED, c.app.value.screen)
         assertTrue(c.app.value.notice!!.contains("nothing was verified"))
@@ -146,7 +153,7 @@ class MissionControllerTest {
     fun needsObservationSendsUserBackToCamera() = runBlocking {
         val b = ScriptedBackend(plans = ArrayDeque(listOf(PlanReply("needs_observation", null, null, "retake"))))
         val c = controller(b)
-        c.startGoal("tidy"); c.captureScene()
+        c.startGoal("tidy"); c.grantConsent(); c.captureScene()
         assertEquals(AppScreen.CAMERA, c.app.value.screen)
         assertEquals("retake", c.app.value.notice)
     }
@@ -155,7 +162,7 @@ class MissionControllerTest {
     fun unknownPlanOutcomeIsNotSuccess() = runBlocking {
         val b = ScriptedBackend(plans = ArrayDeque(listOf(PlanReply("surprise", null, null, null))))
         val c = controller(b)
-        c.startGoal("tidy"); c.captureScene()
+        c.startGoal("tidy"); c.grantConsent(); c.captureScene()
         assertNotEquals(AppScreen.COMPLETED, c.app.value.screen)
         assertTrue(c.data.value.planSteps.isEmpty())
     }
@@ -169,7 +176,7 @@ class MissionControllerTest {
         assertEquals(AppScreen.HOME, c.app.value.screen)
 
         val c2 = controller(ScriptedBackend(), FakeFrames(fail = true))
-        c2.startGoal("tidy"); c2.captureScene()
+        c2.startGoal("tidy"); c2.grantConsent(); c2.captureScene()
         assertEquals("no camera", c2.app.value.notice)
         assertEquals(AppScreen.CAMERA, c2.app.value.screen)
         assertFalse(c2.app.value.busy)
@@ -189,6 +196,65 @@ class MissionControllerTest {
         c.startGoal("   ")
         assertEquals(AppScreen.HOME, c.app.value.screen)
         assertNotNull(c.app.value.notice)
+    }
+
+    @Test
+    fun noPhotoIsTakenOrSentBeforeTheTaskIsAllowed() = runBlocking {
+        val b = ScriptedBackend()
+        val f = FakeFrames()
+        val c = MissionController(b, f)
+        c.startGoal("tidy")
+        assertTrue(c.app.value.awaitingConsent)
+        c.captureScene() // must do nothing
+        c.verifyStep()   // must do nothing
+        assertEquals(0, f.captures)
+        assertEquals(0, b.observeCalls)
+        assertEquals(0, b.verifyCalls)
+        assertTrue(c.app.value.awaitingConsent)
+        assertNotNull(c.app.value.notice)
+    }
+
+    @Test
+    fun allowingMovesToTheCameraAndClearsTheQuestion() = runBlocking {
+        val c = controller(ScriptedBackend())
+        c.startGoal("tidy")
+        c.grantConsent()
+        assertEquals(AppScreen.CAMERA, c.app.value.screen)
+        assertFalse(c.app.value.awaitingConsent)
+        assertTrue(c.app.value.consentGranted)
+    }
+
+    @Test
+    fun decliningCancelsTheTaskWithNothingTakenOrSent() = runBlocking {
+        val b = ScriptedBackend()
+        val f = FakeFrames()
+        val c = MissionController(b, f)
+        c.startGoal("tidy")
+        c.declineConsent()
+        assertEquals(AppScreen.HOME, c.app.value.screen)
+        assertFalse(c.app.value.awaitingConsent)
+        assertFalse(c.app.value.consentGranted)
+        assertEquals(0, f.captures)
+        assertEquals(0, b.observeCalls)
+        assertTrue(c.app.value.notice!!.contains("No photo"))
+    }
+
+    @Test
+    fun theNextTaskAsksAgain() = runBlocking {
+        val c = controller(ScriptedBackend())
+        c.startGoal("tidy"); c.grantConsent()
+        c.abort()
+        c.startGoal("tidy again")
+        assertTrue(c.app.value.awaitingConsent)
+        assertFalse(c.app.value.consentGranted)
+    }
+
+    @Test
+    fun aRefusedGoalNeverAsksForPhotos() = runBlocking {
+        val c = controller(ScriptedBackend(blocked = true))
+        c.startGoal("inspect the wall outlet for loose wire")
+        assertFalse(c.app.value.awaitingConsent)
+        assertFalse(c.app.value.consentGranted)
     }
 }
 

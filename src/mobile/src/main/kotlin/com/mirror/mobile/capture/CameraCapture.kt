@@ -9,7 +9,9 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.mirror.mobile.api.CaptureException
@@ -26,6 +28,10 @@ import kotlin.coroutines.resumeWithException
  * Takes one real still from the back camera per call, computes blur and brightness on device,
  * and returns a downscaled JPEG. There is no simulated frame here: if the camera is unavailable
  * the call throws [CaptureException].
+ *
+ * The camera can also show a live preview ([startPreview]); the still-photo use case stays bound
+ * next to it, so the photo that is sent is a real capture from the same camera the person sees.
+ * NOT yet exercised on a real device (see docs/architecture/VALIDATION.md).
  */
 class CameraCapture(
     private val context: Context,
@@ -33,32 +39,72 @@ class CameraCapture(
 ) : FrameSource {
 
     private var imageCapture: ImageCapture? = null
+    private var provider: ProcessCameraProvider? = null
+
+    fun hasPermission(): Boolean =
+        ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 
     override suspend fun capture(id: String): FrameUpload {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED
-        ) throw CaptureException("Camera permission is needed. Allow it in Settings and try again.")
-
-        val capture = imageCapture ?: bind().also { imageCapture = it }
+        if (!hasPermission()) throw CaptureException("Camera permission is needed. Allow it in Settings and try again.")
+        val capture = imageCapture ?: bindStillOnly()
         val bitmap = takePicture(capture)
         return withContext(Dispatchers.Default) { toUpload(id, bitmap) }
     }
 
-    private suspend fun bind(): ImageCapture = suspendCancellableCoroutine { cont ->
-        val future = ProcessCameraProvider.getInstance(context)
-        future.addListener({
-            try {
-                val provider = future.get()
-                val useCase = ImageCapture.Builder()
-                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                    .build()
-                provider.unbindAll()
-                provider.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, useCase)
-                cont.resume(useCase)
-            } catch (e: Exception) {
-                cont.resumeWithException(CaptureException("Could not start the camera: ${e.message}"))
-            }
-        }, ContextCompat.getMainExecutor(context))
+    /** Shows a live preview in [view] and keeps the still-photo use case bound beside it. Main thread. */
+    suspend fun startPreview(view: PreviewView) {
+        if (!hasPermission()) throw CaptureException("Camera permission is needed. Allow it in Settings and try again.")
+        val cameraProvider = cameraProvider()
+        val still = imageCapture ?: newImageCapture().also { imageCapture = it }
+        val preview = Preview.Builder().build().also { it.setSurfaceProvider(view.surfaceProvider) }
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview, still)
+        } catch (e: Exception) {
+            throw CaptureException("Could not start the camera preview: ${e.message}")
+        }
+    }
+
+    /** Releases the preview but keeps photo capture available for the verification step. Main thread. */
+    fun stopPreview() {
+        val cameraProvider = provider ?: return
+        val still = imageCapture ?: return
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, still)
+        } catch (e: Exception) {
+            imageCapture = null // the next capture() binds again from scratch
+        }
+    }
+
+    private fun newImageCapture(): ImageCapture =
+        ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()
+
+    private suspend fun cameraProvider(): ProcessCameraProvider {
+        provider?.let { return it }
+        return suspendCancellableCoroutine { cont ->
+            val future = ProcessCameraProvider.getInstance(context)
+            future.addListener({
+                try {
+                    cont.resume(future.get().also { provider = it })
+                } catch (e: Exception) {
+                    cont.resumeWithException(CaptureException("Could not start the camera: ${e.message}"))
+                }
+            }, ContextCompat.getMainExecutor(context))
+        }
+    }
+
+    private suspend fun bindStillOnly(): ImageCapture {
+        val cameraProvider = cameraProvider()
+        val still = newImageCapture()
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, still)
+        } catch (e: Exception) {
+            throw CaptureException("Could not start the camera: ${e.message}")
+        }
+        imageCapture = still
+        return still
     }
 
     private suspend fun takePicture(capture: ImageCapture): Bitmap = suspendCancellableCoroutine { cont ->

@@ -23,7 +23,10 @@ data class AppState(
     val notice: String? = null,
     /** True only after the backend confirmed the current step with enough confidence. */
     val stepVerified: Boolean = false,
-    val verifiedSteps: Int = 0
+    val verifiedSteps: Int = 0,
+    /** Photos go to the server (and possibly a cloud AI model). The person allows that once per task. */
+    val awaitingConsent: Boolean = false,
+    val consentGranted: Boolean = false
 )
 
 /** What the screens render. All of it comes from backend replies; none of it is sample data. */
@@ -68,11 +71,35 @@ class MissionController(
             refuse(s.message ?: REFUSAL, AppScreen.HOME)
             return@guarded
         }
-        _app.update { it.copy(screen = AppScreen.CAMERA, notice = null, stepVerified = false, verifiedSteps = 0) }
+        // Ask before the camera opens: nothing is captured or sent until the person agrees.
+        _app.update {
+            it.copy(screen = AppScreen.HOME, notice = null, stepVerified = false, verifiedSteps = 0,
+                    consentGranted = false, awaitingConsent = true)
+        }
+    }
+
+    fun grantConsent() = _app.update {
+        it.copy(
+            consentGranted = true, awaitingConsent = false, notice = null,
+            screen = if (it.screen == AppScreen.HOME && sessionId != null) AppScreen.CAMERA else it.screen
+        )
+    }
+
+    fun declineConsent() {
+        abort()
+        _app.update { it.copy(notice = "Cancelled. No photo was taken or sent.") }
+    }
+
+    /** No photo is taken or sent until the person has allowed it for this task. */
+    private fun requireConsent(): Boolean {
+        if (_app.value.consentGranted) return true
+        _app.update { it.copy(awaitingConsent = true, notice = "Allow sending photos for this task first.") }
+        return false
     }
 
     /** Camera screen "Capture": take a real frame, observe, then plan. */
     suspend fun captureScene() = guarded {
+        if (!requireConsent()) return@guarded
         val sid = requireSession()
         val frame = frames.capture("scene-${++frameCounter}")
         val world = backend.observe(sid, listOf(frame))
@@ -91,6 +118,7 @@ class MissionController(
 
     /** "I did it": take a fresh frame and ask the backend whether the step really worked. */
     suspend fun verifyStep() = guarded {
+        if (!requireConsent()) return@guarded
         val sid = requireSession()
         val frame = frames.capture("verify-${++frameCounter}")
         val reply = backend.verify(sid, listOf(frame))

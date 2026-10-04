@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +38,7 @@ import kotlinx.coroutines.launch
  * verification result comes from the backend.
  */
 @Composable
-fun MirrorApp(controller: MissionController) {
+fun MirrorApp(controller: MissionController, cameraPreview: (@Composable () -> Unit)? = null) {
     val app by controller.app.collectAsState()
     val ui by controller.data.collectAsState()
     val scope = rememberCoroutineScope()
@@ -56,7 +57,8 @@ fun MirrorApp(controller: MissionController) {
                         currentGoal = goal,
                         onSceneCaptured = { scope.launch { controller.captureScene() } },
                         onBackClick = controller::abort,
-                        onEmergencyStop = controller::abort
+                        onEmergencyStop = controller::abort,
+                        cameraPreview = cameraPreview
                     )
 
                     AppScreen.SUMMARY -> MissionSummaryScreen(
@@ -105,6 +107,23 @@ fun MirrorApp(controller: MissionController) {
 
                 app.notice?.let { NoticeBanner(it, Modifier.align(Alignment.TopCenter)) }
                 if (app.busy) CircularProgressIndicator(Modifier.align(Alignment.Center))
+
+                if (app.awaitingConsent) {
+                    AlertDialog(
+                        onDismissRequest = controller::declineConsent,
+                        title = { Text("Send photos for this task?") },
+                        text = {
+                            Text(
+                                "MIRROR sends the photos you take to your MIRROR server, which may pass them to a " +
+                                    "cloud AI model so it can see what is in your space. MIRROR does not store the " +
+                                    "photos; the AI provider terms apply. Do not photograph people, documents or " +
+                                    "screens. If you say no, nothing is taken or sent."
+                            )
+                        },
+                        confirmButton = { Button(onClick = controller::grantConsent) { Text("Allow for this task") } },
+                        dismissButton = { OutlinedButton(onClick = controller::declineConsent) { Text("Do not allow") } }
+                    )
+                }
 
                 ui.activeAlert?.let { alert ->
                     SafetyAlertModal(
