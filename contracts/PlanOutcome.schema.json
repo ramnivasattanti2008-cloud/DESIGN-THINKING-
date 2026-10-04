@@ -1,0 +1,12 @@
+{
+  "enum": [
+    "step",
+    "completed",
+    "no_action_needed",
+    "needs_observation",
+    "blocked_goal",
+    "needs_human"
+  ],
+  "title": "PlanOutcome",
+  "type": "string"
+}
