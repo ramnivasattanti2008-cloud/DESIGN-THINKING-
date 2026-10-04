@@ -17,10 +17,13 @@ The engine determines:
 """
 from __future__ import annotations
 
+import json
+import os
 import re
 import time
 from enum import Enum
 from typing import Any, Optional
+import httpx
 from pydantic import BaseModel, Field
 
 from src.core.world_model import PhysicalEntity, PhysicalWorldModel
@@ -162,6 +165,12 @@ class ConsequenceEngine:
             items = ConsequenceEngine._evaluate_something_wrong(world)
             headline = "Physical Anomaly Diagnosis"
         else:
+            gemini_key = os.environ.get("GEMINI_API_KEY", "").strip() or os.environ.get("MIRROR_MODEL_API_KEY", "").strip()
+            if gemini_key and len(world.entities) > 0 and len(intention_text.split()) > 2:
+                gemini_res = ConsequenceEngine._evaluate_with_gemini(world, intention_text, gemini_key)
+                if gemini_res is not None:
+                    return gemini_res
+
             items = ConsequenceEngine._evaluate_general_check(world)
             headline = "Physical State Audit"
 
@@ -853,6 +862,118 @@ class ConsequenceEngine:
             parts.append(f"{' and '.join(unnec_phrases)}.")
 
         return " ".join(parts)
+
+    @staticmethod
+    def _evaluate_with_gemini(
+        world: PhysicalWorldModel, intention_text: str, api_key: str
+    ) -> Optional[ConsequenceReport]:
+        """Uses Gemini Flash to perform zero-shot physical consequence reasoning for arbitrary intentions."""
+        try:
+            entity_summaries = []
+            for e in world.entities:
+                entity_summaries.append({
+                    "label": e.label,
+                    "state": e.state,
+                    "location": e.location or "environment",
+                    "confidence": e.confidence,
+                    "is_hazard": e.is_hazard,
+                })
+
+            prompt = (
+                f"You are the MIRROR Physical Consequence Intelligence Engine.\n"
+                f"The user has expressed this intention: \"{intention_text}\"\n"
+                f"Observed Physical Entities in Environment:\n"
+                f"{json.dumps(entity_summaries, indent=2)}\n\n"
+                f"Reason about physical consequences, safety hazards, and needed state transitions.\n"
+                f"Output valid JSON matching this schema:\n"
+                f"{{\n"
+                f'  "headline": "Short title describing the mission or state audit",\n'
+                f'  "items": [\n'
+                f"    {{\n"
+                f'      "entity_label": "name of entity",\n'
+                f'      "current_state": "detected state",\n'
+                f'      "desired_state": "target state for this intention",\n'
+                f'      "status": "match|conflict|attention|hazard|unnecessary_active",\n'
+                f'      "severity": "info|warning|critical",\n'
+                f'      "consequence_text": "causal explanation of what happens if ignored",\n'
+                f'      "suggested_action": "what should be done",\n'
+                f'      "action_type": "automated_system|physical_user"\n'
+                f"    }}\n"
+                f"  ]\n"
+                f"}}\n"
+                f"Do not include markdown fences outside the JSON."
+            )
+
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
+            payload = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}
+            }
+
+            resp = httpx.post(url, json=payload, timeout=8.0)
+            if resp.status_code != 200:
+                return None
+
+            data = resp.json()
+            raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
+            parsed = json.loads(raw_text)
+
+            headline = parsed.get("headline", "Physical State Evaluation")
+            raw_items = parsed.get("items", [])
+            items: list[ConsequenceItem] = []
+
+            for raw_i in raw_items:
+                st_str = str(raw_i.get("status", "match")).lower()
+                status_map = {
+                    "match": ConsequenceStatus.MATCH,
+                    "conflict": ConsequenceStatus.CONFLICT,
+                    "attention": ConsequenceStatus.ATTENTION,
+                    "hazard": ConsequenceStatus.HAZARD,
+                    "unnecessary_active": ConsequenceStatus.UNNECESSARY_ACTIVE,
+                }
+                status = status_map.get(st_str, ConsequenceStatus.MATCH)
+
+                act_str = str(raw_i.get("action_type", "physical_user")).lower()
+                act_type = ActionType.AUTOMATED_SYSTEM if "auto" in act_str else ActionType.PHYSICAL_USER
+
+                items.append(ConsequenceItem(
+                    entity_label=str(raw_i.get("entity_label", "device")),
+                    current_state=str(raw_i.get("current_state", "UNKNOWN")),
+                    desired_state=str(raw_i.get("desired_state", "UNKNOWN")),
+                    status=status,
+                    severity=str(raw_i.get("severity", "info")),
+                    consequence_text=str(raw_i.get("consequence_text", "")),
+                    suggested_action=str(raw_i.get("suggested_action", "")),
+                    action_type=act_type,
+                ))
+
+            if not items:
+                return None
+
+            total = len(items)
+            good = sum(1 for i in items if i.status == ConsequenceStatus.MATCH)
+            partial = sum(0.5 for i in items if i.status == ConsequenceStatus.ATTENTION)
+            readiness = round(min(1.0, (good + partial) / total), 2)
+            is_ready = all(i.status in (ConsequenceStatus.MATCH, ConsequenceStatus.ATTENTION) for i in items)
+
+            user_actions = [i.suggested_action for i in items if i.status in (ConsequenceStatus.CONFLICT, ConsequenceStatus.HAZARD, ConsequenceStatus.UNNECESSARY_ACTIVE) and i.action_type == ActionType.PHYSICAL_USER]
+            mirror_actions = [i.suggested_action for i in items if i.status in (ConsequenceStatus.CONFLICT, ConsequenceStatus.HAZARD, ConsequenceStatus.UNNECESSARY_ACTIVE) and i.action_type == ActionType.AUTOMATED_SYSTEM]
+            spoken = ConsequenceEngine._generate_spoken_summary(headline, is_ready, items)
+
+            return ConsequenceReport(
+                session_id=world.session_id,
+                intention_raw=intention_text,
+                intention_type=IntentionType.CHECK_SPACE,
+                headline=headline,
+                readiness_score=readiness,
+                is_ready=is_ready,
+                items=items,
+                user_actions=user_actions,
+                mirror_actions=mirror_actions,
+                spoken_summary=spoken,
+            )
+        except Exception:
+            return None
 
 
 def verify_consequence_resolution(

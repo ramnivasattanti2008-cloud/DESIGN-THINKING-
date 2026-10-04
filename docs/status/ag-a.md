@@ -50,8 +50,16 @@ Last updated: 2026-10-05
        - Natural, sweet, polite female voice persona ("Aura") with Web Speech API TTS (`pitch: 1.18`, `rate: 0.98`).
        - Hands-free Web Speech API recognition: tap the mic or speak an intention aloud; MIRROR listens, reasons, and speaks back!
        - Dedicated `📡 Remote` dock tab with interactive Universal IR Remote (AC Temp/Power dial, TV Mute/Power, Projector toggle, top IR LED beam pulse animation).
-    8. **Comprehensive Test Suite**:
-       - **297 / 297 tests passing green** across the entire repository with zero failures and zero regressions (`src/core/tests/test_consequence.py`, `src/core/tests/test_world_model.py`, `tests/api/test_consequence_api.py`).
+    8. **Zero-Shot Gemini Consequence Reasoning (`src/core/consequence.py`)**:
+       - Open-ended physical causal intelligence via `gemini-flash-latest` for arbitrary user goals (e.g. baby crib setup, soldering station, 3D printing workshop).
+    9. **Synthesized Web Audio API Chimes (`src/ui/web_preview/index.html`)**:
+       - Pure Web Audio synthesizer tones for speech recognition listening chime (`440Hz -> 880Hz`), IR pulse chirp (`3800Hz / 40ms`), and Apple victory chord (`C5-E5-G5-C6`) on closed-loop verification.
+    10. **Android APK Build & Phone Installer**:
+       - Successfully compiled and packaged `:app:assembleDebug` with Gradle 8.9 and JDK 17 into `dist/mirror.apk` (17.68 MB).
+       - Direct download served on Web Studio (`http://<ip>:8080/mirror.apk`).
+       - Created 1-click auto-detect installer scripts `install_phone.bat` and `install_phone.ps1` for ADB phone deployment.
+    11. **Comprehensive Test Suite**:
+       - **298 / 298 tests passing green** across the entire repository with zero failures and zero regressions (`src/core/tests/test_consequence.py`, `src/core/tests/test_world_model.py`, `tests/api/test_consequence_api.py`).
 
 ## Half done
 - None.
@@ -61,7 +69,7 @@ Last updated: 2026-10-05
 - Ram merge into `main`.
 
 ## Blockers / requests
-- None. All endpoints, core logic, tests, and web UI are fully operational and verified live.
+- None. All endpoints, core logic, tests, Android APK, and web UI are fully operational and verified live.
 
 ## Files touched
 - `src/core/world_model.py`
@@ -72,6 +80,9 @@ Last updated: 2026-10-05
 - `src/mobile/src/main/kotlin/com/mirror/mobile/ir/IrBlasterController.kt`
 - `src/ui/web_preview/index.html`
 - `public/index.html`
+- `dist/mirror.apk`
+- `install_phone.bat`
+- `install_phone.ps1`
 - `src/core/tests/test_world_model.py`
 - `src/core/tests/test_consequence.py`
 - `tests/api/test_consequence_api.py`

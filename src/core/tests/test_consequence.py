@@ -117,3 +117,57 @@ def test_closed_loop_verification():
     verified, unresolved = verify_consequence_resolution(report1, world2)
     assert verified is True
     assert len(unresolved) == 0
+
+
+def test_gemini_zero_shot_consequence_reasoning(monkeypatch):
+    """Test ConsequenceEngine._evaluate_with_gemini correctly parses AI output."""
+    from unittest.mock import MagicMock
+    import json
+
+    world = PhysicalWorldModel(session_id="nursery_test")
+    world.entities = [
+        PhysicalEntity(label="space heater", state="ON", location="next to crib"),
+        PhysicalEntity(label="crib mobile", state="SECURE", location="above crib"),
+    ]
+
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_payload = {
+        "headline": "Nursery Thermal Safety Check",
+        "items": [
+            {
+                "entity_label": "space heater",
+                "current_state": "ON",
+                "desired_state": "OFF",
+                "status": "hazard",
+                "severity": "critical",
+                "consequence_text": "Heater proximity to crib creates infant overheating or burn risk.",
+                "suggested_action": "Turn off and relocate space heater away from crib",
+                "action_type": "physical_user",
+            },
+            {
+                "entity_label": "crib mobile",
+                "current_state": "SECURE",
+                "desired_state": "SECURE",
+                "status": "match",
+                "severity": "info",
+                "consequence_text": "Crib fixture is properly mounted.",
+                "suggested_action": "No action needed",
+                "action_type": "physical_user",
+            }
+        ]
+    }
+    mock_response.json.return_value = {
+        "candidates": [{"content": {"parts": [{"text": json.dumps(mock_payload)}]}}]
+    }
+
+    import httpx
+    monkeypatch.setattr(httpx, "post", lambda *args, **kwargs: mock_response)
+
+    report = ConsequenceEngine._evaluate_with_gemini(world, "Prepare the baby nursery for sleep", "fake_key")
+    assert report is not None
+    assert report.headline == "Nursery Thermal Safety Check"
+    assert report.is_ready is False
+    assert len(report.items) == 2
+    assert report.items[0].status == ConsequenceStatus.HAZARD
+    assert "space heater" in report.user_actions[0]

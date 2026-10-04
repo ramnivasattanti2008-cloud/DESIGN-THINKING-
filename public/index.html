@@ -709,6 +709,22 @@
           <span class="ios-badge badge-pink" id="voice-play-badge">Tap to Hear</span>
         </div>
 
+        <!-- Phone Installation & Direct APK Download Card -->
+        <div class="ios-card" style="padding: 12px; background: linear-gradient(135deg, #F0F9FF, #E0F2FE); border: 1px solid #BAE6FD;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 26px;">📲</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #0369A1;">Install MIRROR on Phone</div>
+                <div style="font-size: 11px; color: #0284C7;">Native Android App • IR Remote • Vision</div>
+              </div>
+            </div>
+            <a href="mirror.apk" download="mirror.apk" style="text-decoration: none;">
+              <span class="ios-badge" style="background: #0284C7; color: #FFFFFF; font-weight: 700; padding: 6px 12px; font-size: 12px; border-radius: 12px; cursor: pointer;">⬇️ Get APK</span>
+            </a>
+          </div>
+        </div>
+
         <!-- Signature Intention Presets -->
         <div class="ios-card" style="padding: 12px;">
           <div style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase; margin-bottom: 8px; padding-left: 4px;">
@@ -1247,8 +1263,84 @@
       speakCuteVoice("Hi Ram! I'm Aura, your physical intelligence assistant. Tell me what you're doing, and I'll keep your space safe and perfect!");
     }
 
+    // Web Audio API Synthesizer Chimes
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playAppleChime(type) {
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+        
+        if (type === 'listen') {
+          // Pleasant rising two-tone chime (440Hz -> 880Hz)
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'victory') {
+          // Apple-style four-note success chord (C5: 523.25, E5: 659.25, G5: 783.99, C6: 1046.5)
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            gain.gain.setValueAtTime(0.001, now + idx * 0.08);
+            gain.gain.linearRampToValueAtTime(0.15, now + idx * 0.08 + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.5);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 0.55);
+          });
+        } else if (type === 'ir_pulse') {
+          // High-frequency infrared chirp (3800Hz / 40ms pulse)
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(3800, now);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.06);
+        } else if (type === 'tap') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(180, now);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        }
+      } catch (e) {
+        console.warn("Audio chime prevented:", e);
+      }
+    }
+
     // Hands-Free Speech Recognition (User Voice Input)
     function toggleSpeechRecognition() {
+      playAppleChime('listen');
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
         alert("Speech recognition not supported in this browser. Please type your intention.");
@@ -1261,6 +1353,7 @@
       const micBadge = document.getElementById("mic-badge");
 
       recognition.onstart = () => {
+        playAppleChime('listen');
         micBadge.innerText = "🔴 Listening...";
         micBadge.className = "ios-badge badge-red";
         document.getElementById("cute-voice-bar").classList.add("listening");
@@ -1316,6 +1409,7 @@
 
     // Hardware IR Blaster Transmission
     async function blastIr(deviceType, command) {
+      playAppleChime('ir_pulse');
       // Fire top IR LED beam pulse animation
       const pulseDot = document.getElementById("ir-pulse-dot");
       pulseDot.classList.remove("firing");
@@ -1606,6 +1700,7 @@
 
       const announcement = "Departure state verified! Everything is safe and closed. You're ready to leave, Ram!";
       updateIsland("🟢 Departure Verified", true);
+      playAppleChime('victory');
       speakCuteVoice(announcement);
 
       logAudit("physical_state_verified", {
