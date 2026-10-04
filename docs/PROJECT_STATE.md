@@ -23,6 +23,8 @@ See `docs/TASKS.md`.
 
 ## What has not been done or measured
 
+- Android unit tests not run, no APK built, nothing run on a phone. See `docs/architecture/VALIDATION.md`.
+
 - No real model provider, no real camera frame ever processed.
 - No Android build, no run on a phone, no latency numbers, no verification accuracy.
 - The uvicorn server was not started; the API was exercised through the test client only.

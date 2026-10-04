@@ -15,7 +15,7 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-007 | README skeleton and report outline | studio-b | todo | `README.md`, `docs/report/` | |
 | T-009 | Architecture docs: scope, modules, safety policy, verification, integration checklist | claude | review | `docs/architecture/` | `claude/architecture` |
 | T-008 | Draft the API contract and database schema once the stack is chosen | claude | review | `src/api/`, `db/`, `contracts/` | `claude/architecture` |
-| T-010 | Android Gradle skeleton (`src/mobile/`), include `:ui` from `src/ui`, camera capture + API client against `contracts/` | claude | todo | `src/mobile/` | |
+| T-010 | Android Gradle skeleton (`src/mobile/`), include `:ui` from `src/ui`, camera capture + API client against `contracts/`. Kotlin compiles; unit tests and APK not yet run | claude | review | `src/mobile/` | |
 | T-011 | Wire `src/ui` screens to the backend: replace mock data with `/v1` calls once T-010 lands | ag-a | todo | `src/ui/` | |
 | T-012 | Policy red-team tests: add adversarial goals to `src/core/tests` style, report gaps in your status file (do not edit `src/core/policy.py`) | ag-b | todo | `tests/policy/` | |
 | T-013 | Labelled before/after scene set for verification (`cannot_tell` cases included), every item marked real or sample | studio-a | todo | `data/`, `research/` | |

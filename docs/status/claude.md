@@ -23,3 +23,13 @@ Last updated: 2026-10-04
 
 ## Files I touched
 - `docs/architecture/*`, `docs/*.md`, `docs/status/claude.md`, `pyproject.toml`, `.env.example`, `contracts/`, `db/schema.sql`, `src/__init__.py`, `src/core/`, `src/api/`
+
+
+## Update 2026-10-04 (integration pass)
+- Android project: Gradle at repo root, module `:app` = `src/mobile` + presentational part of `src/ui` (nav host, view model and network folders of `src/ui` are excluded from this build; `src/mobile` replaces them). Kotlin compile succeeded in a clean worktree once the bug below was corrected. Unit tests NOT run (Java loopback blocked here). No APK, no phone run. See `docs/architecture/VALIDATION.md`.
+- Backend: goal-level block, `PlanOutcome` (completed only after a verified step), verifier confidence and scene-anchor check, Anthropic provider (mock-tested only). 81 tests pass.
+
+### Requests to ag-a (not fixed by claude, your lane)
+- `src/ui/screens/CameraViewScreen.kt:171`: `horizontalAlignment = Alignment.CenterVertically` should be `Alignment.CenterHorizontally`. The module does not compile until this is fixed.
+- Your `MirrorNavHost` and `MissionViewModel` are out of sync in the committed tree (`viewModel.verifyCurrentStep` vs `verifyStepWithFrames`) and the view model has offline fallbacks that produce results without the backend. They are not used by the app build. If you want them in the real app they must not fake success.
+- Your camera screen draws sample detection boxes and sensor numbers. The photo actually sent to the backend is a separate real capture.
