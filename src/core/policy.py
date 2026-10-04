@@ -27,7 +27,7 @@ RULES: list[tuple[str, Tier, re.Pattern]] = [
     ("R-A3-control", Tier.A3, _r(r"turn (on|off) the (stove|oven|heater)|smart[- ]home|control the")),
     ("R-A2-contact", Tier.A2, _r(r"call|text|message|email|send")),
     ("R-A2-settings", Tier.A2, _r(r"settings?|delete|uninstall|factory reset")),
-    ("R-A2-physical", Tier.A2, _r(r"ladder|knife|blade|heavy|lift|stove|oven|boil|hot|ignite|tool")),
+    ("R-A2-physical", Tier.A2, _r(r"ladder|knife|blade|heavy|lift|stove|oven|boil|hot|ignite|tool|solder|soldering")),
 ]
 
 

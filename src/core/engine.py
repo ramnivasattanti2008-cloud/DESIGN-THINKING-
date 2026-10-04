@@ -1,7 +1,8 @@
 """Session engine: world model, planner, verifier.
 
-The planner here is a rule template, not a model. Scope matches docs/architecture/OVERVIEW.md:
-"prepare a space for a task", one step at a time.
+Planning is delegated to a Planner (src/core/planner.py), which is keyword and rule based today,
+not a model. Scope matches docs/architecture/OVERVIEW.md: "prepare a space for a task", one step
+at a time. The engine, not the planner, decides when a mission is complete.
 
 Success rules (never relax these):
 - A step is only ever reported verified by Session.verify(), from evidence in new frames.
@@ -15,14 +16,15 @@ forwarded to it, as labels and structured fields only, never frames. The sink ca
 result: its exceptions are caught, logged and noted in Session.log, and what it receives is a copy.
 """
 import copy
-import itertools
 import logging
+import re
 import uuid
 
 from .log_port import SessionLogSink
 from .model_client import ModelClient
 from .models import (Frame, GateDecision, PlanOutcome, Step, Tier, VerifyResult,
                      VerifyStatus, WorldState)
+from .planner import CLUTTER, HAZARDS, NEEDS, HybridPlanner, Planner, step_is_checkable
 from .policy import gate, gate_goal
 
 logger = logging.getLogger("mirror.session")
@@ -32,9 +34,6 @@ BLUR_MAX = 0.6
 BRIGHTNESS_MIN = 0.2
 MAX_RETRIES = 2
 VERIFIED_CONFIDENCE_MIN = 0.85  # below this a step is never reported verified (heuristic, not calibrated)
-HAZARDS = {"smoke", "fire", "exposed wiring", "spill near socket", "sharp object"}
-CLUTTER = {"cup", "plate", "trash", "wrapper", "bottle"}
-NEEDS = {"study": ["lamp", "notebook"], "work": ["laptop", "lamp"], "cook": ["cutting board"]}
 
 
 def frames_ok(frames: list[Frame]) -> bool:
@@ -56,17 +55,18 @@ def _label_confidence(observations) -> dict[str, float]:
 
 
 class Session:
-    def __init__(self, goal: str, model: ModelClient, sink: SessionLogSink | None = None):
+    def __init__(self, goal: str, model: ModelClient, sink: SessionLogSink | None = None,
+                 planner: Planner | None = None):
         self.id = uuid.uuid4().hex[:12]
         self.goal = goal
         self.model = model
         self._sink = sink
+        self.planner: Planner = planner or HybridPlanner(model)
         self.world = WorldState(session_id=self.id)
         self.current: Step | None = None
         self.retries = 0
         self.verified_steps = 0
         self.log: list[dict] = []
-        self._n = itertools.count(1)
         self.goal_gate = gate_goal(goal)
         self._before_labels: set[str] = set()
         self.log.append({"event": "goal", "tier": self.goal_gate.tier.value,
@@ -107,8 +107,9 @@ class Session:
 
     @property
     def interpreted_intent(self) -> str:
+        goal = self.goal.lower()
         for key in NEEDS:
-            if key in self.goal.lower():
+            if re.search(rf"\b{re.escape(key)}\b", goal):
                 return f"prepare the space to {key}"
         return "tidy the space"
 
@@ -146,12 +147,22 @@ class Session:
             self._record("plan", payload={"outcome": PlanOutcome.needs_observation.value})
             return None, None, PlanOutcome.needs_observation
         labels = {o.label for o in self.world.observations}
-        step = self._next_step(labels)
+        step, _planner_outcome = self.planner.plan(
+            self.goal, self.world.observations, self.world.hazards, self.verified_steps)
         if step is None:
             self.current = None
+            # The engine, not the planner, decides when a mission is complete.
             outcome = PlanOutcome.completed if self.verified_steps >= 1 else PlanOutcome.no_action_needed
             self._record("plan", payload={"outcome": outcome.value})
             return None, None, outcome
+        if not step_is_checkable(step):
+            # A step a photo can never confirm is not shown: it could not be verified, or would
+            # "verify" without checking anything. Ask the person instead.
+            self.current = None
+            self._record("plan", payload={"outcome": PlanOutcome.needs_human.value,
+                                          "reason": "step has no checkable evidence",
+                                          "instruction": step.instruction[:300]})
+            return None, None, PlanOutcome.needs_human
         decision = gate(step, self.goal)
         # A step the policy blocks is shown as a refusal and is never held as the current step,
         # so a client cannot verify it and walk on to "completed".
@@ -165,25 +176,6 @@ class Session:
                      payload={"instruction": step.instruction,
                               "expected_evidence": step.expected_evidence})
         return step, decision, PlanOutcome.step
-
-    def _next_step(self, labels: set[str]) -> Step | None:
-        sid = f"s{next(self._n)}"
-        if self.world.hazards:  # hazard first, whatever the goal
-            h = self.world.hazards[0]
-            return Step(id=sid, instruction=f"Stop. Make the area safe or leave: {h} seen.",
-                        tier=Tier.A0, tier_reason="hazard first",
-                        expected_evidence=[f"no {h} visible"])
-        for item in sorted(labels & CLUTTER):
-            return Step(id=sid, instruction=f"Move the {item} off the surface.", tier=Tier.A1,
-                        tier_reason="reversible tidy", expected_evidence=[f"no {item} visible"])
-        for key, needed in NEEDS.items():
-            if key in self.goal.lower():
-                for item in needed:
-                    if item not in labels:
-                        return Step(id=sid, instruction=f"Put a {item} on the surface.", tier=Tier.A1,
-                                    tier_reason="reversible placement",
-                                    expected_evidence=[f"{item} visible"])
-        return None
 
     def verify(self, after: list[Frame]) -> VerifyResult:
         step = self.current
@@ -208,6 +200,9 @@ class Session:
         for ev in step.expected_evidence:
             absent = ev.startswith("no ") and ev.endswith(" visible")
             label = ev[len("no "):-len(" visible")] if absent else ev[:-len(" visible")]
+            if not label.strip():  # defensive: an evidence string with no object can never be checked
+                missing.append(ev)
+                continue
             c = conf.get(label, 0.0)
             if 0 < c < SEEN:
                 unsure.append(ev)  # glimpsed but not confident: never a pass
@@ -238,6 +233,10 @@ class Session:
         else:
             status = VerifyStatus.verified
             reason = "All expected evidence seen in the new frames."
+        if status == VerifyStatus.verified and not step.expected_evidence:
+            # Defensive: plan() never lets such a step through, but nothing is verified by checking nothing.
+            status = VerifyStatus.cannot_tell
+            reason = "This step has no evidence that a photo can check."
         if status == VerifyStatus.verified and confidence < VERIFIED_CONFIDENCE_MIN:
             # The evidence looks right, but the view is not clear or sure enough to call it verified.
             status = VerifyStatus.cannot_tell
