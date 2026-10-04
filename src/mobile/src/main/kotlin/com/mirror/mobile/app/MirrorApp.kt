@@ -32,13 +32,14 @@ import com.mirror.ui.theme.MirrorTheme
 import kotlinx.coroutines.launch
 
 /**
- * Real app host. Replaces the demo MirrorNavHost (which uses sample data) with screens driven by
- * [MissionController], so every plan and every verification result comes from the backend.
+ * Real app host. Replaces the UI seat's nav host and view model (not compiled into this module, see
+ * build.gradle.kts) with the UI seat's screens driven by [MissionController], so every plan and every
+ * verification result comes from the backend.
  */
 @Composable
 fun MirrorApp(controller: MissionController) {
     val app by controller.app.collectAsState()
-    val ui by controller.vm.uiState.collectAsState()
+    val ui by controller.data.collectAsState()
     val scope = rememberCoroutineScope()
     val goal = ui.goalText
 
@@ -82,7 +83,7 @@ fun MirrorApp(controller: MissionController) {
                     )
 
                     AppScreen.VERIFICATION -> {
-                        val result = ui.latestVerificationResult
+                        val result = ui.latestVerification
                         if (result == null) {
                             CircularProgressIndicator(Modifier.align(Alignment.Center))
                         } else {
@@ -105,7 +106,7 @@ fun MirrorApp(controller: MissionController) {
                 app.notice?.let { NoticeBanner(it, Modifier.align(Alignment.TopCenter)) }
                 if (app.busy) CircularProgressIndicator(Modifier.align(Alignment.Center))
 
-                ui.activeSafetyAlert?.let { alert ->
+                ui.activeAlert?.let { alert ->
                     SafetyAlertModal(
                         alert = alert,
                         onAbortMission = controller::abort,

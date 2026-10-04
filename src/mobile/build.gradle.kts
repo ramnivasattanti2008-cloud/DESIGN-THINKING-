@@ -63,3 +63,10 @@ dependencies {
     testImplementation("org.json:json:20240303")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 }
+
+// Only the presentational part of src/ui (model, screens, components, theme) is compiled here.
+// The nav host, view model and network client under src/ui are replaced by src/mobile/integration
+// and src/mobile/api, so the real app never runs the UI seat's sample-data or offline-fallback flow.
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    exclude("navigation/**", "network/**", "viewmodel/**")
+}

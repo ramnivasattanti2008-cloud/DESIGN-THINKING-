@@ -6,7 +6,9 @@ import com.mirror.mobile.api.CaptureException
 import com.mirror.mobile.api.FrameSource
 import com.mirror.mobile.api.PlanReply
 import com.mirror.mobile.api.WorldInfo
-import com.mirror.ui.viewmodel.MissionViewModel
+import com.mirror.ui.model.PlanStep
+import com.mirror.ui.model.SafetyAlert
+import com.mirror.ui.model.VerificationResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,30 +26,44 @@ data class AppState(
     val verifiedSteps: Int = 0
 )
 
+/** What the screens render. All of it comes from backend replies; none of it is sample data. */
+data class MissionData(
+    val goalText: String = "",
+    val planSteps: List<PlanStep> = emptyList(),
+    val activeStepIndex: Int = 0,
+    val latestVerification: VerificationResult? = null,
+    val activeAlert: SafetyAlert? = null
+)
+
 /**
  * Drives the loop: goal -> observe -> plan -> (user acts) -> verify -> next plan.
- * UI state for plans and verification lives in the UI seat's [MissionViewModel]; this class decides
- * which screen is next. The COMPLETED screen is reachable only from a backend `completed` plan
- * outcome, which the backend gives only after at least one verified step.
+ * The COMPLETED screen is reachable only from a backend `completed` plan outcome, which the
+ * backend gives only after at least one verified step and a fresh scan with nothing left to do.
  */
 class MissionController(
     private val backend: Backend,
-    private val frames: FrameSource,
-    val vm: MissionViewModel = MissionViewModel()
+    private val frames: FrameSource
 ) {
     private val _app = MutableStateFlow(AppState())
     val app: StateFlow<AppState> = _app.asStateFlow()
 
+    private val _data = MutableStateFlow(MissionData())
+    val data: StateFlow<MissionData> = _data.asStateFlow()
+
     private var sessionId: String? = null
-    private var intent: String = ""
     private var frameCounter = 0
+    private var alertCounter = 0
+    private var stepCounter = 0
 
     suspend fun startGoal(goal: String) = guarded {
-        vm.submitGoal(goal)
-        vm.uiState.value.errorMessage?.let { notice(it); return@guarded }
+        if (goal.isBlank()) {
+            notice("Please enter a goal first.")
+            return@guarded
+        }
+        _data.value = MissionData(goalText = goal.trim())
+        stepCounter = 0
         val s = backend.createSession(goal.trim())
         sessionId = s.sessionId
-        intent = s.interpretedIntent
         if (s.blocked) {
             refuse(s.message ?: REFUSAL, AppScreen.HOME)
             return@guarded
@@ -64,25 +80,21 @@ class MissionController(
             showHazard(world)
             return@guarded
         }
-        applyPlan(backend.plan(sid), world, frame.id, firstStep = true)
+        applyPlan(backend.plan(sid), firstStep = true)
     }
 
     fun retakeScan() = _app.update { it.copy(screen = AppScreen.CAMERA, notice = null) }
 
     fun proceedToPlan() = _app.update { it.copy(screen = AppScreen.PLAN, notice = null) }
 
-    fun beginStep() {
-        vm.confirmPlanAndStart()
-        _app.update { it.copy(screen = AppScreen.EXECUTING, notice = null, stepVerified = false) }
-    }
+    fun beginStep() = _app.update { it.copy(screen = AppScreen.EXECUTING, notice = null, stepVerified = false) }
 
     /** "I did it": take a fresh frame and ask the backend whether the step really worked. */
     suspend fun verifyStep() = guarded {
         val sid = requireSession()
-        vm.requestStepVerification()
         val frame = frames.capture("verify-${++frameCounter}")
         val reply = backend.verify(sid, listOf(frame))
-        vm.handleBackendVerification(BackendAdapter.verification(reply))
+        _data.update { it.copy(latestVerification = BackendAdapter.verificationResult(reply)) }
         val ok = BackendAdapter.isStepVerified(reply)
         _app.update {
             it.copy(
@@ -100,26 +112,28 @@ class MissionController(
             return@guarded
         }
         _app.update { it.copy(verifiedSteps = it.verifiedSteps + 1, stepVerified = false) }
-        applyPlan(backend.plan(requireSession()), null, null, firstStep = false)
+        _data.update { it.copy(latestVerification = null) }
+        applyPlan(backend.plan(requireSession()), firstStep = false)
     }
 
     fun retakeVerification() =
         _app.update { it.copy(screen = AppScreen.EXECUTING, notice = null, stepVerified = false) }
 
+    /** Closes the alert only. The hazard or refusal is re-checked on the next scan, never skipped. */
     fun dismissAlert() {
-        vm.dismissHazardOverride() // closes the modal only; the hazard is re-checked on the next scan
+        _data.update { it.copy(activeAlert = null) }
         _app.update { it.copy(notice = null) }
     }
 
     fun abort() {
-        vm.abortMission()
         sessionId = null
+        _data.value = MissionData()
         _app.value = AppState()
     }
 
     // ---- internals ----
 
-    private suspend fun applyPlan(reply: PlanReply, world: WorldInfo?, frameId: String?, firstStep: Boolean) {
+    private fun applyPlan(reply: PlanReply, firstStep: Boolean) {
         when (reply.outcome) {
             "step" -> {
                 val step = reply.step
@@ -127,24 +141,22 @@ class MissionController(
                     refuse(reply.message ?: REFUSAL, _app.value.screen)
                     return
                 }
-                if (world != null && frameId != null) {
-                    vm.handleBackendPerception(BackendAdapter.perception(frameId, world, intent))
+                _data.update {
+                    it.copy(
+                        planSteps = listOf(BackendAdapter.planStep(++stepCounter, step, reply.gate)),
+                        activeStepIndex = 0,
+                        latestVerification = null
+                    )
                 }
-                vm.handleBackendPlan(BackendAdapter.plan(requireSession(), intent, step, reply.gate))
                 _app.update {
                     it.copy(screen = if (firstStep) AppScreen.SUMMARY else AppScreen.PLAN, notice = null, stepVerified = false)
                 }
             }
-            "completed" -> {
-                vm.advanceToNextStep() // single-step plans: this is the whole mission, and the backend confirmed it
-                _app.update { it.copy(screen = AppScreen.COMPLETED, notice = null) }
-            }
+            "completed" -> _app.update { it.copy(screen = AppScreen.COMPLETED, notice = null) }
             "no_action_needed" -> {
-                vm.abortMission()
-                _app.update {
-                    AppState(notice = "Nothing needed changing, so nothing was verified. No result to report.")
-                }
                 sessionId = null
+                _data.value = MissionData()
+                _app.value = AppState(notice = "Nothing needed changing, so nothing was verified. No result to report.")
             }
             "needs_observation" ->
                 _app.update { it.copy(screen = AppScreen.CAMERA, notice = reply.message ?: "No clear view yet. Scan again.") }
@@ -157,20 +169,12 @@ class MissionController(
     }
 
     private fun refuse(message: String, screen: AppScreen) {
-        vm.handleBackendPerception(
-            BackendAdapter.hazard("POLICY", message, "Ask a qualified professional or emergency services.")
-        )
+        _data.update { it.copy(activeAlert = BackendAdapter.refusal("refusal-${++alertCounter}", message)) }
         _app.update { it.copy(screen = screen, notice = null, stepVerified = false) }
     }
 
     private fun showHazard(world: WorldInfo) {
-        vm.handleBackendPerception(
-            BackendAdapter.hazard(
-                "HAZARD",
-                "A hazard is visible: ${world.hazards.joinToString(", ")}.",
-                "Make the area safe or leave it, then scan again."
-            )
-        )
+        _data.update { it.copy(activeAlert = BackendAdapter.hazard("hazard-${++alertCounter}", world.hazards)) }
         _app.update { it.copy(screen = AppScreen.CAMERA, notice = null) }
     }
 

@@ -3,99 +3,89 @@ package com.mirror.mobile.integration
 import com.mirror.mobile.api.BackendGate
 import com.mirror.mobile.api.BackendStep
 import com.mirror.mobile.api.VerifyReply
-import com.mirror.mobile.api.WorldInfo
-import com.mirror.ui.network.BackendPerceptionResponse
-import com.mirror.ui.network.BackendPlanResponse
-import com.mirror.ui.network.BackendVerificationResponse
-import com.mirror.ui.network.BoundingBoxDto
-import com.mirror.ui.network.DetectedObjectDto
-import com.mirror.ui.network.HazardDto
-import com.mirror.ui.network.PlanStepDto
+import com.mirror.ui.model.AlertSeverity
+import com.mirror.ui.model.EvidenceType
+import com.mirror.ui.model.HazardType
+import com.mirror.ui.model.PlanStep
+import com.mirror.ui.model.SafetyAlert
+import com.mirror.ui.model.VerificationResult
 
 /**
- * Maps backend replies onto the UI seat's DTOs (src/ui/network). The one rule that matters:
- * a step is verified only when the backend says `verified` AND confidence clears the bar.
- * Unknown statuses count as NOT verified.
+ * Maps backend replies onto the UI seat's presentational models (src/ui/model), which the
+ * screens render. The one rule that matters: a step is verified only when the backend says
+ * `verified` AND confidence clears the bar. Unknown statuses count as NOT verified.
  */
 object BackendAdapter {
 
-    /** Same bar the UI view model applies (MissionViewModel.handleBackendVerification). */
+    /** Minimum confidence for a step to count as verified. A heuristic bar, not a calibrated one. */
     const val CONFIDENCE_BAR = 0.85f
 
     fun isStepVerified(r: VerifyReply): Boolean = r.status == "verified" && r.confidence >= CONFIDENCE_BAR
 
-    fun verification(r: VerifyReply): BackendVerificationResponse {
-        val outcome = when (r.status) {
-            "verified" -> if (r.confidence >= CONFIDENCE_BAR) "COMPLETED" else "UNCERTAIN_REVIEW"
-            "not_verified" -> "FAILED"
-            else -> "UNCERTAIN_REVIEW" // cannot_tell and anything unknown
-        }
+    fun verificationResult(r: VerifyReply): VerificationResult {
         val uncertainty = buildList {
             addAll(r.evidenceMissing)
             if (r.framePoor) add("Photo too blurry or dark")
             if (r.status == "verified" && r.confidence < CONFIDENCE_BAR) add("Confidence below the required level")
+            if (r.status !in KNOWN_STATUSES) add("Unrecognised server status")
         }
-        return BackendVerificationResponse(
+        return VerificationResult(
             isVerified = isStepVerified(r),
             confidenceScore = r.confidence,
-            verificationOutcome = outcome,
-            visualDiffScore = 0f, // the backend does not compute one; do not invent it
-            detectedPhysicalChanges = r.evidenceSeen,
-            uncertaintyFactors = uncertainty,
-            reasoningExplanation = r.reason,
-            isFalseSuccessIntercepted = r.status == "verified" && r.confidence < CONFIDENCE_BAR
+            evidenceType = EvidenceType.VISUAL_CAMERA_DIFF,
+            reasoning = r.reason,
+            detectedChanges = r.evidenceSeen,
+            uncertaintyFactors = uncertainty
         )
     }
 
-    fun plan(sessionId: String, intent: String, step: BackendStep, gate: BackendGate?): BackendPlanResponse {
+    fun planStep(stepNumber: Int, step: BackendStep, gate: BackendGate?): PlanStep {
         val warnings = buildList {
             if (gate?.decision == "confirm") add("This step needs your explicit OK before you start.")
             if (step.tier == "A0") add("Safety first: no other action until this is resolved.")
         }
-        return BackendPlanResponse(
-            missionId = sessionId,
-            interpretedIntent = intent,
-            steps = listOf(
-                PlanStepDto(
-                    stepIndex = 0,
-                    title = step.instruction.removeSuffix("."),
-                    instruction = step.instruction,
-                    targetObjectName = targetOf(step),
-                    toolRequired = null,
-                    safetyWarnings = warnings,
-                    expectedVerificationCriterion = step.expectedEvidence.joinToString("; ")
-                )
-            ),
-            detectedPrerequisites = emptyList(),
-            missingPrerequisites = emptyList(),
-            preliminarySafetyNotes = warnings
+        return PlanStep(
+            stepNumber = stepNumber,
+            title = step.instruction.removeSuffix("."),
+            physicalInstruction = step.instruction,
+            targetObject = targetOf(step),
+            toolNeeded = null,
+            safetyWarnings = warnings,
+            verificationCriterion = step.expectedEvidence.joinToString("; ")
         )
     }
 
-    /** The backend does not return boxes, lux or stability, so none are reported. */
-    fun perception(frameId: String, world: WorldInfo, intent: String): BackendPerceptionResponse =
-        BackendPerceptionResponse(
-            frameId = frameId,
-            timestampMs = System.currentTimeMillis(),
-            ambientLux = 0f,
-            motionStability = 0f,
-            detectedObjects = world.labels.map { DetectedObjectDto(it, 0f, BoundingBoxDto(0f, 0f, 0f, 0f)) },
-            detectedHazards = emptyList(),
-            roomClassification = intent
-        )
+    /** Refusal for a goal or step blocked by policy. No override is offered. */
+    fun refusal(id: String, message: String): SafetyAlert = SafetyAlert(
+        id = id,
+        severity = AlertSeverity.CRITICAL,
+        hazardType = HazardType.PHYSICAL_OBSTACLE,
+        title = "MIRROR will not guide this",
+        description = message,
+        recommendedAction = "Ask a qualified professional or emergency services.",
+        overrideAllowed = false
+    )
 
-    /** Used for refusals (goal or step blocked by policy) and for hazards seen in the scene. */
-    fun hazard(type: String, description: String, safeAction: String): BackendPerceptionResponse =
-        BackendPerceptionResponse(
-            frameId = "blocked",
-            timestampMs = System.currentTimeMillis(),
-            ambientLux = 0f,
-            motionStability = 0f,
-            detectedObjects = emptyList(),
-            detectedHazards = listOf(HazardDto(type, "CRITICAL", description, safeAction, overridePermitted = false)),
-            roomClassification = ""
-        )
+    /** A hazard seen in the scene. The flow stops until the area is made safe and scanned again. */
+    fun hazard(id: String, hazards: List<String>): SafetyAlert = SafetyAlert(
+        id = id,
+        severity = AlertSeverity.CRITICAL,
+        hazardType = hazardType(hazards.firstOrNull().orEmpty()),
+        title = "Hazard detected",
+        description = "A hazard is visible: ${hazards.joinToString(", ")}.",
+        recommendedAction = "Make the area safe or leave it, then scan again.",
+        overrideAllowed = false
+    )
+
+    private fun hazardType(label: String): HazardType = when {
+        label.contains("smoke") || label.contains("fire") -> HazardType.HIGH_TEMPERATURE
+        label.contains("wiring") || label.contains("socket") -> HazardType.ELECTRICAL
+        label.contains("sharp") -> HazardType.SHARP_SURFACE
+        else -> HazardType.PHYSICAL_OBSTACLE
+    }
 
     private fun targetOf(step: BackendStep): String =
         step.expectedEvidence.firstOrNull()?.removePrefix("no ")?.removeSuffix(" visible") ?: "the area"
+
+    private val KNOWN_STATUSES = setOf("verified", "not_verified", "cannot_tell")
 }

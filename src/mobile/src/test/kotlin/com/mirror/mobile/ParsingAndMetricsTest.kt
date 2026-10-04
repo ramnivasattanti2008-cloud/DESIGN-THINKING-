@@ -67,9 +67,10 @@ class ParsingAndMetricsTest {
 
     @Test
     fun adapterFlagsInterceptedFalseSuccess() {
-        val low = BackendAdapter.verification(reply("verified", 0.6f))
-        assertFalse(low.isVerified); assertTrue(low.isFalseSuccessIntercepted)
-        assertEquals("UNCERTAIN_REVIEW", low.verificationOutcome)
+        val low = BackendAdapter.verificationResult(reply("verified", 0.6f))
+        assertFalse(low.isVerified)
+        assertTrue(low.uncertaintyFactors.contains("Confidence below the required level"))
+        assertTrue(BackendAdapter.verificationResult(reply("surprise", 1f)).uncertaintyFactors.contains("Unrecognised server status"))
     }
 
     @Test

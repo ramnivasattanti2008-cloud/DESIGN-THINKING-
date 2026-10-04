@@ -13,7 +13,6 @@ import com.mirror.mobile.api.VerifyReply
 import com.mirror.mobile.api.WorldInfo
 import com.mirror.mobile.integration.AppScreen
 import com.mirror.mobile.integration.MissionController
-import com.mirror.ui.model.MissionState
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -100,7 +99,7 @@ class MissionControllerTest {
         val c = controller(b)
         c.startGoal("tidy"); c.captureScene(); c.proceedToPlan(); c.beginStep(); c.verifyStep()
         assertFalse(c.app.value.stepVerified)
-        assertEquals(MissionState.UNCERTAIN_REVIEW, c.vm.uiState.value.missionState)
+        assertTrue(c.data.value.latestVerification!!.isVerified.not())
     }
 
     @Test
@@ -110,7 +109,7 @@ class MissionControllerTest {
             val c = controller(b)
             c.startGoal("tidy"); c.captureScene(); c.proceedToPlan(); c.beginStep(); c.verifyStep()
             assertFalse(status, c.app.value.stepVerified)
-            assertTrue(status, c.vm.uiState.value.latestVerificationResult?.isVerified == false)
+            assertTrue(status, c.data.value.latestVerification?.isVerified == false)
         }
     }
 
@@ -119,9 +118,8 @@ class MissionControllerTest {
         val c = controller(ScriptedBackend(blocked = true))
         c.startGoal("inspect the wall outlet for loose wire")
         assertEquals(AppScreen.HOME, c.app.value.screen)
-        assertEquals(MissionState.HAZARD_BLOCKED, c.vm.uiState.value.missionState)
-        assertNotNull(c.vm.uiState.value.activeSafetyAlert)
-        assertFalse(c.vm.uiState.value.activeSafetyAlert!!.overrideAllowed)
+        assertNotNull(c.data.value.activeAlert)
+        assertFalse(c.data.value.activeAlert!!.overrideAllowed)
     }
 
     @Test
@@ -130,8 +128,8 @@ class MissionControllerTest {
         val c = controller(b) // plans queue empty: calling plan would throw
         c.startGoal("tidy"); c.captureScene()
         assertEquals(AppScreen.CAMERA, c.app.value.screen)
-        assertNotNull(c.vm.uiState.value.activeSafetyAlert)
-        assertTrue(c.vm.uiState.value.planSteps.isEmpty())
+        assertNotNull(c.data.value.activeAlert)
+        assertTrue(c.data.value.planSteps.isEmpty())
     }
 
     @Test
@@ -159,7 +157,7 @@ class MissionControllerTest {
         val c = controller(b)
         c.startGoal("tidy"); c.captureScene()
         assertNotEquals(AppScreen.COMPLETED, c.app.value.screen)
-        assertTrue(c.vm.uiState.value.planSteps.isEmpty())
+        assertTrue(c.data.value.planSteps.isEmpty())
     }
 
     @Test
@@ -182,7 +180,7 @@ class MissionControllerTest {
         val c = controller(ScriptedBackend())
         c.verifyStep()
         assertNotNull(c.app.value.notice)
-        assertNull(c.vm.uiState.value.latestVerificationResult)
+        assertNull(c.data.value.latestVerification)
     }
 
     @Test
