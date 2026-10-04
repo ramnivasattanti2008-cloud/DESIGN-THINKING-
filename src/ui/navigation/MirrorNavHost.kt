@@ -39,7 +39,7 @@ fun MirrorNavHost(
                         viewModel.submitGoal(goal)
                     },
                     onOpenRecentMission = {
-                        viewModel.submitGoal("Inspect desk wiring and bundle loose cables safely")
+                        viewModel.submitGoal("Prepare space to study")
                     }
                 )
             }
@@ -64,7 +64,10 @@ fun MirrorNavHost(
                     onRetakeScan = {
                         viewModel.retakeVerification()
                     },
-                    onBackClick = { viewModel.resetToHome() }
+                    onBackClick = { viewModel.resetToHome() },
+                    detectedItems = uiState.detectedTools,
+                    missingItems = uiState.missingPrerequisites,
+                    interpretedIntent = uiState.interpretedIntent
                 )
             }
 
@@ -138,7 +141,7 @@ fun MirrorNavHost(
                 } else {
                     HomeScreen(
                         onStartGoal = { viewModel.submitGoal(it) },
-                        onOpenRecentMission = { viewModel.submitGoal("Inspect desk wiring") }
+                        onOpenRecentMission = { viewModel.submitGoal("Prepare space to study") }
                     )
                 }
             }

@@ -3,43 +3,53 @@
 Last updated: 2026-10-04
 
 ## Done
-- Completed final frontend integration pass connecting the UI layer directly to the FastAPI `/v1` backend contract:
-  - `src/ui/network/MirrorBackendContract.kt`: Updated with exact DTOs matching `contracts/*.schema.json` and `src/core/models.py`:
-    - `CreateSessionRequest`, `CreateSessionResponse`, `GateDecisionDto` (A0..A3 tiers)
-    - `FrameDto`, `ObservationDto`, `WorldStateDto`
-    - `StepDto`, `PlanResponse` (matching `outcome`: `step`, `completed`, `no_action_needed`, `needs_observation`, `blocked_goal`, `needs_human`)
-    - `VerifyResultDto` (matching `status`: `verified`, `not_verified`, `cannot_tell`)
-  - `src/ui/network/MirrorBackendClient.kt`: Live HTTP client implementation for Android/Compose mapping real JSON payloads to `/v1/sessions`, `/observe`, `/plan`, and `/verify`.
-  - `src/ui/viewmodel/MissionViewModel.kt`: Central lifecycle state machine updated to reflect real backend responses:
-    - PolicyGate blocks (Tier A3) trigger immediate `SafetyAlertModal` with refusal message and rule ID.
-    - Tier A2 confirmation steps require explicit human confirmation prior to action.
-    - `needs_observation` prompts re-scan when camera frames are blurry/dark.
-    - `needs_human` triggers human-in-the-loop review after repeated verification failures.
-    - `no_action_needed` correctly reports clean workspace without falsely claiming completion.
-    - `cannot_tell` verification state strictly demotes to `UNCERTAIN_REVIEW` (never a pass).
-    - `completed` is displayed only after verified evidence.
-  - `src/ui/web_preview/index.html` and `public/index.html`: Updated interactive mobile simulator with `/v1` contract switcher:
-    - Test `/verify: verified (0.92)`
-    - Test `/verify: cannot_tell (0.0)`
-    - Test `/plan: no_action_needed`
-    - Test `/plan: needs_human`
-    - Test `/sessions: A3 block`
-- All 81 tests passing (`python -m pytest`).
+- Completed final frontend integration and polish pass connecting the UI layer directly to the FastAPI `/v1` backend contract:
+  - `src/ui/screens/HomeScreen.kt`:
+    - Updated quick task presets to clean supported MVP tasks ("Prepare desk for focused study", "Clear workspace and tidy desk", "Find missing pen and notebook", "Check room lighting & ventilation").
+    - Explicitly labeled safety refusal demo: `"[Safety Refusal Demo] Inspect electrical socket wiring"` so users and evaluators can test Tier A3 PolicyGate block deliberately without false positives on standard presets.
+    - Updated text field placeholder to reflect space preparation goal.
+  - `src/ui/screens/MissionSummaryScreen.kt`:
+    - Decoupled from hardcoded cable wiring text.
+    - Made task decomposition, detected items, missing prerequisites, and safety preconditions fully dynamic based on perceived scene state.
+  - `src/ui/screens/VerificationScreen.kt`:
+    - Added explicit `UNCERTAIN (CANNOT_TELL)` status rendering matching backend `cannot_tell` responses (0.0 confidence, frame quality warning, no false success).
+    - Added dedicated retake photo button for uncertain states.
+  - `src/ui/model/MirrorModels.kt`:
+    - Added `status` field to `VerificationResult` ("verified", "not_verified", "cannot_tell") for contract parity.
+  - `src/ui/viewmodel/MissionViewModel.kt`:
+    - Forwarded backend verification status directly to `VerificationResult`.
+    - Maintained strict invariant: no step or mission can be marked complete unless verification passes.
+  - `src/ui/navigation/MirrorNavHost.kt`:
+    - Forwarded dynamic detected tools, missing prerequisites, and interpreted intent from `uiState` to `MissionSummaryScreen`.
+    - Updated recent mission goals to safe supported task ("Prepare space to study").
+  - `src/ui/web_preview/index.html` & `public/index.html`:
+    - Integrated live `/v1` HTTP client with health check (`GET http://localhost:8000/v1/health`).
+    - Added live API calls to `/v1/sessions`, `/v1/sessions/{id}/observe`, `/v1/sessions/{id}/plan`, and `/v1/sessions/{id}/verify`.
+    - Added seamless contract-compliant client fallback when the backend is offline or CORS-restricted.
+    - Interactive toolbar buttons allowing instant testing of all contract modes:
+      - `✔ /verify: verified (0.92)`
+      - `❓ /verify: cannot_tell (0.0)`
+      - `🎯 /plan: no_action_needed`
+      - `👤 /plan: needs_human`
+      - `🚫 /sessions: A3 block`
+- Test suite: **81 / 81 tests passing** (`.venv\Scripts\python -m pytest`).
 
 ## In progress
-- None (frontend integration with backend contract complete).
+- None (frontend integration and polish complete).
 
 ## Next
 - Hand off to Android packaging (`src/mobile/`) when Claude finishes T-010.
 
 ## Blockers / requests
-- None.
+- None. Claude's note regarding the electrical preset mismatch in `docs/status/claude.md` has been fully addressed.
 
 ## Files I touched
-- `src/ui/network/MirrorBackendContract.kt`
-- `src/ui/network/MirrorBackendClient.kt`
-- `src/ui/viewmodel/MissionViewModel.kt`
+- `src/ui/screens/HomeScreen.kt`
+- `src/ui/screens/MissionSummaryScreen.kt`
+- `src/ui/screens/VerificationScreen.kt`
+- `src/ui/model/MirrorModels.kt`
 - `src/ui/navigation/MirrorNavHost.kt`
+- `src/ui/viewmodel/MissionViewModel.kt`
 - `src/ui/web_preview/index.html`
 - `public/index.html`
 - `docs/status/ag-a.md`

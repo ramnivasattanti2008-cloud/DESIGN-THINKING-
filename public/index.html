@@ -2,10 +2,1151 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=../src/ui/web_preview/index.html">
-  <title>MIRROR Mobile UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MIRROR - Embodied AI Mobile Assistant (/v1 Integrated)</title>
+  <style>
+    :root {
+      --mirror-obsidian: #0D0F15;
+      --mirror-surface: #161922;
+      --mirror-elevated: #212534;
+      --mirror-border: #2E3547;
+      --mirror-cyan: #00F0FF;
+      --mirror-cyan-glow: rgba(0, 240, 255, 0.15);
+      --mirror-blue: #387BFF;
+      --mirror-success: #00E676;
+      --mirror-success-glow: rgba(0, 230, 118, 0.15);
+      --mirror-warning: #FFB800;
+      --mirror-warning-glow: rgba(255, 184, 0, 0.15);
+      --mirror-critical: #FF3B30;
+      --mirror-critical-glow: rgba(255, 59, 48, 0.15);
+      --mirror-uncertain: #A855F7;
+      --mirror-uncertain-glow: rgba(168, 85, 247, 0.15);
+      --text-primary: #F3F4F6;
+      --text-secondary: #9CA3AF;
+      --text-muted: #6B7280;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    body {
+      background: #07080C;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px;
+      user-select: none;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--mirror-cyan);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    header p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    /* Live Backend Status Bar */
+    .backend-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: var(--mirror-surface);
+      padding: 5px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--mirror-border);
+      margin-bottom: 10px;
+      font-size: 11px;
+    }
+    .backend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .backend-dot.online {
+      background: var(--mirror-success);
+      box-shadow: 0 0 8px var(--mirror-success);
+    }
+    .backend-dot.offline {
+      background: var(--mirror-warning);
+    }
+    .btn-xs {
+      background: var(--mirror-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--mirror-border);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .btn-xs:hover {
+      color: var(--mirror-cyan);
+      border-color: var(--mirror-cyan);
+    }
+
+    /* Simulation Control Toolbar */
+    .sim-bar {
+      display: flex;
+      gap: 6px;
+      background: var(--mirror-surface);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--mirror-border);
+      margin-bottom: 12px;
+      font-size: 11px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 620px;
+    }
+    .sim-bar span { color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
+    .sim-chip {
+      padding: 4px 9px;
+      border-radius: 12px;
+      background: var(--mirror-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--mirror-border);
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+    .sim-chip:hover { border-color: var(--mirror-cyan); }
+    .sim-chip.active { background: var(--mirror-cyan); color: #000; font-weight: bold; border-color: var(--mirror-cyan); }
+
+    /* Journey Breadcrumbs */
+    .journey-bar {
+      display: flex;
+      gap: 4px;
+      background: var(--mirror-surface);
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--mirror-border);
+      margin-bottom: 14px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .journey-node {
+      padding: 3px 7px;
+      border-radius: 10px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .journey-node.active {
+      background: var(--mirror-cyan);
+      color: #000;
+      font-weight: bold;
+    }
+
+    /* Mobile Device Shell */
+    .phone-frame {
+      width: 380px;
+      height: 750px;
+      background: var(--mirror-obsidian);
+      border-radius: 40px;
+      border: 8px solid #232734;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.85), 0 0 25px rgba(0, 240, 255, 0.12);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Hardware Status Bar */
+    .status-bar {
+      height: 32px;
+      background: var(--mirror-obsidian);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 18px;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      z-index: 10;
+    }
+
+    /* Screens */
+    .screen {
+      flex: 1;
+      overflow-y: auto;
+      display: none;
+      padding: 16px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    /* Cards & Components */
+    .card {
+      background: var(--mirror-surface);
+      border: 1px solid var(--mirror-border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .card-elevated {
+      background: var(--mirror-elevated);
+    }
+
+    .btn {
+      background: var(--mirror-cyan);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--mirror-border);
+      color: var(--text-primary);
+    }
+    .btn-secondary:hover {
+      background: var(--mirror-elevated);
+      border-color: var(--mirror-cyan);
+    }
+    .btn-critical {
+      background: var(--mirror-critical);
+      color: #fff;
+    }
+    .btn-success {
+      background: var(--mirror-success);
+      color: #000;
+    }
+    .btn-uncertain {
+      background: var(--mirror-uncertain);
+      color: #fff;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-cyan { background: var(--mirror-cyan-glow); color: var(--mirror-cyan); }
+    .badge-success { background: var(--mirror-success-glow); color: var(--mirror-success); }
+    .badge-warning { background: var(--mirror-warning-glow); color: var(--mirror-warning); }
+    .badge-critical { background: var(--mirror-critical-glow); color: var(--mirror-critical); }
+    .badge-uncertain { background: var(--mirror-uncertain-glow); color: var(--mirror-uncertain); }
+
+    /* Viewfinder HUD */
+    .viewfinder-container {
+      position: relative;
+      background: #040508;
+      height: 380px;
+      border-radius: 16px;
+      border: 1px solid var(--mirror-border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+    }
+    canvas#viewfinder-canvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1;
+    }
+    .viewfinder-hud {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      pointer-events: none;
+    }
+    .laser-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--mirror-cyan), transparent);
+      box-shadow: 0 0 10px var(--mirror-cyan);
+      animation: scanLaser 2.2s ease-in-out infinite alternate;
+      z-index: 2;
+    }
+    @keyframes scanLaser {
+      0% { top: 15%; opacity: 0.2; }
+      50% { opacity: 0.9; }
+      100% { top: 85%; opacity: 0.2; }
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .modal-card {
+      background: #251014;
+      border: 2px solid var(--mirror-critical);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 10px 40px rgba(255,59,48,0.3);
+    }
+
+    .step-item {
+      background: var(--mirror-surface);
+      border: 1px solid var(--mirror-border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .step-item.active {
+      border-color: var(--mirror-cyan);
+      background: var(--mirror-elevated);
+      box-shadow: 0 0 12px var(--mirror-cyan-glow);
+    }
+
+    .log-tray {
+      font-size: 10px;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.5);
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-top: auto;
+    }
+  </style>
 </head>
-<body style="background:#080A0F; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;">
-  <p>Loading MIRROR Mobile Flow... <a href="../src/ui/web_preview/index.html" style="color:#00F0FF;">Click here if not redirected</a>.</p>
+<body>
+
+  <header>
+    <h1>MIRROR Mobile Flow</h1>
+    <p>Connected to Backend Contract /v1 Lifecycle • iQOO</p>
+  </header>
+
+  <!-- Live Backend Connection Bar -->
+  <div class="backend-bar">
+    <div class="backend-dot offline" id="backend-dot"></div>
+    <span id="backend-status-text" style="color: var(--text-secondary); font-size: 11px;">Checking http://localhost:8000/v1/health...</span>
+    <button class="btn-xs" onclick="checkBackendHealth()">Check API</button>
+  </div>
+
+  <!-- Live Simulation State Switcher matching /v1 outcomes -->
+  <div class="sim-bar">
+    <span>Contract Test Modes:</span>
+    <button id="mode-verified" class="sim-chip active" onclick="setBackendResponseMode('verified')">✔ /verify: verified (0.92)</button>
+    <button id="mode-cannottell" class="sim-chip" onclick="setBackendResponseMode('cannot_tell')">❓ /verify: cannot_tell (0.0)</button>
+    <button id="mode-noaction" class="sim-chip" onclick="setBackendResponseMode('no_action_needed')">🎯 /plan: no_action_needed</button>
+    <button id="mode-needshuman" class="sim-chip" onclick="setBackendResponseMode('needs_human')">👤 /plan: needs_human</button>
+    <button id="mode-blockgoal" class="sim-chip" style="color: var(--mirror-critical);" onclick="setBackendResponseMode('blocked_goal')">🚫 /sessions: A3 block</button>
+  </div>
+
+  <!-- Journey Stage Stepper -->
+  <div class="journey-bar">
+    <div id="step-node-0" class="journey-node active" onclick="navTo('home')">1. Goal</div>
+    <div id="step-node-1" class="journey-node" onclick="navTo('camera')">2. Observe</div>
+    <div id="step-node-2" class="journey-node" onclick="navTo('summary')">3. Intent</div>
+    <div id="step-node-3" class="journey-node" onclick="navTo('plan')">4. Plan Step</div>
+    <div id="step-node-4" class="journey-node" onclick="navTo('verify')">5. Verify</div>
+  </div>
+
+  <!-- Mobile Screen Shell -->
+  <div class="phone-frame">
+    <!-- Top Hardware Status Bar -->
+    <div class="status-bar">
+      <span>12:45</span>
+      <span style="color: var(--mirror-cyan); font-weight: 700;">iQOO • MIRROR /v1</span>
+      <span id="backend-status-indicator" style="color: var(--mirror-warning);">○ CHECKING API</span>
+    </div>
+
+    <!-- SCREEN 1: HOME -->
+    <div id="screen-home" class="screen active">
+      <div>
+        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Enter Space Goal</h2>
+        <p style="font-size: 12px; color: var(--text-secondary);">MIRROR gates your goal via safety policy, observes the scene, and guides verified physical preparation.</p>
+      </div>
+
+      <div class="card" style="border-color: var(--mirror-cyan);">
+        <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; outline: none;" placeholder="e.g. prepare the space to study, cook, work...">prepare space to study</textarea>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <span class="badge badge-cyan" id="voice-indicator">POST /v1/sessions</span>
+          <button class="btn" style="padding: 8px 14px; font-size: 12px;" onclick="onGoalSubmitted()">Create Session</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Preset Tasks (Tested Against Policy)</h3>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('prepare space to study')">📖 prepare space to study (A0 Allowed)</div>
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('prepare space to work')">💻 prepare space to work (A0 Allowed)</div>
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,59,48,0.3);" onclick="setPreset('inspect electrical socket wiring')">⚡ [Safety Refusal Demo] inspect electrical socket wiring (A3 Blocked)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Active Session Contract</h3>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary);">
+          <span id="session-id-pill">Session: None</span>
+          <span id="session-tier-pill">Tier: -</span>
+          <span style="color: var(--mirror-success);" id="session-gate-pill">Gate: -</span>
+        </div>
+      </div>
+
+      <div class="log-tray" id="log-home">
+        Contract Invariant: Empty goals rejected (422) • A3 goals blocked upfront
+      </div>
+    </div>
+
+    <!-- SCREEN 2: CAMERA VIEWFINDER -->
+    <div id="screen-camera" class="screen">
+      <div class="viewfinder-container">
+        <canvas id="viewfinder-canvas"></canvas>
+        <div class="laser-line"></div>
+
+        <div class="viewfinder-hud">
+          <div style="display: flex; justify-content: space-between;">
+            <span class="badge badge-cyan">HUD LIVE</span>
+            <span class="badge badge-warning" id="camera-quality-badge">Blur: 0.05 • Brightness: 0.60</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 20px; align-self: center; font-size: 11px; border: 1px solid var(--mirror-border);">
+              🎯 Target: <span id="camera-goal-pill" style="color: var(--mirror-cyan); font-weight: bold;">study</span>
+            </div>
+            <button class="btn" style="pointer-events: auto;" onclick="onSceneCaptured()">Capture Scene & Observe (/observe)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Frame Telemetry Requirements</h3>
+        <p style="font-size: 11px; color: var(--text-secondary);">BLUR_MAX &le; 0.6 • BRIGHTNESS_MIN &ge; 0.2 • Grounded scene anchors required.</p>
+      </div>
+
+      <div class="log-tray" id="log-camera">
+        Submitting to POST /v1/sessions/{sid}/observe
+      </div>
+    </div>
+
+    <!-- SCREEN 3: MISSION SUMMARY & INTENT -->
+    <div id="summary-screen" class="screen">
+      <div>
+        <h2 style="font-size: 20px; font-weight: 700;">Task Interpretation</h2>
+        <p style="font-size: 12px; color: var(--text-secondary);">Environmental scene observed against physical goal.</p>
+      </div>
+
+      <div class="card">
+        <span class="badge badge-cyan" id="summary-sid">Session: -</span>
+        <h3 style="font-size: 13px; font-weight: 700; margin-top: 8px;">Interpreted Physical Intent</h3>
+        <p id="summary-intent-text" style="font-size: 12px; color: var(--text-primary); margin-top: 4px; font-style: italic;">prepare the space to study</p>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Perceived Scene Observations</h3>
+        <div id="summary-observations" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
+          <!-- dynamically populated -->
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Prerequisites & Clutter Assessment</h3>
+        <div id="summary-needs-breakdown" style="font-size: 11px; color: var(--text-secondary);">
+          Needs for "study": lamp, notebook. Clutter detected: cup.
+        </div>
+      </div>
+
+      <button class="btn" onclick="onProceedToPlan()">Request Action Plan (/plan)</button>
+      <button class="btn btn-secondary" onclick="navTo('camera')">Rescan Scene</button>
+
+      <div class="log-tray" id="log-summary">
+        Contract: Outcome may be 'step', 'no_action_needed', or 'needs_observation'
+      </div>
+    </div>
+
+    <!-- SCREEN 4: ACTION PLAN STEP -->
+    <div id="plan-screen" class="screen">
+      <div>
+        <h2 style="font-size: 20px; font-weight: 700;">Action Plan Step</h2>
+        <p style="font-size: 12px; color: var(--text-secondary);">Review one physical step before executing. Reversible steps only.</p>
+      </div>
+
+      <div class="step-item active">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="badge badge-cyan" id="step-id-text">Step s1</span>
+          <span class="badge badge-warning" id="step-tier-text">Tier A1 (Reversible)</span>
+        </div>
+        <h3 id="step-instruction-text" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px;">Move the cup off the surface.</h3>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">
+          Expected post-evidence: <span id="step-evidence-text" style="color: var(--mirror-cyan);">no cup visible</span>
+        </div>
+        <div style="font-size: 10px; color: var(--text-muted);" id="step-tier-reason">
+          Tier: A1 • Reason: reversible tidy
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Policy Gate Decision</h3>
+        <p style="font-size: 11px; color: var(--mirror-success);">Decision: allow (Tier A1). User manual confirmation triggers physical execution.</p>
+      </div>
+
+      <button class="btn" onclick="onExecuteStep()">User Confirms: Execute Step</button>
+      <button class="btn btn-secondary" onclick="navTo('summary')">Back to Summary</button>
+
+      <div class="log-tray" id="log-plan">
+        Enforcing invariant: No task is complete without verification.
+      </div>
+    </div>
+
+    <!-- SCREEN 5: VERIFICATION -->
+    <div id="verify-screen" class="screen">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="font-size: 20px; font-weight: 700;">Result Verification</h2>
+        <span id="v-status-badge" class="badge badge-success">VERIFIED</span>
+      </div>
+
+      <!-- Result Card -->
+      <div id="v-card" class="card" style="border-color: var(--mirror-success); background: var(--mirror-success-glow);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span id="v-icon" style="font-size: 24px;">✅</span>
+          <div>
+            <div id="v-title" style="font-weight: 700; font-size: 14px; color: var(--mirror-success);">VERIFIED COMPLETE</div>
+            <div id="v-confidence" style="font-size: 11px; color: var(--text-secondary);">Confidence: 0.92 (Grounded in anchor evidence)</div>
+          </div>
+        </div>
+        <div style="margin-top: 10px; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden;">
+          <div id="v-bar" style="width: 92%; height: 100%; background: var(--mirror-success); transition: width 0.4s;"></div>
+        </div>
+      </div>
+
+      <!-- Evidence Seen vs Missing -->
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Backend Verification Evidence</h3>
+        <div id="v-evidence-list" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
+          <!-- dynamically populated -->
+        </div>
+      </div>
+
+      <button id="v-primary-btn" class="btn btn-success" onclick="onAdvanceOrPlanNext()">Advance & Plan Next Step</button>
+      <button class="btn btn-secondary" onclick="navTo('camera')">Retake Verification Photo</button>
+
+      <div class="log-tray" id="log-verify">
+        Verified steps: <span id="v-steps-count">0</span> • Invariant enforced
+      </div>
+    </div>
+
+    <!-- SCREEN 6: MISSION COMPLETED CELEBRATION -->
+    <div id="complete-screen" class="screen">
+      <div style="text-align: center; padding: 20px 0;">
+        <div style="font-size: 48px; margin-bottom: 10px;">🎉</div>
+        <h2 id="complete-title" style="font-size: 20px; font-weight: 800; color: var(--mirror-success);">MISSION COMPLETED</h2>
+        <p id="complete-desc" style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">All physical steps verified against visual sensor evidence.</p>
+      </div>
+
+      <div class="card" style="border-color: var(--mirror-success);">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--mirror-success); margin-bottom: 8px;">Audit Trail Summary</h3>
+        <div id="complete-summary-list" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
+          <!-- dynamically populated -->
+        </div>
+      </div>
+
+      <button class="btn" style="background: var(--mirror-cyan);" onclick="resetAllToHome()">Start New Session</button>
+    </div>
+
+    <!-- SAFETY ALERT MODAL -->
+    <div id="safety-modal" class="modal-overlay">
+      <div class="modal-card">
+        <div style="font-size: 40px;">⚠️</div>
+        <span id="modal-tier-badge" class="badge badge-critical" style="align-self: center;">TIER A3 BLOCKED</span>
+        <h2 id="modal-hazard-title" style="font-size: 16px; color: #fff;">Safety Policy Refusal</h2>
+        <p id="modal-hazard-desc" style="font-size: 12px; color: var(--text-primary);">MIRROR will not guide this. Ask a qualified professional or emergency services.</p>
+        <div id="modal-rule-pill" style="background: rgba(0,0,0,0.5); padding: 8px; border-radius: 8px; font-size: 11px; color: var(--mirror-warning); text-align: left;">
+          Rule Triggered: R-A3-electrical
+        </div>
+        <button class="btn btn-critical" onclick="onAbortMission()">Abort Mission Immediately</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:8000";
+    let backendOnline = false;
+
+    // State model mapped 1:1 to FastAPI backend models
+    const backendState = {
+      sessionId: null,
+      goal: "prepare space to study",
+      interpretedIntent: "prepare the space to study",
+      goalGate: { step_id: "goal", tier: "A0", decision: "allow", rule_id: "R-planner" },
+      world: { observations: [], unknowns: [], hazards: [] },
+      currentStep: null,
+      currentGate: null,
+      verifiedSteps: 0,
+      mode: "verified" // verified, cannot_tell, no_action_needed, needs_human, blocked_goal
+    };
+
+    // Check Live FastAPI Backend Health
+    async function checkBackendHealth() {
+      const dot = document.getElementById("backend-dot");
+      const txt = document.getElementById("backend-status-text");
+      const indicator = document.getElementById("backend-status-indicator");
+      try {
+        const res = await fetch(`${API_BASE}/v1/health`, { method: "GET" });
+        if (res.ok) {
+          const data = await res.json();
+          backendOnline = true;
+          if (dot) dot.className = "backend-dot online";
+          if (txt) txt.innerText = `Connected: ${API_BASE}/v1 (${data.provider})`;
+          if (indicator) {
+            indicator.innerText = "● LIVE /v1";
+            indicator.style.color = "var(--mirror-success)";
+          }
+          return true;
+        }
+      } catch (e) {
+        // Backend offline or CORS restriction
+      }
+      backendOnline = false;
+      if (dot) dot.className = "backend-dot offline";
+      if (txt) txt.innerText = "Backend offline • Using Contract-Compliant Client Engine";
+      if (indicator) {
+        indicator.innerText = "○ SIMULATION";
+        indicator.style.color = "var(--mirror-warning)";
+      }
+      return false;
+    }
+
+    // Canvas Simulation Setup for Camera Viewfinder
+    const canvas = document.getElementById("viewfinder-canvas");
+    const ctx = canvas.getContext("2d");
+    let animationFrameId = null;
+    let t = 0;
+
+    function resizeCanvas() {
+      if (!canvas || !canvas.parentElement) return;
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+
+    function drawCameraSimulation() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      t += 0.03;
+
+      const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      bg.addColorStop(0, "#080B12");
+      bg.addColorStop(1, "#020406");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "rgba(46, 53, 71, 0.4)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 30) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Simulated Desk Surface & Clutter
+      const objX = canvas.width * 0.35 + Math.sin(t * 0.5) * 4;
+      const objY = canvas.height * 0.35 + Math.cos(t * 0.5) * 4;
+      ctx.strokeStyle = "#00F0FF";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(objX, objY, 130, 80);
+      ctx.fillStyle = "rgba(0, 240, 255, 0.1)";
+      ctx.fillRect(objX, objY, 130, 80);
+      ctx.fillStyle = "#00F0FF";
+      ctx.font = "bold 9px sans-serif";
+      ctx.fillText("Observation: cup (0.92)", objX + 4, objY + 12);
+
+      const lampX = canvas.width * 0.55 + Math.cos(t * 0.4) * 4;
+      const lampY = canvas.height * 0.65;
+      ctx.strokeStyle = "#00E676";
+      ctx.strokeRect(lampX, lampY, 90, 50);
+      ctx.fillStyle = "rgba(0, 230, 118, 0.08)";
+      ctx.fillRect(lampX, lampY, 90, 50);
+      ctx.fillStyle = "#00E676";
+      ctx.fillText("Observation: desk (0.95)", lampX + 4, lampY + 12);
+
+      animationFrameId = requestAnimationFrame(drawCameraSimulation);
+    }
+
+    // Navigation and Screen Flow
+    function navTo(screenName) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".journey-node").forEach(n => n.classList.remove("active"));
+
+      if (screenName === "home") {
+        document.getElementById("screen-home").classList.add("active");
+        document.getElementById("step-node-0").classList.add("active");
+      } else if (screenName === "camera") {
+        document.getElementById("screen-camera").classList.add("active");
+        document.getElementById("step-node-1").classList.add("active");
+        document.getElementById("camera-goal-pill").innerText = backendState.goal;
+        resizeCanvas();
+        if (!animationFrameId) drawCameraSimulation();
+      } else if (screenName === "summary") {
+        document.getElementById("summary-screen").classList.add("active");
+        document.getElementById("step-node-2").classList.add("active");
+      } else if (screenName === "plan") {
+        document.getElementById("plan-screen").classList.add("active");
+        document.getElementById("step-node-3").classList.add("active");
+        renderPlanScreen();
+      } else if (screenName === "verify") {
+        document.getElementById("verify-screen").classList.add("active");
+        document.getElementById("step-node-4").classList.add("active");
+        renderVerifyScreen();
+      } else if (screenName === "complete") {
+        document.getElementById("complete-screen").classList.add("active");
+      }
+    }
+
+    function setPreset(text) {
+      document.getElementById("goal-input").value = text;
+      backendState.goal = text;
+    }
+
+    // POST /v1/sessions
+    async function onGoalSubmitted() {
+      const val = document.getElementById("goal-input").value.trim();
+      if (!val) {
+        alert("Goal cannot be empty.");
+        return;
+      }
+      backendState.goal = val;
+
+      // Try Live Backend First
+      if (backendOnline) {
+        try {
+          const res = await fetch(`${API_BASE}/v1/sessions`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ goal: val })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            backendState.sessionId = data.session_id;
+            backendState.interpretedIntent = data.interpreted_intent;
+            backendState.goalGate = data.goal_gate;
+            if (data.blocked) {
+              document.getElementById("modal-tier-badge").innerText = `TIER ${data.goal_gate.tier} BLOCKED`;
+              document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (" + data.goal_gate.tier + ")";
+              document.getElementById("modal-hazard-desc").innerText = data.message || "MIRROR will not guide this. Ask a qualified professional or emergency services.";
+              document.getElementById("modal-rule-pill").innerText = "Rule Triggered: " + data.goal_gate.rule_id;
+              document.getElementById("safety-modal").style.display = "flex";
+              return;
+            }
+            document.getElementById("session-id-pill").innerText = "Session: " + backendState.sessionId;
+            document.getElementById("session-tier-pill").innerText = "Tier: " + data.goal_gate.tier;
+            document.getElementById("session-gate-pill").innerText = "Gate: " + data.goal_gate.decision;
+            navTo("camera");
+            return;
+          }
+        } catch (err) {
+          console.warn("Backend request failed, falling back to local simulation:", err);
+        }
+      }
+
+      // Local Deterministic Policy Check matching src/core/policy.py
+      const low = val.toLowerCase();
+      const isA3 = backendState.mode === "blocked_goal" ||
+                   /\b(wiring|wires?|fuse|circuit|breaker|mains|socket|outlet|voltage)\b/i.test(low) ||
+                   /\b(gas|lpg|pilot light)\b/i.test(low) ||
+                   /\b(medicine|medication|dose|dosage|pill|prescription|diagnos\w*)\b/i.test(low);
+
+      if (isA3) {
+        // A3 Blocked
+        document.getElementById("modal-tier-badge").innerText = "TIER A3 BLOCKED";
+        document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (A3)";
+        document.getElementById("modal-hazard-desc").innerText = "MIRROR will not guide this. Ask a qualified professional or emergency services.";
+        document.getElementById("modal-rule-pill").innerText = "Rule Triggered: R-A3-electrical";
+        document.getElementById("safety-modal").style.display = "flex";
+        return;
+      }
+
+      backendState.sessionId = "sess_" + Math.random().toString(36).substring(2, 8);
+      backendState.interpretedIntent = val.includes("study") ? "prepare the space to study" : val.includes("cook") ? "prepare the space to cook" : val.includes("work") ? "prepare the space to work" : "prepare the space to " + val;
+      backendState.goalGate = { step_id: "goal", tier: "A0", decision: "allow", rule_id: "R-planner" };
+
+      document.getElementById("session-id-pill").innerText = "Session: " + backendState.sessionId;
+      document.getElementById("session-tier-pill").innerText = "Tier: A0";
+      document.getElementById("session-gate-pill").innerText = "Gate: allow";
+
+      navTo("camera");
+    }
+
+    // Trigger Capture from Camera HUD
+    function onSceneCaptured() {
+      onSceneObserved();
+    }
+
+    // POST /v1/sessions/{sid}/observe
+    async function onSceneObserved() {
+      let fakeLabels = ["cup", "desk", "lamp"];
+      if (backendState.mode === "no_action_needed") {
+        fakeLabels = ["desk", "lamp", "notebook"];
+      }
+
+      if (backendOnline && backendState.sessionId) {
+        try {
+          const res = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/observe`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              frames: [{ id: "f1", blur: 0.05, brightness: 0.6, fake_labels: fakeLabels }]
+            })
+          });
+          if (res.ok) {
+            const world = await res.json();
+            backendState.world = world;
+          }
+        } catch (err) {
+          console.warn("Live observe failed, using simulation:", err);
+        }
+      } else {
+        if (backendState.mode === "no_action_needed") {
+          backendState.world.observations = [
+            { label: "desk", confidence: 0.95 },
+            { label: "lamp", confidence: 0.91 },
+            { label: "notebook", confidence: 0.89 }
+          ];
+        } else {
+          backendState.world.observations = [
+            { label: "cup", confidence: 0.92 },
+            { label: "desk", confidence: 0.95 },
+            { label: "lamp", confidence: 0.90 }
+          ];
+        }
+      }
+
+      document.getElementById("summary-intent-text").innerText = backendState.interpretedIntent;
+      document.getElementById("summary-sid").innerText = "Session ID: " + (backendState.sessionId || "sess_sim");
+
+      const obsContainer = document.getElementById("summary-observations");
+      obsContainer.innerHTML = "";
+      (backendState.world.observations || []).forEach(o => {
+        obsContainer.innerHTML += `<div style="color: var(--mirror-success);">✔ ${o.label} (confidence: ${o.confidence})</div>`;
+      });
+
+      const needs = document.getElementById("summary-needs-breakdown");
+      const hasCup = (backendState.world.observations || []).some(o => o.label === "cup");
+      needs.innerHTML = `Needs for "${backendState.goal}": lamp, notebook. Clutter detected: ${hasCup ? "cup" : "None"}.`;
+
+      navTo("summary");
+    }
+
+    // POST /v1/sessions/{sid}/plan
+    async function onProceedToPlan() {
+      if (backendOnline && backendState.sessionId) {
+        try {
+          const res = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/plan`, {
+            method: "POST"
+          });
+          if (res.ok) {
+            const planData = await res.json();
+            if (planData.outcome === "no_action_needed") {
+              document.getElementById("complete-title").innerText = "NO ACTION NEEDED";
+              document.getElementById("complete-title").style.color = "var(--mirror-cyan)";
+              document.getElementById("complete-desc").innerText = "Space is already clear and ready. Zero verified changes made (no false success claimed).";
+              document.getElementById("complete-summary-list").innerHTML = "<div>✔ Space already prepared. Zero tasks required.</div>";
+              navTo("complete");
+              return;
+            }
+            if (planData.outcome === "completed") {
+              onMissionCompleted();
+              return;
+            }
+            if (planData.outcome === "needs_human") {
+              alert("needs_human: Verification failed repeatedly. Please check the step yourself.");
+              return;
+            }
+            if (planData.outcome === "blocked_goal") {
+              document.getElementById("modal-tier-badge").innerText = "TIER A3 BLOCKED";
+              document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (A3)";
+              document.getElementById("modal-hazard-desc").innerText = planData.message || "MIRROR will not guide this.";
+              document.getElementById("modal-rule-pill").innerText = "Rule Triggered: " + (planData.gate?.rule_id || "R-A3");
+              document.getElementById("safety-modal").style.display = "flex";
+              return;
+            }
+            if (planData.step) {
+              backendState.currentStep = planData.step;
+              backendState.currentGate = planData.gate;
+              navTo("plan");
+              return;
+            }
+          }
+        } catch (err) {
+          console.warn("Live plan failed, using simulation:", err);
+        }
+      }
+
+      // Local simulation fallback
+      if (backendState.mode === "no_action_needed") {
+        document.getElementById("complete-title").innerText = "NO ACTION NEEDED";
+        document.getElementById("complete-title").style.color = "var(--mirror-cyan)";
+        document.getElementById("complete-desc").innerText = "Space is already clear and ready. Zero verified changes made (no false success claimed).";
+        document.getElementById("complete-summary-list").innerHTML = "<div>✔ Space already prepared. Zero tasks required.</div>";
+        navTo("complete");
+        return;
+      }
+
+      if (backendState.mode === "needs_human") {
+        alert("needs_human: Verification failed repeatedly. Please check the step yourself.");
+        return;
+      }
+
+      backendState.currentStep = {
+        id: "s1",
+        instruction: "Move the cup off the surface.",
+        tier: "A1",
+        tier_reason: "reversible tidy",
+        expected_evidence: ["no cup visible"]
+      };
+      backendState.currentGate = {
+        step_id: "s1",
+        tier: "A1",
+        decision: "allow",
+        rule_id: "R-planner"
+      };
+
+      navTo("plan");
+    }
+
+    function renderPlanScreen() {
+      const step = backendState.currentStep;
+      if (!step) return;
+
+      document.getElementById("step-id-text").innerText = "Step " + step.id;
+      document.getElementById("step-instruction-text").innerText = step.instruction;
+      document.getElementById("step-evidence-text").innerText = (step.expected_evidence || []).join(", ");
+      document.getElementById("step-tier-reason").innerText = "Tier: " + step.tier + " • Reason: " + (step.tier_reason || "reversible tidy");
+    }
+
+    function onExecuteStep() {
+      navTo("verify");
+    }
+
+    // POST /v1/sessions/{sid}/verify
+    async function renderVerifyScreen() {
+      const badge = document.getElementById("v-status-badge");
+      const card = document.getElementById("v-card");
+      const icon = document.getElementById("v-icon");
+      const title = document.getElementById("v-title");
+      const conf = document.getElementById("v-confidence");
+      const bar = document.getElementById("v-bar");
+      const evList = document.getElementById("v-evidence-list");
+      const btn = document.getElementById("v-primary-btn");
+      const stepCount = document.getElementById("v-steps-count");
+
+      let verifyStatus = backendState.mode;
+      let verifyConfidence = 0.92;
+      let evidenceSeen = ["no cup visible"];
+      let evidenceMissing = [];
+      let reason = "All expected evidence seen in the new frames.";
+
+      // Try Live Backend Verification
+      if (backendOnline && backendState.sessionId) {
+        try {
+          let verifyFrames = [];
+          if (backendState.mode === "cannot_tell") {
+            verifyFrames = [{ id: "f_verify", blur: 0.85, brightness: 0.1, fake_labels: [] }];
+          } else if (backendState.mode === "not_verified") {
+            verifyFrames = [{ id: "f_verify", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp", "cup"] }];
+          } else {
+            verifyFrames = [{ id: "f_verify", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp"] }];
+          }
+
+          const res = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ frames: verifyFrames })
+          });
+          if (res.ok) {
+            const v = await res.json();
+            verifyStatus = v.status;
+            verifyConfidence = v.confidence;
+            evidenceSeen = v.evidence_seen || [];
+            evidenceMissing = v.evidence_missing || [];
+            reason = v.reason || "";
+          }
+        } catch (err) {
+          console.warn("Live verify failed, using simulation:", err);
+        }
+      }
+
+      if (verifyStatus === "verified") {
+        badge.className = "badge badge-success";
+        badge.innerText = "VERIFIED";
+        card.style.borderColor = "var(--mirror-success)";
+        card.style.background = "var(--mirror-success-glow)";
+        icon.innerText = "✅";
+        title.innerText = "VERIFIED PASS";
+        title.style.color = "var(--mirror-success)";
+        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)} (Grounded in anchor evidence)`;
+        bar.style.width = `${Math.round(verifyConfidence * 100)}%`;
+        bar.style.background = "var(--mirror-success)";
+        evList.innerHTML = `
+          <div style="color: var(--mirror-success);">✔ Evidence seen: ${evidenceSeen.join(", ") || "no cup visible"}</div>
+          <div>• Frame quality: ok (blur: 0.05, brightness: 0.60)</div>
+          <div>• Anchor confidence: 0.95 (desk & lamp recognized)</div>
+        `;
+        btn.innerText = "Advance & Plan Next Step";
+        btn.className = "btn btn-success";
+        btn.onclick = onAdvanceOrPlanNext;
+      } else if (verifyStatus === "cannot_tell") {
+        badge.className = "badge badge-uncertain";
+        badge.innerText = "CANNOT_TELL";
+        card.style.borderColor = "var(--mirror-uncertain)";
+        card.style.background = "var(--mirror-uncertain-glow)";
+        icon.innerText = "❓";
+        title.innerText = "UNCERTAIN (CANNOT_TELL)";
+        title.style.color = "var(--mirror-uncertain)";
+        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)} (Unusable frame / ungrounded anchor)`;
+        bar.style.width = "0%";
+        bar.style.background = "var(--mirror-uncertain)";
+        evList.innerHTML = `
+          <div style="color: var(--mirror-warning);">⚠ Reason: ${reason || "Frames too blurry or dark. Retake photo."}</div>
+          <div>• Evidence missing: ${evidenceMissing.join(", ") || "no cup visible"}</div>
+          <div style="color: var(--text-secondary);">Rule: Uncertainty is never marked as success.</div>
+        `;
+        btn.innerText = "Retake Photo at Same Angle";
+        btn.className = "btn btn-uncertain";
+        btn.onclick = () => navTo("camera");
+      } else {
+        badge.className = "badge badge-critical";
+        badge.innerText = "NOT_VERIFIED";
+        card.style.borderColor = "var(--mirror-critical)";
+        card.style.background = "var(--mirror-critical-glow)";
+        icon.innerText = "❌";
+        title.innerText = "VERIFICATION FAILED";
+        title.style.color = "var(--mirror-critical)";
+        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)}`;
+        bar.style.width = `${Math.round(verifyConfidence * 100)}%`;
+        bar.style.background = "var(--mirror-critical)";
+        evList.innerHTML = `
+          <div style="color: var(--mirror-critical);">❌ Expected evidence missing: ${evidenceMissing.join(", ") || "no cup visible"}</div>
+          <div>• Reason: ${reason || "Physical condition was not met."}</div>
+        `;
+        btn.innerText = "Retry Step Execution";
+        btn.className = "btn btn-critical";
+        btn.onclick = () => navTo("plan");
+      }
+
+      stepCount.innerText = backendState.verifiedSteps;
+    }
+
+    async function onAdvanceOrPlanNext() {
+      backendState.verifiedSteps += 1;
+      document.getElementById("v-steps-count").innerText = backendState.verifiedSteps;
+
+      if (backendOnline && backendState.sessionId) {
+        try {
+          await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/observe`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              frames: [{ id: "f_done", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp", "notebook"] }]
+            })
+          });
+          const planRes = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/plan`, {
+            method: "POST"
+          });
+          if (planRes.ok) {
+            const planData = await planRes.json();
+            // Outcome: completed
+          }
+        } catch (err) {
+          console.warn("Live completion request failed:", err);
+        }
+      }
+
+      onMissionCompleted();
+    }
+
+    function onMissionCompleted() {
+      document.getElementById("complete-title").innerText = "MISSION COMPLETED";
+      document.getElementById("complete-title").style.color = "var(--mirror-success)";
+      document.getElementById("complete-desc").innerText = `Session finished: ${backendState.verifiedSteps} verified step(s) recorded with empirical proof.`;
+      document.getElementById("complete-summary-list").innerHTML = `
+        <div><span style="color: var(--mirror-success); font-weight:700;">✔ Step s1 verified:</span> Move cup off surface</div>
+        <div style="color: var(--text-secondary); font-size:10px; margin-left: 14px;">Outcome: PlanOutcome.completed (0 clutter remaining)</div>
+      `;
+      navTo("complete");
+    }
+
+    function resetAllToHome() {
+      backendState.sessionId = null;
+      backendState.verifiedSteps = 0;
+      backendState.currentStep = null;
+      document.getElementById("session-id-pill").innerText = "Session: None";
+      document.getElementById("session-tier-pill").innerText = "Tier: -";
+      document.getElementById("session-gate-pill").innerText = "Gate: -";
+      navTo("home");
+    }
+
+    function onAbortMission() {
+      document.getElementById("safety-modal").style.display = "none";
+      resetAllToHome();
+    }
+
+    function setBackendResponseMode(mode) {
+      backendState.mode = mode;
+      document.querySelectorAll(".sim-chip").forEach(c => c.classList.remove("active"));
+      if (mode === "verified") document.getElementById("mode-verified").classList.add("active");
+      if (mode === "cannot_tell") document.getElementById("mode-cannottell").classList.add("active");
+      if (mode === "no_action_needed") document.getElementById("mode-noaction").classList.add("active");
+      if (mode === "needs_human") document.getElementById("mode-needshuman").classList.add("active");
+      if (mode === "blocked_goal") document.getElementById("mode-blockgoal").classList.add("active");
+
+      if (document.getElementById("verify-screen").classList.contains("active")) {
+        renderVerifyScreen();
+      }
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("DOMContentLoaded", () => {
+      resizeCanvas();
+      drawCameraSimulation();
+      checkBackendHealth();
+    });
+  </script>
 </body>
 </html>

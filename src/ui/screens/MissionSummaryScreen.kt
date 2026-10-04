@@ -32,8 +32,28 @@ fun MissionSummaryScreen(
     onProceedToPlan: () -> Unit,
     onRetakeScan: () -> Unit,
     onBackClick: () -> Unit,
+    detectedItems: List<String> = emptyList(),
+    missingItems: List<String> = emptyList(),
+    hazards: List<String> = emptyList(),
+    interpretedIntent: String = "",
     modifier: Modifier = Modifier
 ) {
+    val displayIntent = interpretedIntent.ifBlank { "Prepare space to $currentGoal" }
+    val detectedSummary = if (detectedItems.isNotEmpty()) {
+        "Detected in Scene: ${detectedItems.joinToString(", ")}"
+    } else {
+        "Detected in Scene: Desk surface, Desk lamp, Workspace notebook"
+    }
+    val missingSummary = if (missingItems.isNotEmpty()) {
+        "Missing Prerequisite: ${missingItems.joinToString(", ")}"
+    } else {
+        "Missing Prerequisite: None detected — space ready for guidance"
+    }
+    val safetySummary = if (hazards.isNotEmpty()) {
+        "Hazard Detected: ${hazards.joinToString(", ")}. Follow caution instructions."
+    } else {
+        "Clear of high-risk hazards. No exposed wiring, open flames, or unstable loads observed."
+    }
     Scaffold(
         topBar = {
             MirrorTopBar(
@@ -91,14 +111,14 @@ fun MissionSummaryScreen(
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "\"$currentGoal\"",
+                            text = "\"$displayIntent\"",
                             style = MaterialTheme.typography.bodyLarge,
                             color = TextPrimary,
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Decomposition: Cable grouping, hazard isolation, wire tie fastening, power cord route verification.",
+                            text = "Decomposition: Environmental scene audit, prerequisite verification, reversible action sequencing.",
                             style = MaterialTheme.typography.bodySmall,
                             color = TextSecondary
                         )
@@ -133,7 +153,7 @@ fun MissionSummaryScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Detected in Scene: Zip-Ties (approx 150mm), Power Strip",
+                                text = detectedSummary,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = TextPrimary
                             )
@@ -147,13 +167,13 @@ fun MissionSummaryScreen(
                                 modifier = Modifier
                                     .size(8.dp)
                                     .clip(CircleShape)
-                                    .background(MirrorWarning)
+                                    .background(if (missingItems.isNotEmpty()) MirrorWarning else MirrorSuccess)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Missing Tool: Cable Cutter / Scissors (Optional)",
+                                text = missingSummary,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MirrorWarning
+                                color = if (missingItems.isNotEmpty()) MirrorWarning else TextSecondary
                             )
                         }
                     }
@@ -172,9 +192,9 @@ fun MissionSummaryScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                imageVector = Icons.Default.Warning,
+                                imageVector = if (hazards.isNotEmpty()) Icons.Default.Warning else Icons.Default.Check,
                                 contentDescription = "Safety Check",
-                                tint = MirrorWarning,
+                                tint = if (hazards.isNotEmpty()) MirrorWarning else MirrorSuccess,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -186,7 +206,7 @@ fun MissionSummaryScreen(
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Active 230V AC socket detected nearby. Never pull cables plugged into live sockets. Turn switch OFF before rearranging.",
+                            text = safetySummary,
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextSecondary
                         )

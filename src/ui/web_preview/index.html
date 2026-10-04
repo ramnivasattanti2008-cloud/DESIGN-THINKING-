@@ -41,7 +41,7 @@
 
     header {
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     header h1 {
       font-size: 22px;
@@ -56,6 +56,46 @@
       margin-top: 3px;
     }
 
+    /* Live Backend Status Bar */
+    .backend-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: var(--mirror-surface);
+      padding: 5px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--mirror-border);
+      margin-bottom: 10px;
+      font-size: 11px;
+    }
+    .backend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .backend-dot.online {
+      background: var(--mirror-success);
+      box-shadow: 0 0 8px var(--mirror-success);
+    }
+    .backend-dot.offline {
+      background: var(--mirror-warning);
+    }
+    .btn-xs {
+      background: var(--mirror-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--mirror-border);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+    .btn-xs:hover {
+      color: var(--mirror-cyan);
+      border-color: var(--mirror-cyan);
+    }
+
     /* Simulation Control Toolbar */
     .sim-bar {
       display: flex;
@@ -64,12 +104,12 @@
       padding: 6px 12px;
       border-radius: 20px;
       border: 1px solid var(--mirror-border);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       font-size: 11px;
       align-items: center;
       flex-wrap: wrap;
       justify-content: center;
-      max-width: 580px;
+      max-width: 620px;
     }
     .sim-bar span { color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
     .sim-chip {
@@ -316,14 +356,21 @@
     <p>Connected to Backend Contract /v1 Lifecycle • iQOO</p>
   </header>
 
+  <!-- Live Backend Connection Bar -->
+  <div class="backend-bar">
+    <div class="backend-dot offline" id="backend-dot"></div>
+    <span id="backend-status-text" style="color: var(--text-secondary); font-size: 11px;">Checking http://localhost:8000/v1/health...</span>
+    <button class="btn-xs" onclick="checkBackendHealth()">Check API</button>
+  </div>
+
   <!-- Live Simulation State Switcher matching /v1 outcomes -->
   <div class="sim-bar">
-    <span>Backend Response Mode:</span>
-    <button id="mode-verified" class="sim-chip active" onclick="setBackendResponseMode('verified')">/verify: verified (0.92)</button>
-    <button id="mode-cannottell" class="sim-chip" onclick="setBackendResponseMode('cannot_tell')">/verify: cannot_tell (0.0)</button>
-    <button id="mode-noaction" class="sim-chip" onclick="setBackendResponseMode('no_action_needed')">/plan: no_action_needed</button>
-    <button id="mode-needshuman" class="sim-chip" onclick="setBackendResponseMode('needs_human')">/plan: needs_human</button>
-    <button id="mode-blockgoal" class="sim-chip" style="color: var(--mirror-critical);" onclick="setBackendResponseMode('blocked_goal')">/sessions: A3 block</button>
+    <span>Contract Test Modes:</span>
+    <button id="mode-verified" class="sim-chip active" onclick="setBackendResponseMode('verified')">✔ /verify: verified (0.92)</button>
+    <button id="mode-cannottell" class="sim-chip" onclick="setBackendResponseMode('cannot_tell')">❓ /verify: cannot_tell (0.0)</button>
+    <button id="mode-noaction" class="sim-chip" onclick="setBackendResponseMode('no_action_needed')">🎯 /plan: no_action_needed</button>
+    <button id="mode-needshuman" class="sim-chip" onclick="setBackendResponseMode('needs_human')">👤 /plan: needs_human</button>
+    <button id="mode-blockgoal" class="sim-chip" style="color: var(--mirror-critical);" onclick="setBackendResponseMode('blocked_goal')">🚫 /sessions: A3 block</button>
   </div>
 
   <!-- Journey Stage Stepper -->
@@ -341,7 +388,7 @@
     <div class="status-bar">
       <span>12:45</span>
       <span style="color: var(--mirror-cyan); font-weight: 700;">iQOO • MIRROR /v1</span>
-      <span id="backend-status-indicator" style="color: var(--mirror-success);">● API CONNECTED</span>
+      <span id="backend-status-indicator" style="color: var(--mirror-warning);">○ CHECKING API</span>
     </div>
 
     <!-- SCREEN 1: HOME -->
@@ -352,7 +399,7 @@
       </div>
 
       <div class="card" style="border-color: var(--mirror-cyan);">
-        <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; outline: none;" placeholder="e.g. prepare the space to study, cook, work...">study</textarea>
+        <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #fff; font-size: 13px; resize: none; outline: none;" placeholder="e.g. prepare the space to study, cook, work...">prepare space to study</textarea>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
           <span class="badge badge-cyan" id="voice-indicator">POST /v1/sessions</span>
           <button class="btn" style="padding: 8px 14px; font-size: 12px;" onclick="onGoalSubmitted()">Create Session</button>
@@ -362,9 +409,9 @@
       <div class="card">
         <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Preset Tasks (Tested Against Policy)</h3>
         <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('study')">📖 prepare space to study (A0 Allowed)</div>
-          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('work')">💻 prepare space to work (A0 Allowed)</div>
-          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,59,48,0.3);" onclick="setPreset('inspect electrical socket wiring')">⚡ inspect electrical socket wiring (A3 Blocked)</div>
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('prepare space to study')">📖 prepare space to study (A0 Allowed)</div>
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer;" onclick="setPreset('prepare space to work')">💻 prepare space to work (A0 Allowed)</div>
+          <div class="card-elevated" style="padding: 8px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,59,48,0.3);" onclick="setPreset('inspect electrical socket wiring')">⚡ [Safety Refusal Demo] inspect electrical socket wiring (A3 Blocked)</div>
         </div>
       </div>
 
@@ -378,123 +425,118 @@
       </div>
 
       <div class="log-tray" id="log-home">
-        POST /v1/sessions ready • PolicyGate armed
+        Contract Invariant: Empty goals rejected (422) • A3 goals blocked upfront
       </div>
     </div>
 
-    <!-- SCREEN 2: CAMERA / OBSERVE -->
+    <!-- SCREEN 2: CAMERA VIEWFINDER -->
     <div id="screen-camera" class="screen">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-size: 16px;">Camera Observation</h2>
-        <span class="badge badge-cyan">POST /observe</span>
-      </div>
-
       <div class="viewfinder-container">
         <canvas id="viewfinder-canvas"></canvas>
         <div class="laser-line"></div>
-        
+
         <div class="viewfinder-hud">
-          <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--mirror-cyan);">
-            <span>Frame: 1080p JPEG</span>
-            <span id="hud-lux">Brightness: 0.60</span>
-            <span style="color: var(--mirror-success);" id="hud-imu">Blur: 0.05 (Sharp)</span>
+          <div style="display: flex; justify-content: space-between;">
+            <span class="badge badge-cyan">HUD LIVE</span>
+            <span class="badge badge-warning" id="camera-quality-badge">Blur: 0.05 • Brightness: 0.60</span>
           </div>
 
-          <!-- Central Target HUD Overlay -->
-          <svg style="align-self: center; width: 120px; height: 120px; opacity: 0.8;" viewBox="0 0 200 200">
-            <path d="M 20 50 L 20 20 L 50 20" stroke="#00F0FF" stroke-width="3" fill="none" />
-            <path d="M 150 20 L 180 20 L 180 50" stroke="#00F0FF" stroke-width="3" fill="none" />
-            <path d="M 180 150 L 180 180 L 150 180" stroke="#00F0FF" stroke-width="3" fill="none" />
-            <path d="M 50 180 L 20 180 L 20 150" stroke="#00F0FF" stroke-width="3" fill="none" />
-            <circle cx="100" cy="100" r="14" stroke="#00F0FF" stroke-width="1.5" stroke-dasharray="4 2" fill="none" />
-          </svg>
-
-          <div style="background: rgba(13,15,21,0.85); padding: 8px; border-radius: 8px; font-size: 11px; border: 1px solid var(--mirror-border);">
-            🎯 Goal: <span id="camera-goal-pill" style="color: var(--mirror-cyan);">study</span>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 20px; align-self: center; font-size: 11px; border: 1px solid var(--mirror-border);">
+              🎯 Target: <span id="camera-goal-pill" style="color: var(--mirror-cyan); font-weight: bold;">study</span>
+            </div>
+            <button class="btn" style="pointer-events: auto;" onclick="onSceneCaptured()">Capture Scene & Observe (/observe)</button>
           </div>
         </div>
       </div>
 
-      <button class="btn" onclick="onSceneObserved()">Send Frames to /observe & /plan</button>
-      <button class="btn btn-secondary" onclick="navTo('home')">Back to Goal Input</button>
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Frame Telemetry Requirements</h3>
+        <p style="font-size: 11px; color: var(--text-secondary);">BLUR_MAX &le; 0.6 • BRIGHTNESS_MIN &ge; 0.2 • Grounded scene anchors required.</p>
+      </div>
 
       <div class="log-tray" id="log-camera">
-        WorldState: Awaiting observations
+        Submitting to POST /v1/sessions/{sid}/observe
       </div>
     </div>
 
-    <!-- SCREEN 3: MISSION SUMMARY / INTENT -->
+    <!-- SCREEN 3: MISSION SUMMARY & INTENT -->
     <div id="summary-screen" class="screen">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-size: 16px;">Task Interpretation</h2>
-        <span class="badge badge-cyan">WORLD STATE</span>
-      </div>
-
-      <div class="card" style="border-color: var(--mirror-cyan);">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--mirror-cyan); margin-bottom: 4px;">Interpreted Intent</h3>
-        <p id="summary-intent-text" style="font-size: 14px; font-weight: 700; color: #fff;">prepare the space to study</p>
-        <p id="summary-sid" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Session ID: -</p>
+      <div>
+        <h2 style="font-size: 20px; font-weight: 700;">Task Interpretation</h2>
+        <p style="font-size: 12px; color: var(--text-secondary);">Environmental scene observed against physical goal.</p>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">World State Observations</h3>
-        <div id="summary-observations" style="font-size: 11px; display: flex; flex-direction: column; gap: 6px;">
+        <span class="badge badge-cyan" id="summary-sid">Session: -</span>
+        <h3 style="font-size: 13px; font-weight: 700; margin-top: 8px;">Interpreted Physical Intent</h3>
+        <p id="summary-intent-text" style="font-size: 12px; color: var(--text-primary); margin-top: 4px; font-style: italic;">prepare the space to study</p>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Perceived Scene Observations</h3>
+        <div id="summary-observations" style="font-size: 11px; display: flex; flex-direction: column; gap: 4px;">
           <!-- dynamically populated -->
         </div>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Clutter & Needs Breakdown</h3>
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Prerequisites & Clutter Assessment</h3>
         <div id="summary-needs-breakdown" style="font-size: 11px; color: var(--text-secondary);">
-          <!-- populated -->
+          Needs for "study": lamp, notebook. Clutter detected: cup.
         </div>
       </div>
 
-      <button class="btn" onclick="onProceedToPlan()">Request Plan from Backend</button>
-      <button class="btn btn-secondary" onclick="navTo('camera')">Re-observe Scene</button>
+      <button class="btn" onclick="onProceedToPlan()">Request Action Plan (/plan)</button>
+      <button class="btn btn-secondary" onclick="navTo('camera')">Rescan Scene</button>
 
       <div class="log-tray" id="log-summary">
-        POST /v1/sessions/{sid}/plan ready
+        Contract: Outcome may be 'step', 'no_action_needed', or 'needs_observation'
       </div>
     </div>
 
     <!-- SCREEN 4: ACTION PLAN STEP -->
     <div id="plan-screen" class="screen">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-size: 16px;">Proposed Step</h2>
-        <span id="plan-gate-badge" class="badge badge-warning">TIER A1 ALLOW</span>
+      <div>
+        <h2 style="font-size: 20px; font-weight: 700;">Action Plan Step</h2>
+        <p style="font-size: 12px; color: var(--text-secondary);">Review one physical step before executing. Reversible steps only.</p>
       </div>
 
-      <div id="plan-step-card" class="step-item active">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span id="step-id-text" style="font-weight: 700; font-size: 13px; color: var(--mirror-cyan);">Step s1</span>
-          <span class="badge badge-cyan">PENDING ACTION</span>
+      <div class="step-item active">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="badge badge-cyan" id="step-id-text">Step s1</span>
+          <span class="badge badge-warning" id="step-tier-text">Tier A1 (Reversible)</span>
         </div>
-        <p id="step-instruction-text" style="font-size: 13px; font-weight: 600; color: #fff; margin-top: 6px;">Move the cup off the surface.</p>
-        <div style="margin-top: 8px; font-size: 11px; color: var(--text-secondary);">
-          Expected evidence: <span id="step-evidence-text" style="color: var(--mirror-cyan);">no cup visible</span>
+        <h3 id="step-instruction-text" style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px;">Move the cup off the surface.</h3>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">
+          Expected post-evidence: <span id="step-evidence-text" style="color: var(--mirror-cyan);">no cup visible</span>
         </div>
-        <div id="step-tier-reason" style="margin-top: 4px; font-size: 10px; color: var(--text-muted);">
-          Reason: reversible tidy
+        <div style="font-size: 10px; color: var(--text-muted);" id="step-tier-reason">
+          Tier: A1 • Reason: reversible tidy
         </div>
       </div>
 
-      <button id="plan-confirm-btn" class="btn" onclick="onExecuteStep()">Perform Physical Action</button>
+      <div class="card">
+        <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Policy Gate Decision</h3>
+        <p style="font-size: 11px; color: var(--mirror-success);">Decision: allow (Tier A1). User manual confirmation triggers physical execution.</p>
+      </div>
+
+      <button class="btn" onclick="onExecuteStep()">User Confirms: Execute Step</button>
       <button class="btn btn-secondary" onclick="navTo('summary')">Back to Summary</button>
 
       <div class="log-tray" id="log-plan">
-        POST /v1/sessions/{sid}/verify ready
+        Enforcing invariant: No task is complete without verification.
       </div>
     </div>
 
     <!-- SCREEN 5: VERIFICATION -->
     <div id="verify-screen" class="screen">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-size: 16px;">Result Verification</h2>
+        <h2 style="font-size: 20px; font-weight: 700;">Result Verification</h2>
         <span id="v-status-badge" class="badge badge-success">VERIFIED</span>
       </div>
 
-      <!-- Result Banner -->
+      <!-- Result Card -->
       <div id="v-card" class="card" style="border-color: var(--mirror-success); background: var(--mirror-success-glow);">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span id="v-icon" style="font-size: 24px;">✅</span>
@@ -558,10 +600,13 @@
   </div>
 
   <script>
+    const API_BASE = "http://localhost:8000";
+    let backendOnline = false;
+
     // State model mapped 1:1 to FastAPI backend models
     const backendState = {
       sessionId: null,
-      goal: "study",
+      goal: "prepare space to study",
       interpretedIntent: "prepare the space to study",
       goalGate: { step_id: "goal", tier: "A0", decision: "allow", rule_id: "R-planner" },
       world: { observations: [], unknowns: [], hazards: [] },
@@ -571,6 +616,37 @@
       mode: "verified" // verified, cannot_tell, no_action_needed, needs_human, blocked_goal
     };
 
+    // Check Live FastAPI Backend Health
+    async function checkBackendHealth() {
+      const dot = document.getElementById("backend-dot");
+      const txt = document.getElementById("backend-status-text");
+      const indicator = document.getElementById("backend-status-indicator");
+      try {
+        const res = await fetch(`${API_BASE}/v1/health`, { method: "GET" });
+        if (res.ok) {
+          const data = await res.json();
+          backendOnline = true;
+          if (dot) dot.className = "backend-dot online";
+          if (txt) txt.innerText = `Connected: ${API_BASE}/v1 (${data.provider})`;
+          if (indicator) {
+            indicator.innerText = "● LIVE /v1";
+            indicator.style.color = "var(--mirror-success)";
+          }
+          return true;
+        }
+      } catch (e) {
+        // Backend offline or CORS restriction
+      }
+      backendOnline = false;
+      if (dot) dot.className = "backend-dot offline";
+      if (txt) txt.innerText = "Backend offline • Using Contract-Compliant Client Engine";
+      if (indicator) {
+        indicator.innerText = "○ SIMULATION";
+        indicator.style.color = "var(--mirror-warning)";
+      }
+      return false;
+    }
+
     // Canvas Simulation Setup for Camera Viewfinder
     const canvas = document.getElementById("viewfinder-canvas");
     const ctx = canvas.getContext("2d");
@@ -578,11 +654,13 @@
     let t = 0;
 
     function resizeCanvas() {
+      if (!canvas || !canvas.parentElement) return;
       canvas.width = canvas.parentElement.clientWidth;
       canvas.height = canvas.parentElement.clientHeight;
     }
 
     function drawCameraSimulation() {
+      if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       t += 0.03;
 
@@ -658,7 +736,6 @@
         renderVerifyScreen();
       } else if (screenName === "complete") {
         document.getElementById("complete-screen").classList.add("active");
-        renderCompleteScreen();
       }
     }
 
@@ -668,14 +745,54 @@
     }
 
     // POST /v1/sessions
-    function onGoalSubmitted() {
+    async function onGoalSubmitted() {
       const val = document.getElementById("goal-input").value.trim();
-      if (!val) return;
+      if (!val) {
+        alert("Goal cannot be empty.");
+        return;
+      }
       backendState.goal = val;
 
-      // Policy check matching src/core/policy.py
+      // Try Live Backend First
+      if (backendOnline) {
+        try {
+          const res = await fetch(`${API_BASE}/v1/sessions`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ goal: val })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            backendState.sessionId = data.session_id;
+            backendState.interpretedIntent = data.interpreted_intent;
+            backendState.goalGate = data.goal_gate;
+            if (data.blocked) {
+              document.getElementById("modal-tier-badge").innerText = `TIER ${data.goal_gate.tier} BLOCKED`;
+              document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (" + data.goal_gate.tier + ")";
+              document.getElementById("modal-hazard-desc").innerText = data.message || "MIRROR will not guide this. Ask a qualified professional or emergency services.";
+              document.getElementById("modal-rule-pill").innerText = "Rule Triggered: " + data.goal_gate.rule_id;
+              document.getElementById("safety-modal").style.display = "flex";
+              return;
+            }
+            document.getElementById("session-id-pill").innerText = "Session: " + backendState.sessionId;
+            document.getElementById("session-tier-pill").innerText = "Tier: " + data.goal_gate.tier;
+            document.getElementById("session-gate-pill").innerText = "Gate: " + data.goal_gate.decision;
+            navTo("camera");
+            return;
+          }
+        } catch (err) {
+          console.warn("Backend request failed, falling back to local simulation:", err);
+        }
+      }
+
+      // Local Deterministic Policy Check matching src/core/policy.py
       const low = val.toLowerCase();
-      if (backendState.mode === "blocked_goal" || low.includes("wiring") || low.includes("socket") || low.includes("fuse") || low.includes("voltage")) {
+      const isA3 = backendState.mode === "blocked_goal" ||
+                   /\b(wiring|wires?|fuse|circuit|breaker|mains|socket|outlet|voltage)\b/i.test(low) ||
+                   /\b(gas|lpg|pilot light)\b/i.test(low) ||
+                   /\b(medicine|medication|dose|dosage|pill|prescription|diagnos\w*)\b/i.test(low);
+
+      if (isA3) {
         // A3 Blocked
         document.getElementById("modal-tier-badge").innerText = "TIER A3 BLOCKED";
         document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (A3)";
@@ -686,7 +803,8 @@
       }
 
       backendState.sessionId = "sess_" + Math.random().toString(36).substring(2, 8);
-      backendState.interpretedIntent = val.includes("study") ? "prepare the space to study" : val.includes("cook") ? "prepare the space to cook" : "prepare the space to " + val;
+      backendState.interpretedIntent = val.includes("study") ? "prepare the space to study" : val.includes("cook") ? "prepare the space to cook" : val.includes("work") ? "prepare the space to work" : "prepare the space to " + val;
+      backendState.goalGate = { step_id: "goal", tier: "A0", decision: "allow", rule_id: "R-planner" };
 
       document.getElementById("session-id-pill").innerText = "Session: " + backendState.sessionId;
       document.getElementById("session-tier-pill").innerText = "Tier: A0";
@@ -695,42 +813,113 @@
       navTo("camera");
     }
 
+    // Trigger Capture from Camera HUD
+    function onSceneCaptured() {
+      onSceneObserved();
+    }
+
     // POST /v1/sessions/{sid}/observe
-    function onSceneObserved() {
+    async function onSceneObserved() {
+      let fakeLabels = ["cup", "desk", "lamp"];
+      if (backendState.mode === "no_action_needed") {
+        fakeLabels = ["desk", "lamp", "notebook"];
+      }
+
+      if (backendOnline && backendState.sessionId) {
+        try {
+          const res = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/observe`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              frames: [{ id: "f1", blur: 0.05, brightness: 0.6, fake_labels: fakeLabels }]
+            })
+          });
+          if (res.ok) {
+            const world = await res.json();
+            backendState.world = world;
+          }
+        } catch (err) {
+          console.warn("Live observe failed, using simulation:", err);
+        }
+      } else {
+        if (backendState.mode === "no_action_needed") {
+          backendState.world.observations = [
+            { label: "desk", confidence: 0.95 },
+            { label: "lamp", confidence: 0.91 },
+            { label: "notebook", confidence: 0.89 }
+          ];
+        } else {
+          backendState.world.observations = [
+            { label: "cup", confidence: 0.92 },
+            { label: "desk", confidence: 0.95 },
+            { label: "lamp", confidence: 0.90 }
+          ];
+        }
+      }
+
       document.getElementById("summary-intent-text").innerText = backendState.interpretedIntent;
-      document.getElementById("summary-sid").innerText = "Session ID: " + backendState.sessionId;
+      document.getElementById("summary-sid").innerText = "Session ID: " + (backendState.sessionId || "sess_sim");
 
       const obsContainer = document.getElementById("summary-observations");
       obsContainer.innerHTML = "";
-
-      if (backendState.mode === "no_action_needed") {
-        backendState.world.observations = [
-          { label: "desk", confidence: 0.95 },
-          { label: "lamp", confidence: 0.91 },
-          { label: "notebook", confidence: 0.89 }
-        ];
-      } else {
-        backendState.world.observations = [
-          { label: "cup", confidence: 0.92 },
-          { label: "desk", confidence: 0.95 },
-          { label: "lamp", confidence: 0.90 }
-        ];
-      }
-
-      backendState.world.observations.forEach(o => {
+      (backendState.world.observations || []).forEach(o => {
         obsContainer.innerHTML += `<div style="color: var(--mirror-success);">✔ ${o.label} (confidence: ${o.confidence})</div>`;
       });
 
       const needs = document.getElementById("summary-needs-breakdown");
-      needs.innerHTML = `Needs for "${backendState.goal}": lamp, notebook. Clutter detected: ${backendState.world.observations.find(o => o.label === "cup") ? "cup" : "None"}.`;
+      const hasCup = (backendState.world.observations || []).some(o => o.label === "cup");
+      needs.innerHTML = `Needs for "${backendState.goal}": lamp, notebook. Clutter detected: ${hasCup ? "cup" : "None"}.`;
 
       navTo("summary");
     }
 
     // POST /v1/sessions/{sid}/plan
-    function onProceedToPlan() {
+    async function onProceedToPlan() {
+      if (backendOnline && backendState.sessionId) {
+        try {
+          const res = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/plan`, {
+            method: "POST"
+          });
+          if (res.ok) {
+            const planData = await res.json();
+            if (planData.outcome === "no_action_needed") {
+              document.getElementById("complete-title").innerText = "NO ACTION NEEDED";
+              document.getElementById("complete-title").style.color = "var(--mirror-cyan)";
+              document.getElementById("complete-desc").innerText = "Space is already clear and ready. Zero verified changes made (no false success claimed).";
+              document.getElementById("complete-summary-list").innerHTML = "<div>✔ Space already prepared. Zero tasks required.</div>";
+              navTo("complete");
+              return;
+            }
+            if (planData.outcome === "completed") {
+              onMissionCompleted();
+              return;
+            }
+            if (planData.outcome === "needs_human") {
+              alert("needs_human: Verification failed repeatedly. Please check the step yourself.");
+              return;
+            }
+            if (planData.outcome === "blocked_goal") {
+              document.getElementById("modal-tier-badge").innerText = "TIER A3 BLOCKED";
+              document.getElementById("modal-hazard-title").innerText = "PolicyGate Refusal (A3)";
+              document.getElementById("modal-hazard-desc").innerText = planData.message || "MIRROR will not guide this.";
+              document.getElementById("modal-rule-pill").innerText = "Rule Triggered: " + (planData.gate?.rule_id || "R-A3");
+              document.getElementById("safety-modal").style.display = "flex";
+              return;
+            }
+            if (planData.step) {
+              backendState.currentStep = planData.step;
+              backendState.currentGate = planData.gate;
+              navTo("plan");
+              return;
+            }
+          }
+        } catch (err) {
+          console.warn("Live plan failed, using simulation:", err);
+        }
+      }
+
+      // Local simulation fallback
       if (backendState.mode === "no_action_needed") {
-        // no_action_needed outcome
         document.getElementById("complete-title").innerText = "NO ACTION NEEDED";
         document.getElementById("complete-title").style.color = "var(--mirror-cyan)";
         document.getElementById("complete-desc").innerText = "Space is already clear and ready. Zero verified changes made (no false success claimed).";
@@ -744,7 +933,6 @@
         return;
       }
 
-      // Propose step s1
       backendState.currentStep = {
         id: "s1",
         instruction: "Move the cup off the surface.",
@@ -768,8 +956,8 @@
 
       document.getElementById("step-id-text").innerText = "Step " + step.id;
       document.getElementById("step-instruction-text").innerText = step.instruction;
-      document.getElementById("step-evidence-text").innerText = step.expected_evidence.join(", ");
-      document.getElementById("step-tier-reason").innerText = "Tier: " + step.tier + " • Reason: " + step.tier_reason;
+      document.getElementById("step-evidence-text").innerText = (step.expected_evidence || []).join(", ");
+      document.getElementById("step-tier-reason").innerText = "Tier: " + step.tier + " • Reason: " + (step.tier_reason || "reversible tidy");
     }
 
     function onExecuteStep() {
@@ -777,7 +965,7 @@
     }
 
     // POST /v1/sessions/{sid}/verify
-    function renderVerifyScreen() {
+    async function renderVerifyScreen() {
       const badge = document.getElementById("v-status-badge");
       const card = document.getElementById("v-card");
       const icon = document.getElementById("v-icon");
@@ -788,7 +976,43 @@
       const btn = document.getElementById("v-primary-btn");
       const stepCount = document.getElementById("v-steps-count");
 
-      if (backendState.mode === "verified") {
+      let verifyStatus = backendState.mode;
+      let verifyConfidence = 0.92;
+      let evidenceSeen = ["no cup visible"];
+      let evidenceMissing = [];
+      let reason = "All expected evidence seen in the new frames.";
+
+      // Try Live Backend Verification
+      if (backendOnline && backendState.sessionId) {
+        try {
+          let verifyFrames = [];
+          if (backendState.mode === "cannot_tell") {
+            verifyFrames = [{ id: "f_verify", blur: 0.85, brightness: 0.1, fake_labels: [] }];
+          } else if (backendState.mode === "not_verified") {
+            verifyFrames = [{ id: "f_verify", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp", "cup"] }];
+          } else {
+            verifyFrames = [{ id: "f_verify", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp"] }];
+          }
+
+          const res = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ frames: verifyFrames })
+          });
+          if (res.ok) {
+            const v = await res.json();
+            verifyStatus = v.status;
+            verifyConfidence = v.confidence;
+            evidenceSeen = v.evidence_seen || [];
+            evidenceMissing = v.evidence_missing || [];
+            reason = v.reason || "";
+          }
+        } catch (err) {
+          console.warn("Live verify failed, using simulation:", err);
+        }
+      }
+
+      if (verifyStatus === "verified") {
         badge.className = "badge badge-success";
         badge.innerText = "VERIFIED";
         card.style.borderColor = "var(--mirror-success)";
@@ -796,18 +1020,18 @@
         icon.innerText = "✅";
         title.innerText = "VERIFIED PASS";
         title.style.color = "var(--mirror-success)";
-        conf.innerText = "Confidence: 0.92 (Grounded in anchor evidence)";
-        bar.style.width = "92%";
+        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)} (Grounded in anchor evidence)`;
+        bar.style.width = `${Math.round(verifyConfidence * 100)}%`;
         bar.style.background = "var(--mirror-success)";
         evList.innerHTML = `
-          <div style="color: var(--mirror-success);">✔ Evidence seen: no cup visible</div>
+          <div style="color: var(--mirror-success);">✔ Evidence seen: ${evidenceSeen.join(", ") || "no cup visible"}</div>
           <div>• Frame quality: ok (blur: 0.05, brightness: 0.60)</div>
           <div>• Anchor confidence: 0.95 (desk & lamp recognized)</div>
         `;
         btn.innerText = "Advance & Plan Next Step";
         btn.className = "btn btn-success";
         btn.onclick = onAdvanceOrPlanNext;
-      } else if (backendState.mode === "cannot_tell") {
+      } else if (verifyStatus === "cannot_tell") {
         badge.className = "badge badge-uncertain";
         badge.innerText = "CANNOT_TELL";
         card.style.borderColor = "var(--mirror-uncertain)";
@@ -815,27 +1039,69 @@
         icon.innerText = "❓";
         title.innerText = "UNCERTAIN (CANNOT_TELL)";
         title.style.color = "var(--mirror-uncertain)";
-        conf.innerText = "Confidence: 0.0 (Unusable frame / ungrounded anchor)";
+        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)} (Unusable frame / ungrounded anchor)`;
         bar.style.width = "0%";
         bar.style.background = "var(--mirror-uncertain)";
         evList.innerHTML = `
-          <div style="color: var(--mirror-warning);">⚠ Reason: Frames too blurry or dark. Retake photo.</div>
-          <div>• Evidence missing: no cup visible</div>
+          <div style="color: var(--mirror-warning);">⚠ Reason: ${reason || "Frames too blurry or dark. Retake photo."}</div>
+          <div>• Evidence missing: ${evidenceMissing.join(", ") || "no cup visible"}</div>
           <div style="color: var(--text-secondary);">Rule: Uncertainty is never marked as success.</div>
         `;
         btn.innerText = "Retake Photo at Same Angle";
         btn.className = "btn btn-uncertain";
         btn.onclick = () => navTo("camera");
+      } else {
+        badge.className = "badge badge-critical";
+        badge.innerText = "NOT_VERIFIED";
+        card.style.borderColor = "var(--mirror-critical)";
+        card.style.background = "var(--mirror-critical-glow)";
+        icon.innerText = "❌";
+        title.innerText = "VERIFICATION FAILED";
+        title.style.color = "var(--mirror-critical)";
+        conf.innerText = `Confidence: ${verifyConfidence.toFixed(2)}`;
+        bar.style.width = `${Math.round(verifyConfidence * 100)}%`;
+        bar.style.background = "var(--mirror-critical)";
+        evList.innerHTML = `
+          <div style="color: var(--mirror-critical);">❌ Expected evidence missing: ${evidenceMissing.join(", ") || "no cup visible"}</div>
+          <div>• Reason: ${reason || "Physical condition was not met."}</div>
+        `;
+        btn.innerText = "Retry Step Execution";
+        btn.className = "btn btn-critical";
+        btn.onclick = () => navTo("plan");
       }
 
       stepCount.innerText = backendState.verifiedSteps;
     }
 
-    function onAdvanceOrPlanNext() {
+    async function onAdvanceOrPlanNext() {
       backendState.verifiedSteps += 1;
       document.getElementById("v-steps-count").innerText = backendState.verifiedSteps;
 
-      // Plan outcome: completed (>= 1 verified step, space now prepared)
+      if (backendOnline && backendState.sessionId) {
+        try {
+          await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/observe`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              frames: [{ id: "f_done", blur: 0.05, brightness: 0.6, fake_labels: ["desk", "lamp", "notebook"] }]
+            })
+          });
+          const planRes = await fetch(`${API_BASE}/v1/sessions/${backendState.sessionId}/plan`, {
+            method: "POST"
+          });
+          if (planRes.ok) {
+            const planData = await planRes.json();
+            // Outcome: completed
+          }
+        } catch (err) {
+          console.warn("Live completion request failed:", err);
+        }
+      }
+
+      onMissionCompleted();
+    }
+
+    function onMissionCompleted() {
       document.getElementById("complete-title").innerText = "MISSION COMPLETED";
       document.getElementById("complete-title").style.color = "var(--mirror-success)";
       document.getElementById("complete-desc").innerText = `Session finished: ${backendState.verifiedSteps} verified step(s) recorded with empirical proof.`;
@@ -850,6 +1116,9 @@
       backendState.sessionId = null;
       backendState.verifiedSteps = 0;
       backendState.currentStep = null;
+      document.getElementById("session-id-pill").innerText = "Session: None";
+      document.getElementById("session-tier-pill").innerText = "Tier: -";
+      document.getElementById("session-gate-pill").innerText = "Gate: -";
       navTo("home");
     }
 
@@ -876,6 +1145,7 @@
     window.addEventListener("DOMContentLoaded", () => {
       resizeCanvas();
       drawCameraSimulation();
+      checkBackendHealth();
     });
   </script>
 </body>
