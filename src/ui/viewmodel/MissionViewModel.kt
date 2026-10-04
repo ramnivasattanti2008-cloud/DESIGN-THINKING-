@@ -276,7 +276,8 @@ class MissionViewModel(
                             confidenceScore = v.confidence,
                             evidenceType = EvidenceType.VISUAL_CAMERA_DIFF,
                             reasoning = v.reason.ifBlank { "All expected evidence seen in new frames." },
-                            detectedChanges = v.evidence_seen
+                            detectedChanges = v.evidence_seen,
+                            status = "verified"
                         )
                         _uiState.update {
                             it.copy(
@@ -296,7 +297,8 @@ class MissionViewModel(
                             evidenceType = EvidenceType.VISUAL_CAMERA_DIFF,
                             reasoning = v.reason.ifBlank { "Could not recognise the same scene. Point camera at same area." },
                             detectedChanges = v.evidence_seen,
-                            uncertaintyFactors = v.evidence_missing.ifEmpty { listOf(v.reason) }
+                            uncertaintyFactors = v.evidence_missing.ifEmpty { listOf(v.reason) },
+                            status = "cannot_tell"
                         )
                         _uiState.update {
                             it.copy(
@@ -314,7 +316,8 @@ class MissionViewModel(
                             evidenceType = EvidenceType.VISUAL_CAMERA_DIFF,
                             reasoning = v.reason.ifBlank { "Expected evidence not seen." },
                             detectedChanges = v.evidence_seen,
-                            uncertaintyFactors = v.evidence_missing
+                            uncertaintyFactors = v.evidence_missing,
+                            status = "not_verified"
                         )
                         _uiState.update {
                             it.copy(

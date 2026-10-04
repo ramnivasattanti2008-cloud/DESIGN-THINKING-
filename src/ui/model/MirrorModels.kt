@@ -91,7 +91,8 @@ data class VerificationResult(
     val evidenceType: EvidenceType,
     val reasoning: String,
     val detectedChanges: List<String>,
-    val uncertaintyFactors: List<String> = emptyList()
+    val uncertaintyFactors: List<String> = emptyList(),
+    val status: String = if (isVerified) "verified" else "not_verified"
 )
 
 enum class EvidenceType {

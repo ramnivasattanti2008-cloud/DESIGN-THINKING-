@@ -37,8 +37,10 @@ fun VerificationScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isSuccess = verificationResult.isVerified && verificationResult.confidenceScore >= 0.85f
-    val isUncertain = !verificationResult.isVerified && verificationResult.confidenceScore in 0.50f..0.84f
+    val isCannotTell = verificationResult.status == "cannot_tell" ||
+        (!verificationResult.isVerified && (verificationResult.confidenceScore in 0.50f..0.84f || verificationResult.uncertaintyFactors.isNotEmpty()))
+    val isSuccess = verificationResult.isVerified && verificationResult.confidenceScore >= 0.85f && !isCannotTell
+    val isUncertain = isCannotTell
 
     Scaffold(
         topBar = {
@@ -116,7 +118,7 @@ fun VerificationScreen(
                                 Text(
                                     text = when {
                                         isSuccess -> "VERIFIED COMPLETE"
-                                        isUncertain -> "UNCERTAIN RESULT"
+                                        isUncertain -> "UNCERTAIN (CANNOT_TELL)"
                                         else -> "VERIFICATION FAILED"
                                     },
                                     style = MaterialTheme.typography.titleLarge,
@@ -125,7 +127,7 @@ fun VerificationScreen(
                                 )
                                 Text(
                                     text = if (isSuccess) "Real-world state matches target criteria"
-                                    else if (isUncertain) "Ambiguous sensor data; requires human glance"
+                                    else if (isUncertain) "Ambiguous sensor frames or low anchor match; requires retake or human glance"
                                     else "Physical outcome does not match target postconditions",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = TextSecondary

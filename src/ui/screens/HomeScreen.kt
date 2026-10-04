@@ -38,11 +38,11 @@ fun HomeScreen(
     var isListening by remember { mutableStateOf(false) }
 
     val presetGoals = listOf(
-        "Assemble desk bookshelf",
-        "Inspect electrical socket for loose wire",
-        "Clear workspace safely",
-        "Find missing Phillips screwdriver",
-        "Check room ventilation & lighting"
+        "Prepare desk for focused study",
+        "Clear workspace and tidy desk",
+        "Find missing pen and notebook",
+        "Check room lighting & ventilation",
+        "[Safety Refusal Demo] Inspect electrical socket wiring"
     )
 
     Scaffold(
@@ -91,7 +91,7 @@ fun HomeScreen(
                             onValueChange = { goalText = it },
                             placeholder = {
                                 Text(
-                                    "e.g., Guide me through assembling this IKEA chair safely...",
+                                    "e.g., Prepare workspace to study or cook...",
                                     color = TextMuted,
                                     fontSize = 14.sp
                                 )
