@@ -203,6 +203,59 @@ Paste-ready prompt (AI Studio does not see the repo, so paste in: `AGENTS.md`, `
 You are studio-b (README, report, slides, demo script) on the MIRROR repo. A reviewer found claims in your branch that the repo does not support. Rewrite README.md, docs/report/OUTLINE.md, docs/report/DEMO_SCRIPT.md and docs/slides/SLIDES.md so that every factual claim is supported by the pasted docs. The ONLY source of verified facts is VALIDATION.md; copy numbers from it exactly. Required fixes: (1) delete "verified on GitHub Actions", "continuous integration" claims, the "unverified claims: zero" badge, "calibrated confidence" (say heuristic, not calibrated), "zero jailbreak risk", "mathematically impossible", and the "confirmation dialog" (it is a warning line plus a Begin step button); (2) delete invented results and sources: "FSR = 0% achieved", "100% on Tier A3", "empirical evaluation" (describe it as planned), "MIT License" (no LICENSE file exists; Ram decides), "20-35%" and "Kim et al., 2019" (remove or mark UNVERIFIED), "OkHttp" (the app uses HttpURLConnection); (3) correct thresholds to blur limit 0.6 and brightness minimum 0.2, remove the made-up 0.94 or label it an invented example, and fix the demo so an already-prepared desk is not "completed" (completed only appears after a verified step and a fresh scan; the web preview is a mock); (4) run instructions must match RUNNING.md exactly (pip install -e ".[dev]", host 0.0.0.0 for a phone, Gradle commands, backend URL options, JAVA_TOOL_OPTIONS for the Windows fix); (5) state: Android unit tests 21 passed and the debug APK builds, nothing has run on a phone, no real model has been called, the planner is a rule template, thresholds are heuristics; (6) keep the AI-use disclosure and the honest limits. Mark anything you cannot support UNVERIFIED or remove it. Output the four full files. Ram will put them in a branch studio-b/readme and open a PR into claude/architecture.
 ```
 
+## Round 3: what claude needs from Antigravity (and from Ram)
+
+claude has finished everything that can be done without a model key, a phone, or another seat's files. What is left needs the people below. Verified state when this was written: 283 backend tests pass, 30 Android unit tests pass and the debug app builds, GitHub's two checks are green (see `docs/architecture/VALIDATION.md` for the live numbers).
+
+### ag-a (frontend and UI): T-033 and the pull request
+
+A. UI components. The new flow currently uses plain functional screens that claude wrote inside `src/mobile/.../app/MirrorApp.kt`. Build proper themed versions as NEW files in `src/ui/screens/` (MirrorTheme styling; no imports from `navigation`, `network` or `viewmodel`; no sample or fake data) with EXACTLY these signatures, so claude can swap each in with a one-line change:
+
+```kotlin
+@Composable fun ExecutingScreen(instruction: String, evidence: String, onDone: () -> Unit, onCancel: () -> Unit, modifier: Modifier = Modifier)
+@Composable fun CompletedScreen(verifiedSteps: Int, onDone: () -> Unit, modifier: Modifier = Modifier)
+@Composable fun PhotoConsentDialog(onAllow: () -> Unit, onDecline: () -> Unit)
+@Composable fun ServerSettingsDialog(initialUrl: String, initialKey: String, error: String?, onSave: (url: String, key: String) -> Unit, onClose: () -> Unit)
+@Composable fun NoticeBanner(text: String, modifier: Modifier = Modifier)
+```
+Wording that must stay (the meaning is part of the safety policy):
+- `ExecutingScreen`: title "Do this step", the instruction, "MIRROR will look for: <evidence>", primary button "I did it. Check with the camera", secondary "Cancel mission".
+- `CompletedScreen`: title "Done and verified", "The camera confirmed <n> step(s), and a fresh scan shows nothing left to do.", button "Back to start". Show success wording ONLY here.
+- `PhotoConsentDialog`: title "Send photos for this task?", body "MIRROR sends the photos you take to your MIRROR server, which may pass them to a cloud AI model so it can see what is in your space. MIRROR does not store the photos; the AI provider terms apply. Do not photograph people, documents or screens. If you say no, nothing is taken or sent.", buttons "Allow for this task" and "Do not allow" (same visual weight, no pre-selected default).
+- `ServerSettingsDialog`: two fields (server address, API key hidden), the error text under them, a note "For development. A key stored in the app can be extracted.", Save and Cancel.
+Do not touch `src/mobile`, `src/core`, `src/api`, repo root or `tests/`. Check that it compiles with `./gradlew :app:assembleDebug` (Windows note in `docs/architecture/RUNNING.md`) or push the branch and read the GitHub Android CI result; never write "compiles" without one of those.
+
+B. Pull request #4 into `main`.
+1. Replace its description with the verified numbers from `docs/architecture/VALIDATION.md` (the current ones, not the old "216 tests / tip 074251d" text) and the current head commit.
+2. Wait for Ram's explicit "yes" in chat. Then merge with "Create a merge commit" (not squash). Nobody merges to `main` any other way.
+3. Do not merge any other branch. Write what you did in `docs/status/ag-a.md`.
+
+Paste-ready prompt:
+
+```
+You are ag-a (frontend and UI) on the MIRROR repo. First run: git fetch origin && git checkout -b ag-a/ui-components origin/claude/architecture. Read AGENTS.md and docs/tasks/BRIEFS.md, section "Round 3", part ag-a. Task A: create five themed Compose components as NEW files in src/ui/screens/ with exactly the signatures and wording in that section (ExecutingScreen, CompletedScreen, PhotoConsentDialog, ServerSettingsDialog, NoticeBanner). Only touch src/ui/screens, src/ui/components, src/ui/theme and docs/status/ag-a.md. No fake data, no imports from navigation/network/viewmodel, success wording only on CompletedScreen. Do not claim it compiles unless you ran ./gradlew :app:assembleDebug or read a green GitHub Android CI run. Open a PR into claude/architecture. Task B: update the description of PR #4 (claude/architecture into main) with the current numbers from docs/architecture/VALIDATION.md and the current head commit, then WAIT for Ram to say yes in chat before pressing Merge, and use "Create a merge commit". Never push to main directly.
+```
+
+### ag-b (QA and bug hunting): T-034
+
+Goal: try to break the guarantees, not to confirm them. Files: `tests/property/` (new), `tests/api/` (new files only), `docs/status/ag-b.md`. Do not edit `src/`. `hypothesis` is already in the dev extras.
+1. Property tests with Hypothesis on `Session` directly (fake provider, no network): random sequences of `observe`, `plan`, `verify` with random `fake_labels` (mix of clutter, hazards, needed items, random words, confidences written as `label:0.4`), random blur and brightness, goals from a list plus random text. Assert: `completed` appears only after a verified step; every `verified` has confidence at least 0.85; a step the policy blocks can never be verified (`ValueError`, API 409); any A3 goal is refused up front; evidence strings outside the grammar (`X visible`, `no X visible`) never verify; the audit-log sink raising never changes an outcome.
+2. API red-team (`tests/api/test_redteam.py`, in-process `TestClient`): try to get past auth (wrong key, header casing, empty Bearer, key in the query string, unicode), the rate limit (many requests, spoofed headers), the body-size limit, odd session ids, enormous `frames` lists. Report every failure as a bug in your status file with a minimal reproduction; do not fix `src/`.
+
+Paste-ready prompt:
+
+```
+You are ag-b (tests, CI, bug hunting) on the MIRROR repo. First run: git fetch origin && git checkout -b ag-b/property-tests origin/claude/architecture. Read AGENTS.md, docs/tasks/BRIEFS.md section "Round 3" part ag-b, docs/architecture/VERIFICATION.md, docs/architecture/SAFETY_POLICY.md, src/core/engine.py, src/core/policy.py, src/core/planner.py and src/api/security.py. Write tests/property/test_invariants.py (Hypothesis, Session with FakeModelClient, no network) asserting: completed only after a verified step; verified only at confidence >= 0.85; a policy-blocked step can never be verified; A3 goals are always blocked up front; evidence outside the grammar never verifies; a failing audit sink never changes an outcome. Also write tests/api/test_redteam.py trying to bypass auth, rate limit, body-size limit, odd session ids and huge frames lists through TestClient. Your goal is to FIND bugs: report each failing case as a bug with a minimal reproduction in docs/status/ag-b.md and do not edit src/. Run python -m pytest -q and paste the real result; never claim a pass you did not run. Open a PR into claude/architecture.
+```
+
+### ag-c (reserve)
+Nothing needed now.
+
+### Ram (not Antigravity)
+- T-032, the phone test: follow `docs/architecture/DEVICE_TEST.md` (a free Gemini key from Google AI Studio, one photo through `tools/check_model.py`, then three scenes on the phone) and send back the results table. This is the only way to learn whether the real loop works.
+- Say "yes" in chat when you want PR #4 merged.
+- Paste the fix prompts for studio-a, studio-b and Copilot (sections above) when you can.
+
 ## About the extra models Ram added
 
 The seats can use stronger models for the same tasks. The rules do not change: only the listed files, only verified claims, branch from `origin/claude/architecture`, PR into `claude/architecture`, never `main`. A stronger model is a good fit for T-020 and T-021.
