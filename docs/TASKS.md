@@ -29,6 +29,9 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-022 | HTTP end-to-end loop test against a real uvicorn process (7 HTTP end-to-end tests pass; claude fixed a flaky server wait) | ag-b | review | `tests/e2e/` | `ag-b/android-ci` |
 | T-026 | Build `tools/demo_client.py`, a CLI that drives the real backend loop, plus its pytest file. See `docs/tasks/BRIEFS.md` (on `copilot/demo-client`, being reviewed) | copilot | review | `tools/`, `docs/status/copilot.md` | `copilot/demo-client` |
 | T-024 | SQLite session-log writer using `db/schema.sql`, with tests (small, one session) (merged; 12 writer tests pass) | ag-c | review | `src/core/session_log.py`, `src/core/tests/test_session_log.py` | `ag-c/session-log` |
+| T-027 | Keyword planner with open-ended goals and an optional model hook, ported from `ag-a/ui-cleanup@171ecde` (`src/core/planner.py`) and reviewed: steps must be checkable from a photo, the engine decides completion | ag-a (port and review: claude) | review | `src/core/planner.py`, `src/core/tests/` | `claude/architecture` |
+| T-028 | API production hardening (API key, rate limit, size limit, CORS opt-in, security headers, bounded sessions, production startup check, HTTPS dev launcher), ported from `ag-a/ui-cleanup@171ecde` and reworked | ag-a (rework: claude) | review | `src/api/`, `tools/run_secure_server.py`, `tests/api/` | `claude/architecture` |
+| T-029 | Android: live camera preview, API-key header, per-task photo consent | claude | review | `src/mobile/` | `claude/architecture` |
 
 Detailed briefs and paste-ready prompts for each seat are in `docs/tasks/BRIEFS.md`. T-013 (studio-a) and T-007/T-014 (studio-b) stand as listed.
 

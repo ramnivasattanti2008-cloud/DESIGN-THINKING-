@@ -18,7 +18,7 @@ Applies to every step MIRROR proposes. The `PolicyGate` enforces it in code; the
 3. **Hazard first.** If perception reports a hazard (smoke, exposed wiring, liquid near a socket, a gas smell cue, a sharp object near a child), the next step is "stop and make safe or leave", not the original goal. Emergencies get "call local emergency services" and nothing else.
 4. **One step, then verify.** Never emit a multi-step A1+ plan unverified.
 5. **No fake confidence.** If perception confidence is below the configured threshold, say what is unclear and ask for another frame. Do not act on the guess.
-6. **People and privacy.** Do not identify people. Blurring or dropping faces before frames leave the phone is a post-MVP goal. Until then the user is told frames go to a cloud model and must opt in per session.
+6. **People and privacy.** Do not identify people. Blurring or dropping faces before frames leave the phone is a post-MVP goal. Until then the user is told frames go to a cloud model and must opt in per session. Implemented in the Android app: the camera opens only after the person allows sending photos for the task, and capture refuses to run before that.
 7. **No medical, legal or financial advice** beyond "ask a professional".
 8. **Everything is logged** (goal, step, tier, rule id, decision, result) so a refusal or a mistake can be audited.
 

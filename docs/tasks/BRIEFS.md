@@ -167,6 +167,8 @@ Everything up to `b901585` (T-020) is accepted and merged. The 15 commits after 
 - **Edits outside your lane.** The branch changes `src/core/model_client.py` and `src/core/tests/test_model_client.py` (claude's), `tests/` (ag-b's), `tools/` (copilot's), `data/`, `research/`, `prompts/` (studio-a's) and merges the other seats' branches (`studio-a/scenes`, `studio-b/readme`, `copilot/demo-client`, `ag-b/android-ci`, `ag-c/session-log`) without review. Integration is claude's job; those branches contain problems already listed in this file.
 - **Out of MVP scope.** The "Sara" chat persona, 8-language i18n, voice, Gemini/OpenAI integration: the backend has no chat endpoint and the MVP is one scenario. Propose features in your status file first.
 
+UPDATE: from the later commit `171ecde` claude took, selectively and with fixes, the planner, the API hardening, the secure-server script and the camera preview slot (see commit `07627d1` on `claude/architecture`). Nothing else after `b901585` was taken.
+
 What to do: reset `ag-a/ui-cleanup` to `b901585` (`git checkout ag-a/ui-cleanup && git reset --hard b901585`; the extra work stays recoverable in the reflog) and keep your future branches inside `src/ui/`, `public/`, `assets/` and `docs/status/ag-a.md`. Do not merge other seats' branches. Do not claim data is real.
 
 Paste-ready prompt:

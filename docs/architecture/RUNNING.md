@@ -13,6 +13,25 @@ Providers (env, see `.env.example`):
 - `MIRROR_MODEL_PROVIDER=fake` (default): reads labels from test input. No real perception.
 - `MIRROR_MODEL_PROVIDER=anthropic` with `MIRROR_MODEL_API_KEY` set: real vision calls. Not yet exercised against the live API.
 
+## Production hardening (backend)
+
+Configured by environment variables, safe by default (code: `src/api/security.py`):
+
+| Variable | Meaning |
+|---|---|
+| `MIRROR_ENV=production` | A missing `MIRROR_API_KEY` becomes a startup error instead of a silently open server |
+| `MIRROR_API_KEY` | When set, every route except `/v1/health` needs it (`X-API-Key` header or `Authorization: Bearer ...`). Unset means an open development server and a warning in the log |
+| `MIRROR_RATE_LIMIT_PER_MINUTE` | Per client, default 60. `0` switches it off (the test suite does this) |
+| `MIRROR_TRUST_PROXY=1` | Take the client address from `X-Forwarded-For`. Only behind a proxy you control, otherwise clients can fake their address |
+| `MIRROR_MAX_BODY_BYTES` | Request size limit, default 8 MiB (a photo is a few hundred KiB) |
+| `MIRROR_MAX_SESSIONS` | Sessions kept in memory, default 1000 (the oldest is dropped) |
+| `MIRROR_ALLOWED_ORIGINS` | Comma separated browser origins. Empty (default) means no CORS headers; a native app does not need them |
+| `MIRROR_SESSION_DB` | SQLite path for the optional audit log (no photos are ever written) |
+
+HTTPS for local or LAN testing: `python tools/run_secure_server.py` (generates a self-signed development certificate into the git-ignored `certs/`; needs the `cryptography` package from the dev extras). A real deployment should terminate TLS at a proper proxy or host with a real certificate.
+
+The Android debug build can send the key: `./gradlew :app:assembleDebug -PmirrorApiKey=<key>`. A key baked into an APK can be extracted, so this is for development only; a shipped app needs per-user sign-in.
+
 ## Android app
 
 One Gradle module (`:app`) built from `src/mobile` (integration, owned by `claude`) plus `src/ui` (screens, owned by `ag-a`, compiled unchanged).
@@ -54,6 +73,7 @@ export GRADLE_OPTS="-Xmx2g -Dfile.encoding=UTF-8"
 3. "Nothing to change" is reported as such, never as success.
 4. Unsafe goals are refused before any scan. Hazards seen in the scene stop the flow; there is no override.
 5. Server, model or camera failures show a message and change no state toward success.
+6. No photo is taken or sent until the person allows it for the task (a dialog appears before the camera opens). Declining cancels the task with nothing taken or sent; the next task asks again.
 
 ## Known limits
 
