@@ -27,7 +27,7 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-020 | UI cleanup: fix CameraViewScreen.kt:171 compile bug, remove or label fake HUD data, MVP-safe presets, optional hazard-simulation button. See `docs/tasks/BRIEFS.md` | ag-a | todo | `src/ui/screens/`, `src/ui/components/`, `src/ui/theme/`, `src/ui/model/`, `src/ui/web_preview/`, `public/`, `assets/` | `ag-a/ui-cleanup` |
 | T-021 | Android CI job: Gradle unit tests and debug build on GitHub Actions | ag-b | todo | `.github/workflows/android.yml` | `ag-b/android-ci` |
 | T-022 | HTTP end-to-end loop test against a real uvicorn process | ag-b | todo | `tests/e2e/` | `ag-b/android-ci` |
-| T-025 | Review only (no source edits): Kotlin integration, engine and policy, report findings as file:line with suggested fixes | copilot | todo | `docs/status/copilot.md` | |
+| T-026 | Build `tools/demo_client.py`, a CLI that drives the real backend loop, plus its pytest file. See `docs/tasks/BRIEFS.md` | copilot | todo | `tools/`, `docs/status/copilot.md` | `copilot/demo-client` |
 | T-024 | SQLite session-log writer using `db/schema.sql`, with tests (small, one session) | ag-c | todo | `src/core/session_log.py`, `src/core/tests/test_session_log.py` | `ag-c/session-log` |
 
 Detailed briefs and paste-ready prompts for each seat are in `docs/tasks/BRIEFS.md`. T-013 (studio-a) and T-007/T-014 (studio-b) stand as listed.

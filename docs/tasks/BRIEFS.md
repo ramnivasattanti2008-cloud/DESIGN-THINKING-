@@ -91,23 +91,23 @@ Paste-ready prompt:
 You are studio-b (README, report, slides, demo script) on the MIRROR repo (AI Studio does not see the repo, so Ram pastes you: AGENTS.md, docs/architecture/OVERVIEW.md, docs/architecture/RUNNING.md, docs/architecture/VALIDATION.md). Do T-014 and T-007: write README.md (what MIRROR is, how to run the backend and the Android app, the safety rules, honest known limits), a report outline under docs/report/, and a 3-minute demo script. Use only what the pasted files say is verified; mark everything else UNVERIFIED and list the limits from VALIDATION.md plainly. Do not claim the Android tests passed, that a real model was called, or that anything ran on a phone. Do not hide AI use; Ram decides the wording. Ram will put your output in a branch studio-b/readme and open a PR into claude/architecture.
 ```
 
-## copilot (GitHub Copilot Chat): T-025, review only
+## copilot (GitHub Copilot Chat): T-026, one build task
 
-AGENTS.md limits Copilot to autocomplete. Ram asked for Copilot Chat to take work too, so for this task it is a **reviewer**: it reads code and reports. It does not edit any source file. Files you may touch: `docs/status/copilot.md` only.
+Replaces the earlier review-only task. Copilot builds one small, standalone tool. Files you may touch: everything under the new folder `tools/`, and `docs/status/copilot.md`. Nothing else.
 
-Review these files for compile errors and logic bugs, in this order, and list each finding as `file:line`, what is wrong, and a suggested fix (do not apply it):
-1. `src/mobile/src/main/kotlin/com/mirror/mobile/integration/MissionController.kt`
-2. `src/mobile/src/main/kotlin/com/mirror/mobile/integration/BackendAdapter.kt`
-3. `src/mobile/src/main/kotlin/com/mirror/mobile/api/JsonParsing.kt` and `MirrorApi.kt`
-4. `src/mobile/src/main/kotlin/com/mirror/mobile/capture/CameraCapture.kt` (CameraX 1.3.4 API use, coroutine resume safety)
-5. `src/core/engine.py` and `src/core/policy.py` (verifier grounding logic, policy regex gaps)
+Build `tools/demo_client.py`, a command-line demo that drives the real MIRROR backend over HTTP so anyone can see the loop without the phone app:
+- Usage: `python tools/demo_client.py --url http://127.0.0.1:8000 --goal "get my desk ready to study"`.
+- It calls `POST /v1/sessions`, then loops: ask the user (stdin) what the camera "sees" as a comma-separated list like `desk, cup, lamp:0.4` (this feeds `fake_labels`, so it only works with the fake provider; print a clear note about that), call `observe`, call `plan`, print the outcome, the step, the safety tier and decision, then ask the user what the camera sees after they do the step, call `verify`, print status, confidence and reason. Repeat until `plan` returns `completed`, `no_action_needed`, `blocked_goal` or `needs_human`.
+- Print a loud line `NOT A REAL RESULT: fake provider` when `GET /v1/health` reports `FakeModelClient`.
+- Never print "success" or "done" unless the backend returned `completed`. A `no_action_needed` result must be printed as "nothing to change, nothing verified".
+- Use only `httpx` (already a dependency) and the standard library. Handle connection errors and HTTP errors with a clear message, no stack trace.
+- Add `--script path.json` to replay a list of frame label sets non-interactively, and add `tools/test_demo_client.py` (pytest) that runs the client against the FastAPI app with `fastapi.testclient.TestClient` for: blocked goal, a full verified loop ending in `completed`, a failed verification, and `no_action_needed`.
+- Run `python -m pytest tools/test_demo_client.py` and paste the output in your PR.
 
-Specifically look for: any path where the app or backend could report success without a verified step; a coroutine that can resume twice; unhandled exceptions; regexes in `policy.py` that over-block or under-block common household goals. Mark anything you are unsure of `UNVERIFIED`.
-
-Paste-ready prompt (Copilot Chat, with the files above open or attached):
+Paste-ready prompt (Copilot Chat, with `src/api/main.py`, `src/core/engine.py`, `src/core/models.py` and `docs/architecture/RUNNING.md` attached):
 
 ```
-You are the reviewer seat (copilot) for the MIRROR repo. Do not edit any file in src/. Read AGENTS.md and docs/tasks/BRIEFS.md (section "copilot: T-025"). Review MissionController.kt, BackendAdapter.kt, JsonParsing.kt, MirrorApi.kt, CameraCapture.kt, engine.py and policy.py. Report each problem as file:line, what is wrong, and a suggested fix. Focus on: any way the app or backend could claim success without a verified step, a coroutine that can resume twice (CameraCapture), unhandled exceptions, and regex gaps in policy.py. Mark guesses UNVERIFIED. Put the findings in docs/status/copilot.md and nowhere else.
+You are the copilot seat on the MIRROR repo. Read AGENTS.md and docs/tasks/BRIEFS.md (section "copilot: T-026"). Build tools/demo_client.py (a command-line client that drives the MIRROR backend /v1 loop: create session, observe, plan, verify, repeating until the backend returns completed, no_action_needed, blocked_goal or needs_human) and tools/test_demo_client.py (pytest using FastAPI TestClient: blocked goal, full verified loop ending in completed, failed verification, no_action_needed). Use only httpx and the standard library. Print a loud "NOT A REAL RESULT: fake provider" when /v1/health says FakeModelClient. Never print success or done unless the backend returned "completed"; print no_action_needed as "nothing to change, nothing verified". Touch only the tools/ folder and docs/status/copilot.md. Run python -m pytest tools/test_demo_client.py and paste the real output; do not claim it passes unless you ran it. Ram will put your files in a branch copilot/demo-client and open a PR into claude/architecture. Never push to main.
 ```
 
 ## About the extra models Ram added
