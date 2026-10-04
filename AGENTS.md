@@ -6,13 +6,14 @@ Owner: Ram (ramnivasattanti2008@gmail.com). Ram has the final say on everything.
 
 ## The team
 
-Six seats. Each one has a lane. Stay in yours.
+Seven seats. Each one has a lane. Stay in yours.
 
 | Seat | Tool | Lane |
 |---|---|---|
-| `claude` | Claude (Claude Code / claude.ai) | Lead engineer. Architecture, core logic, integration, reviews every PR |
+| `claude` | Claude (Claude Code / claude.ai) | Lead engineer. Architecture, core logic, reviews every PR |
 | `ag-a` | Antigravity, account 1 | Frontend and UI, app screens, user flow |
 | `ag-b` | Antigravity, account 2 | Tests, CI, bug hunting, security and performance checks |
+| `ag-c` | Antigravity, account 3 | API glue, database schema and migrations, hosting and deployment config |
 | `studio-a` | Google AI Studio, account 1 | Research, datasets, prompts, model experiments, evaluation |
 | `studio-b` | Google AI Studio, account 2 | README, report or paper, slides, demo script |
 | `copilot` | GitHub Copilot (Student Pack) | Autocomplete only. No autonomous changes |

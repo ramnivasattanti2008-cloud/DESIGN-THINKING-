@@ -1,4 +1,4 @@
-**Seat:** (claude / ag-a / ag-b / studio-a / studio-b)
+**Seat:** (claude / ag-a / ag-b / ag-c / studio-a / studio-b)
 **Task ID:** T-___
 
 ## What changed

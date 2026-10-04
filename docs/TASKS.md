@@ -13,5 +13,6 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-005 | Set up test tooling and a CI workflow | ag-b | todo | `tests/`, `.github/workflows/` | |
 | T-006 | First UI sketch based on the agreed user flow | ag-a | todo | `src/ui/` | |
 | T-007 | README skeleton and report outline | studio-b | todo | `README.md`, `docs/report/` | |
+| T-008 | Draft the API contract and database schema once the stack is chosen | ag-c | todo | `src/api/`, `db/` | |
 
 Add real tasks here once T-001 is done. Every task needs one owner and a list of files, so nothing overlaps.
