@@ -3,16 +3,20 @@
 Last updated: 2026-10-04
 
 ## Done
-- Created the coordination files (AGENTS.md, ROLES, TASKS, state, decisions, status files, PR template).
+- Coordination files (earlier setup commit).
+- T-001, T-002: goal in PROJECT_STATE, D-001 stack decision.
+- T-009: architecture docs in `docs/architecture/` (branch `claude/architecture`, needs Ram's review).
 
 ## In progress
 - Nothing.
 
 ## Next
-- T-001 and T-002 once Ram says which project this repo is for.
+- T-003 scaffold and T-008 contracts, after Ram answers D-002 and the checklist section 0.
 
 ## Blockers / requests
-- Need Ram to name the project and confirm the stack.
+- Ram: decide D-002 (cloud-first vs on-device), model provider and budget, frame opt-in wording, success targets.
 
 ## Files I touched
-- Everything in the setup commit.
+- `docs/architecture/*`, `docs/TASKS.md`, `docs/DECISIONS.md`, `docs/PROJECT_STATE.md`, `docs/ROLES.md`, `docs/status/claude.md`
+
+Nothing has been run or tested. This is documentation only.
