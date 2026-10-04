@@ -10,6 +10,7 @@ What was run, what passed, and what was not checked. Nothing here is estimated.
 | Android unit tests | `./gradlew :app:testDebugUnitTest` on commit `8a6a185` (Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17) | 21 passed, 0 failed (12 controller state machine, 9 parsing and photo-quality) |
 | Android debug build | `./gradlew :app:assembleDebug` on commit `8a6a185` | Builds. APKs for the emulator address and the Wi-Fi address were produced (git-ignored `dist/`) |
 | Full loop over real HTTP | uvicorn on port 8000, scripted client, fake provider (run earlier in the session) | Blocked goal refused; plan before any observation returned `needs_observation`; failed check `not_verified`; blurry frame `cannot_tell`; cup removed `verified`; final plan `completed`. Every outcome is also driven through `TestClient` in `src/core/tests/test_contract_responses.py` |
+| Independent CI on GitHub (clean Linux runners) | commit `10f5623`, branch `claude/architecture` | Android CI: all steps succeeded (JDK 17, SDK 34, `:app:testDebugUnitTest`, `:app:assembleDebug`, artifacts uploaded): https://github.com/ramnivasattanti2008-cloud/DESIGN-THINKING-/actions/runs/37196263936. MIRROR CI (pytest): success: https://github.com/ramnivasattanti2008-cloud/DESIGN-THINKING-/actions/runs/37196263870 |
 | API shapes | contract tests | Every response body validates against a model, and the committed JSON Schemas must equal the generated ones |
 
 The Android sources have not changed since `8a6a185`. Later commits touch the Python backend and docs only.
@@ -22,7 +23,7 @@ History worth knowing: the commit before `8a6a185` (`0a5b11a`) did not compile b
 - **No real model has been called.** `AnthropicModelClient` is tested only with a mocked transport. There is no API key in this repo. The default model name was taken from the session environment, not checked against the live API. The fake provider cannot read real photos, so the phone app cannot get past "scan again" until a provider key is set.
 - **No latency or accuracy numbers exist.** Blur, brightness, the confidence formula and the 0.85 bar are heuristics, not calibrated.
 - The planner is a rule template (study / work / cook, clutter, hazards). It is not a model.
-- The Android CI job (`.github/workflows/android.yml`) has been merged but its first GitHub run had not been checked when this was written; treat CI as unverified until a run is green.
+
 
 ## How the success rules are checked
 
