@@ -35,7 +35,11 @@ class MainActivity : ComponentActivity() {
             MirrorApp(
                 controller,
                 cameraPreview = {
-                    CameraPreviewHost(capture, cameraGranted) { askCamera.launch(Manifest.permission.CAMERA) }
+                    CameraPreviewHost(
+                        capture = capture,
+                        permissionGranted = cameraGranted,
+                        onRequestPermission = { askCamera.launch(Manifest.permission.CAMERA) }
+                    )
                 }
             )
         }
