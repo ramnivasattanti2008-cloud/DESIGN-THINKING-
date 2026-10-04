@@ -17,7 +17,8 @@ from pydantic import BaseModel
 
 from src.api.security import RateLimiter, install_security, rate_limiter, verify_api_key  # noqa: F401
 from src.core.consequence import (
-    ConsequenceEngine, ConsequenceReport, IntentionType, verify_consequence_resolution
+    ConsequenceEngine, ConsequenceItem, ConsequenceReport, IntentionType,
+    classify_multilingual_intention, verify_consequence_resolution
 )
 from src.core.engine import CLUTTER, HAZARDS, NEEDS, Session
 from src.core.log_port import SessionLogSink
@@ -168,7 +169,7 @@ class SnapshotCompareRequest(BaseModel):
 
 @app.get("/v1/consequence/presets")
 def consequence_presets():
-    """Returns the 8 master intention presets for Physical Consequence Intelligence."""
+    """Returns the master intention presets for Physical Consequence Intelligence."""
     return {
         "presets": [
             {
@@ -205,6 +206,41 @@ def consequence_presets():
                 "icon": "📽️",
                 "desc": "Classroom & AV equipment setup (projector on, HDMI signal ready)",
                 "example": "Prepare this room for my presentation",
+            },
+            {
+                "id": "working",
+                "title": "I'm going to work",
+                "icon": "💻",
+                "desc": "Workspace & deep work focus (dual monitors, DND, task lighting)",
+                "example": "Prepare my desk for deep work",
+            },
+            {
+                "id": "travel",
+                "title": "I'm going on vacation",
+                "icon": "✈️",
+                "desc": "Extended multi-day trip check (water taps shut, HVAC off, deadbolt locked)",
+                "example": "Going on vacation for a week",
+            },
+            {
+                "id": "guest_arrival",
+                "title": "Guests are arriving",
+                "icon": "🥂",
+                "desc": "Hospitality & ambient welcoming (warm lights, 23°C comfort AC, decluttered seating)",
+                "example": "Prepare room for arriving guests",
+            },
+            {
+                "id": "movie",
+                "title": "Let's watch a movie",
+                "icon": "🍿",
+                "desc": "Cinema mode (display on, ambient lights dim, curtains drawn)",
+                "example": "Movie night setup",
+            },
+            {
+                "id": "cleaning",
+                "title": "I'm cleaning this room",
+                "icon": "🧹",
+                "desc": "Room reset & sanitation (declutter surfaces, empty trash, ventilation window)",
+                "example": "Clean and reset this room",
             },
             {
                 "id": "teach_room",
@@ -397,3 +433,71 @@ def transmit_ir(body: IrTransmitRequest):
         "timestamp": time.time(),
         "status_message": f"Transmitted 38kHz IR signal: {body.device_type}.{body.command}"
     }
+
+
+# ---- Explainability, Missions, Epistemic, & Multilingual Endpoints ----
+
+class WhyExplanationRequest(BaseModel):
+    item: ConsequenceItem
+    intention: str = "general check"
+
+
+@app.post("/v1/consequence/why")
+def explain_consequence(body: WhyExplanationRequest):
+    """Explainable AI: Answers 'Why did MIRROR recommend this?' (Features 13, 52)."""
+    explanation = ConsequenceEngine.generate_explanation_for_item(body.item, body.intention)
+    return explanation.model_dump()
+
+
+class EpistemicRequest(BaseModel):
+    entities: list[PhysicalEntity] = []
+
+
+@app.post("/v1/consequence/epistemic")
+def epistemic_partition(body: EpistemicRequest):
+    """Partitions world model into Known, Probable, and Unknown (Features 11, 53, 54)."""
+    world = PhysicalWorldModel(entities=body.entities)
+    return world.get_epistemic_partition()
+
+
+class MissionPlanRequest(BaseModel):
+    intention: str
+    room_type: str = "general_room"
+    entities: list[PhysicalEntity] = []
+
+
+@app.post("/v1/missions/plan")
+def create_mission_plan(body: MissionPlanRequest):
+    """Hierarchical Mission Planning with dependency tracking (Features 14, 22, 85)."""
+    world = PhysicalWorldModel(room_type=body.room_type, entities=body.entities)
+    report = ConsequenceEngine.evaluate(world, body.intention)
+    return report.mission_plan.model_dump() if report.mission_plan else {}
+
+
+class TranslateIntentRequest(BaseModel):
+    text: str
+
+
+@app.post("/v1/translate/intent")
+def translate_intent(body: TranslateIntentRequest):
+    """Multilingual & Indian Code-Switching Intent Interpreter (Features 37, 38)."""
+    itype, lang = classify_multilingual_intention(body.text)
+    return {
+        "raw_text": body.text,
+        "intention_type": itype.value,
+        "detected_language": lang,
+    }
+
+
+class FailureRecoveryRequest(BaseModel):
+    initial_report: ConsequenceReport
+    fresh_entities: list[PhysicalEntity] = []
+
+
+@app.post("/v1/consequence/failure_recovery")
+def failure_recovery(body: FailureRecoveryRequest):
+    """Failure Recovery Reasoner (Feature 21): Explains what failed and next safe action."""
+    fresh_world = PhysicalWorldModel(entities=body.fresh_entities)
+    analysis = ConsequenceEngine.diagnose_verification_failure(body.initial_report, fresh_world)
+    return analysis.model_dump()
+

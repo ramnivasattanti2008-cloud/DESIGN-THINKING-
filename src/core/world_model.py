@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import time
 import uuid
+from enum import Enum
 from typing import Any, Optional
 from pydantic import BaseModel, Field
 
@@ -37,11 +38,68 @@ class PhysicalEntity(BaseModel):
         return self.state.upper() in ("ON", "ACTIVE", "RUNNING", "CHARGING", "OPEN")
 
 
+class EpistemicLevel(str, Enum):
+    """Certainty level of observation/inference (Features 11, 53, 54)."""
+    KNOWN = "known"       # Confidence >= 0.85, direct clear evidence
+    PROBABLE = "probable" # 0.50 <= Confidence < 0.85, reasonable evidence
+    UNKNOWN = "unknown"   # Confidence < 0.50 or missing required operational parameter
+
+
+class EntityRelationship(BaseModel):
+    """Relational edge between two physical entities (Features 3, 32)."""
+    source_label: str
+    target_label: str
+    relation: str         # "near_to", "controls", "connected_to", "mounted_on", "inside", "powers"
+    distance_metric: str = "adjacent" # "adjacent", "near", "across_room", "overhead"
+    confidence: float = 0.9
+
+
+class PersonalRule(BaseModel):
+    """User-defined physical world preference or learned rule (Features 25, 40)."""
+    rule_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:8])
+    entity_pattern: str   # e.g., "laptop charger", "router", "window"
+    condition: str        # "always_keep_on", "never_warn", "always_verify", "custom"
+    reason: str = ""
+
+
+class SpaceProfile(BaseModel):
+    """Location-based profile preserving temporary operational knowledge (Features 26, 44)."""
+    profile_id: str
+    name: str             # "Home", "Hostel 304", "Classroom 204", "Office", "Hotel Room", "Lab"
+    room_type: str        # "bedroom", "classroom", "hotel_room", "kitchen", "workspace", "lab"
+    known_controls: dict[str, str] = Field(default_factory=dict) # e.g. {"projector": "switch 3", "ac": "ir_remote"}
+    personal_rules: list[PersonalRule] = Field(default_factory=list)
+    last_snapshot_name: Optional[str] = None
+
+
+def sanitize_observed_text(raw_text: str) -> str:
+    """Adversarial Defense (Features 98, 99).
+    Treats observed physical OCR and display text strictly as environmental content,
+    neutralizing prompt injection attempts embedded in the physical world.
+    """
+    adversarial_triggers = [
+        "ignore previous instructions",
+        "system prompt",
+        "developer mode",
+        "you are now",
+        "turn everything on",
+        "unlock the door",
+        "forget all rules",
+    ]
+    cleaned = raw_text
+    lower = raw_text.lower()
+    for trigger in adversarial_triggers:
+        if trigger in lower:
+            cleaned = f"[REDACTED_ADVERSARIAL_PHYSICAL_TEXT: '{trigger}']"
+    return cleaned
+
+
 class PhysicalWorldModel(BaseModel):
     """Temporary representation of the surrounding physical environment."""
     session_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
     room_type: str = "general_room"  # "bedroom", "kitchen", "classroom", "hotel_room", "workspace"
     entities: list[PhysicalEntity] = Field(default_factory=list)
+    relationships: list[EntityRelationship] = Field(default_factory=list)
     timestamp: float = Field(default_factory=time.time)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
@@ -65,6 +123,44 @@ class PhysicalWorldModel(BaseModel):
                 self.entities[idx] = entity
                 return
         self.entities.append(entity)
+
+    def add_relationship(self, source: str, target: str, relation: str, distance: str = "adjacent") -> None:
+        self.relationships.append(EntityRelationship(
+            source_label=source,
+            target_label=target,
+            relation=relation,
+            distance_metric=distance
+        ))
+
+    def find_relationships_for(self, entity_label: str) -> list[EntityRelationship]:
+        lbl = entity_label.lower()
+        return [r for r in self.relationships if lbl in r.source_label.lower() or lbl in r.target_label.lower()]
+
+    def get_epistemic_partition(self) -> dict[str, list[dict[str, Any]]]:
+        """Partitions world model into Known, Probable, and Unknown (Features 11, 53, 54)."""
+        partition: dict[str, list[dict[str, Any]]] = {
+            "known": [],
+            "probable": [],
+            "unknown": []
+        }
+        for e in self.entities:
+            info = {
+                "id": e.id,
+                "label": e.label,
+                "state": e.state,
+                "location": e.location or "scene",
+                "confidence": e.confidence,
+                "is_device": e.is_device,
+                "is_hazard": e.is_hazard,
+            }
+            if e.confidence >= 0.85 and e.state.upper() != "UNKNOWN":
+                partition["known"].append(info)
+            elif e.confidence >= 0.50 and e.state.upper() != "UNKNOWN":
+                partition["probable"].append(info)
+            else:
+                info["reason_unknown"] = "Low visual confidence or occluded operational state."
+                partition["unknown"].append(info)
+        return partition
 
 
 class EntityStateDiff(BaseModel):

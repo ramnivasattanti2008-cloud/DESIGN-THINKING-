@@ -630,6 +630,158 @@
     .ir-btn-blast:active {
       transform: scale(0.96);
     }
+
+    /* iOS 18 Bottom Sheet: Explainable AI "Why?" & Mission */
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 90;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ios-spring);
+    }
+    .sheet-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .ios-bottom-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      max-height: 82%;
+      background: var(--ios-surface);
+      border-radius: 28px 28px 0 0;
+      padding: 16px 18px 28px;
+      z-index: 100;
+      transform: translateY(105%);
+      transition: transform 0.38s var(--ios-spring);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .ios-bottom-sheet.open {
+      transform: translateY(0);
+    }
+    .sheet-handle {
+      width: 40px;
+      height: 5px;
+      background: var(--ios-text-tertiary);
+      border-radius: 3px;
+      align-self: center;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .sheet-close-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #E5E5EA;
+      border: none;
+      font-weight: 700;
+      color: var(--ios-text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .why-section {
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      background: var(--ios-surface-secondary);
+      border-radius: var(--ios-radius-md);
+      border: 1px solid var(--ios-border);
+    }
+    .why-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--ios-text-secondary);
+      margin-bottom: 4px;
+    }
+    .why-section-content {
+      font-size: 13px;
+      color: var(--ios-text-primary);
+      line-height: 1.4;
+    }
+    .why-fact-pill {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: #E5E5EA;
+      color: #333;
+      margin: 2px 4px 2px 0;
+    }
+
+    /* Mission Plan Timeline */
+    .mission-step-row {
+      display: flex;
+      gap: 12px;
+      position: relative;
+      padding-bottom: 14px;
+    }
+    .mission-step-row:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 28px;
+      bottom: 0;
+      width: 2px;
+      background: #E5E5EA;
+    }
+    .mission-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--ios-blue);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .mission-step-num.done {
+      background: var(--ios-green);
+    }
+    .mission-step-num.pending {
+      background: #8E8E93;
+    }
+
+    /* Multilingual Chip Styles */
+    .lang-chips-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 0 8px;
+      scrollbar-width: none;
+    }
+    .lang-chips-row::-webkit-scrollbar {
+      display: none;
+    }
+    .lang-chip {
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--ios-surface);
+      border: 1px solid var(--ios-border);
+      color: var(--ios-text-primary);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .lang-chip:active {
+      background: var(--ios-pink-light);
+      border-color: var(--ios-pink);
+      color: var(--ios-pink);
+    }
   </style>
 </head>
 <body>
@@ -687,9 +839,19 @@
               🎙️ Tap to Speak
             </span>
           </div>
-          <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #000; font-size: 17px; font-weight: 600; letter-spacing: -0.3px; outline: none; resize: none;" placeholder="What are you trying to accomplish?">I'm leaving</textarea>
+          <textarea id="goal-input" style="width: 100%; height: 50px; background: transparent; border: none; color: #000; font-size: 17px; font-weight: 600; letter-spacing: -0.3px; outline: none; resize: none;" placeholder="What are you trying to accomplish?">I'm leaving</textarea>
           
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 0.5px solid var(--ios-border); padding-top: 10px;">
+          <!-- Multilingual Quick Suggestion Chips (Features 37, 38) -->
+          <div class="lang-chips-row">
+            <span class="lang-chip" onclick="applyIntentionText('I\'m leaving', 'bedroom_leaving')">🇺🇸 "I'm leaving"</span>
+            <span class="lang-chip" onclick="applyIntentionText('Nenu bayataki velthunna', 'bedroom_leaving')">🇮🇳 "Nenu bayataki velthunna"</span>
+            <span class="lang-chip" onclick="applyIntentionText('Padukodaniki velthunna', 'bedroom_sleep')">🇮🇳 "Padukodaniki velthunna"</span>
+            <span class="lang-chip" onclick="applyIntentionText('Main sone ja raha hu', 'bedroom_sleep')">🇮🇳 "Main sone ja raha hu"</span>
+            <span class="lang-chip" onclick="applyIntentionText('Khana banane ja raha hu', 'kitchen_cooking')">🍳 "Khana banane ja raha hu"</span>
+            <span class="lang-chip" onclick="applyIntentionText('Prepare this room for presentation', 'classroom_av')">📽️ "Presentation Setup"</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; border-top: 0.5px solid var(--ios-border); padding-top: 8px;">
             <span style="font-size: 12px; color: var(--ios-text-secondary);" id="active-scene-preset-label">Scene: Living Room</span>
             <button class="ios-btn-primary" style="width: auto; padding: 10px 18px; font-size: 14px; background: var(--ios-pink);" onclick="onEvaluateIntention()">
               Evaluate State →
@@ -920,6 +1082,19 @@
             ✓ Actions Done, Verify State →
           </button>
         </div>
+
+        <!-- Hierarchical Mission Execution Plan Card (Features 14, 22, 85) -->
+        <div class="ios-card" style="padding: 12px;" id="mission-plan-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--ios-blue); text-transform: uppercase;">
+              🗺️ Mission Execution Plan
+            </div>
+            <span class="ios-badge badge-blue" id="mission-progress-badge">1 / 4 steps verified</span>
+          </div>
+          <div id="mission-steps-list" style="display: flex; flex-direction: column; gap: 4px;">
+            <!-- Rendered mission steps -->
+          </div>
+        </div>
       </div>
 
       <!-- SCREEN 4: UNIVERSAL IR REMOTE CONTROLLER -->
@@ -1134,6 +1309,22 @@
       <div class="dock-item" id="dock-audit" onclick="navTo('audit')">
         <span class="dock-icon">⚙️</span>
         <span>Audit</span>
+      </div>
+    </div>
+
+    <!-- iOS 18 Bottom Sheet: Explainable AI "Why?" Sheet (Features 13, 52) -->
+    <div class="sheet-backdrop" id="why-backdrop" onclick="closeWhySheet()"></div>
+    <div class="ios-bottom-sheet" id="why-sheet">
+      <div class="sheet-handle" onclick="closeWhySheet()"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🔍</span>
+          <h2 style="font-size: 16px; font-weight: 700;" id="why-sheet-title">Why does this matter?</h2>
+        </div>
+        <button class="sheet-close-btn" onclick="closeWhySheet()">✕</button>
+      </div>
+      <div id="why-sheet-body">
+        <!-- Populated via Explainable AI breakdown -->
       </div>
     </div>
 
@@ -1553,6 +1744,132 @@
       speakCuteVoice(report.spoken_summary);
     }
 
+    function applyIntentionText(text, sceneKey) {
+      playAppleChime('tap');
+      document.getElementById("goal-input").value = text;
+      appState.intention = text;
+      appState.sceneType = sceneKey;
+      document.getElementById("active-scene-preset-label").innerText = `Scene: ${sceneKey.replace('_', ' ')}`;
+      speakCuteVoice(`Evaluating your intention: ${text}`);
+      onEvaluateIntention();
+    }
+
+    async function showWhyExplanation(entityLabel) {
+      playAppleChime('tap');
+      const item = appState.consequenceReport && appState.consequenceReport.items.find(i => i.entity_label.toLowerCase() === entityLabel.toLowerCase());
+      if (!item) return;
+
+      const titleEl = document.getElementById("why-sheet-title");
+      const bodyEl = document.getElementById("why-sheet-body");
+      titleEl.innerText = `Why: ${item.entity_label.toUpperCase()}`;
+      bodyEl.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--ios-text-secondary);">Reasoning consequence causality...</div>`;
+
+      // Open sheet with iOS spring animation
+      document.getElementById("why-backdrop").classList.add("active");
+      document.getElementById("why-sheet").classList.add("open");
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/consequence/why`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            intention: appState.intention,
+            item: {
+              entity_label: item.entity_label,
+              current_state: item.current_state,
+              desired_state: item.desired_state,
+              status: item.status,
+              severity: item.severity || "warning",
+              consequence_text: item.consequence_text,
+              suggested_action: item.suggested_action,
+              action_type: item.action_type || "physical_user",
+              location: item.location || "room",
+              confidence: item.confidence || 0.95
+            }
+          })
+        });
+
+        if (res.ok) {
+          const why = await res.json();
+          renderWhyContent(why, item);
+          speakCuteVoice(`Here's why: ${why.causal_consequence}`);
+          return;
+        }
+      } catch (e) {
+        console.warn("Why endpoint fallback:", e);
+      }
+
+      // Local fallback
+      renderWhyContent({
+        entity_label: item.entity_label,
+        observed_facts: [
+          `Entity: ${item.entity_label}`,
+          `Observed state: ${item.current_state}`,
+          `Confidence: ${Math.round((item.confidence || 0.95) * 100)}% sensor certainty`
+        ],
+        inferred_condition: `Given intention '${appState.intention}', state '${item.current_state}' conflicts with target '${item.desired_state}'.`,
+        causal_consequence: item.consequence_text,
+        safety_basis: "Physical Causality Graph & Safety Guardrails",
+        recommendation: item.suggested_action
+      }, item);
+      speakCuteVoice(`Here's why: ${item.consequence_text}`);
+    }
+
+    function renderWhyContent(why, item) {
+      const bodyEl = document.getElementById("why-sheet-body");
+      bodyEl.innerHTML = `
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+          <span class="ios-badge ${item.status === 'match' ? 'badge-green' : 'badge-red'}" style="font-size: 13px;">
+            ${item.status.toUpperCase()}: ${item.current_state} → ${item.desired_state}
+          </span>
+          <span class="ios-badge badge-blue" style="font-size: 12px;">
+            Confidence: ${Math.round((why.confidence_score || 0.95) * 100)}%
+          </span>
+        </div>
+
+        <div class="why-section">
+          <div class="why-section-title">🔍 Observed Sensor Facts</div>
+          <div style="margin-top: 4px;">
+            ${why.observed_facts.map(f => `<span class="why-fact-pill">• ${f}</span>`).join(" ")}
+          </div>
+        </div>
+
+        <div class="why-section">
+          <div class="why-section-title">🧠 Causal Consequence Reasoning</div>
+          <div class="why-section-content">
+            <b>${why.inferred_condition}</b>
+            <div style="margin-top: 6px; color: var(--ios-red); font-weight: 600;">
+              ${why.causal_consequence}
+            </div>
+          </div>
+        </div>
+
+        <div class="why-section">
+          <div class="why-section-title">🛡️ Safety Invariant & Basis</div>
+          <div class="why-section-content" style="color: var(--ios-text-secondary); font-size: 12px;">
+            ${why.safety_basis || "Physical Consequence Causality Graph"}
+          </div>
+        </div>
+
+        <div class="why-section" style="background: #F0FDF4; border-color: #BBF7D0;">
+          <div class="why-section-title" style="color: #15803D;">✅ Recommended Action</div>
+          <div class="why-section-content" style="font-weight: 600; color: #166534;">
+            ${why.recommendation}
+          </div>
+        </div>
+
+        <button class="ios-btn-primary" style="margin-top: 8px; background: var(--ios-pink);" onclick="closeWhySheet()">
+          Understood, Close
+        </button>
+      `;
+    }
+
+    function closeWhySheet() {
+      playAppleChime('tap');
+      document.getElementById("why-backdrop").classList.remove("active");
+      document.getElementById("why-sheet").classList.remove("open");
+    }
+
     function renderConsequenceMatrix(report) {
       document.getElementById("matrix-headline").innerText = report.headline;
       const statusBadge = document.getElementById("matrix-status-badge");
@@ -1575,6 +1892,8 @@
       report.items.forEach(item => {
         const card = document.createElement("div");
         card.className = `consequence-card ${item.status}`;
+        card.setAttribute("onclick", `showWhyExplanation('${item.entity_label}')`);
+        card.style.cursor = "pointer";
         
         let statusBadgeHTML = "";
         if (item.status === "conflict") statusBadgeHTML = `<span class="ios-badge badge-red">CONFLICT: ${item.current_state}</span>`;
@@ -1583,16 +1902,22 @@
         else if (item.status === "attention") statusBadgeHTML = `<span class="ios-badge badge-orange">CHECK: ${item.current_state}</span>`;
         else statusBadgeHTML = `<span class="ios-badge badge-green">MATCH: ${item.current_state} ✓</span>`;
 
+        const epistemicTag = (item.confidence >= 0.85) ? "🟢 KNOWN" : "🟡 PROBABLE";
+
         card.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <b style="font-size: 14px; text-transform: capitalize;">${item.entity_label}</b>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <b style="font-size: 14px; text-transform: capitalize;">${item.entity_label}</b>
+              <span style="font-size: 10px; color: var(--ios-text-secondary);">${epistemicTag}</span>
+            </div>
             ${statusBadgeHTML}
           </div>
           <div style="font-size: 12px; color: var(--ios-text-primary); font-weight: 500;">
             ${item.consequence_text}
           </div>
-          <div style="font-size: 11px; color: var(--ios-text-secondary); border-top: 0.5px solid var(--ios-border); padding-top: 6px;">
-            Target: <b>${item.desired_state}</b> • ${item.suggested_action}
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; border-top: 0.5px solid var(--ios-border); padding-top: 6px;">
+            <span style="font-size: 11px; color: var(--ios-text-secondary);">Target: <b>${item.desired_state}</b></span>
+            <span style="font-size: 11px; color: var(--ios-pink); font-weight: 600;">Why this matters? →</span>
           </div>
         `;
         list.appendChild(card);
@@ -1607,6 +1932,65 @@
       userList.innerHTML = (report.user_actions && report.user_actions.length > 0)
         ? report.user_actions.map(a => `<div>• ${a} (Physical)</div>`).join("")
         : `<div>• All physical items verified</div>`;
+
+      // Render Hierarchical Mission Plan
+      const missionList = document.getElementById("mission-steps-list");
+      const missionBadge = document.getElementById("mission-progress-badge");
+      if (missionList && missionBadge) {
+        if (report.mission_plan && report.mission_plan.steps && report.mission_plan.steps.length > 0) {
+          missionBadge.innerText = report.mission_plan.progress_fraction || `${report.mission_plan.steps.length} steps`;
+          missionList.innerHTML = report.mission_plan.steps.map(s => `
+            <div class="mission-step-row">
+              <div class="mission-step-num ${s.status === 'completed' ? 'done' : 'pending'}">
+                ${s.status === 'completed' ? '✓' : s.step_number}
+              </div>
+              <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <b style="font-size: 13px;">${s.title}</b>
+                  <span class="ios-badge ${s.status === 'completed' ? 'badge-green' : 'badge-blue'}" style="font-size: 10px;">
+                    ${s.status.toUpperCase()}
+                  </span>
+                </div>
+                <div style="font-size: 11px; color: var(--ios-text-secondary); margin-top: 2px;">
+                  ${s.description}
+                </div>
+              </div>
+            </div>
+          `).join("");
+        } else {
+          missionBadge.innerText = "1 / 4 steps verified";
+          missionList.innerHTML = `
+            <div class="mission-step-row">
+              <div class="mission-step-num done">✓</div>
+              <div style="flex: 1;">
+                <b style="font-size: 13px;">1. Scan Physical Environment</b>
+                <div style="font-size: 11px; color: var(--ios-text-secondary);">Map fixtures and active devices in room</div>
+              </div>
+            </div>
+            <div class="mission-step-row">
+              <div class="mission-step-num pending">2</div>
+              <div style="flex: 1;">
+                <b style="font-size: 13px;">2. Resolve Physical Closures</b>
+                <div style="font-size: 11px; color: var(--ios-text-secondary);">Close and securely latch open window</div>
+              </div>
+            </div>
+            <div class="mission-step-row">
+              <div class="mission-step-num pending">3</div>
+              <div style="flex: 1;">
+                <b style="font-size: 13px;">3. IR Blaster Device Shutdown</b>
+                <div style="font-size: 11px; color: var(--ios-text-secondary);">Transmit 38kHz power off signal to Air Conditioner</div>
+              </div>
+            </div>
+            <div class="mission-step-row">
+              <div class="mission-step-num pending">4</div>
+              <div style="flex: 1;">
+                <b style="font-size: 13px;">4. Closed-Loop Sensor Proof</b>
+                <div style="font-size: 11px; color: var(--ios-text-secondary);">Re-scan with smartphone camera to verify final state</div>
+              </div>
+            </div>
+          `;
+        }
+      }
     }
 
     // Camera Canvas

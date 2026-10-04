@@ -171,3 +171,100 @@ def test_gemini_zero_shot_consequence_reasoning(monkeypatch):
     assert len(report.items) == 2
     assert report.items[0].status == ConsequenceStatus.HAZARD
     assert "space heater" in report.user_actions[0]
+
+
+def test_working_mode_evaluation():
+    world = PhysicalWorldModel(session_id="work_test")
+    world.entities = [
+        PhysicalEntity(label="desk", state="CLUTTERED", location="center"),
+        PhysicalEntity(label="television", state="ON", location="wall", is_device=True),
+        PhysicalEntity(label="lamp", state="OFF", location="desk"),
+    ]
+    report = ConsequenceEngine.evaluate(world, "I'm going to work on my laptop")
+    assert report.intention_type == IntentionType.WORKING
+    assert report.headline == "Workspace Focus Setup"
+    assert report.is_ready is False
+    assert any("clutter" in i.consequence_text.lower() for i in report.items)
+    assert any(i.action_type == ActionType.AUTOMATED_SYSTEM and any(k in i.entity_label.lower() for k in ("tv", "television")) for i in report.items)
+
+
+def test_travel_mode_evaluation():
+    world = PhysicalWorldModel(session_id="travel_test")
+    world.entities = [
+        PhysicalEntity(label="window", state="OPEN", location="bedroom"),
+        PhysicalEntity(label="air conditioner", state="RUNNING", location="wall", is_device=True),
+        PhysicalEntity(label="stove", state="ON", location="kitchen", is_device=True),
+        PhysicalEntity(label="water tap", state="LEAKING", location="bathroom"),
+    ]
+    report = ConsequenceEngine.evaluate(world, "Going on vacation for a week")
+    assert report.intention_type == IntentionType.TRAVEL
+    assert report.headline == "Extended Travel & Vacation Check"
+    assert report.is_ready is False
+    assert any(i.status == ConsequenceStatus.HAZARD for i in report.items)
+
+
+def test_guest_arrival_and_movie_evaluation():
+    # Guest Arrival
+    world_guest = PhysicalWorldModel(session_id="guest_test")
+    world_guest.entities = [
+        PhysicalEntity(label="ceiling light", state="OFF", location="living room"),
+        PhysicalEntity(label="air conditioner", state="RUNNING", properties={"temperature": "28°C"}, is_device=True),
+    ]
+    rep_guest = ConsequenceEngine.evaluate(world_guest, "Guests are arriving tonight")
+    assert rep_guest.intention_type == IntentionType.GUEST_ARRIVAL
+    assert rep_guest.headline == "Guest Arrival & Hospitality Preparation"
+
+    # Movie Mode
+    world_movie = PhysicalWorldModel(session_id="movie_test")
+    world_movie.entities = [
+        PhysicalEntity(label="television", state="OFF", location="wall", is_device=True),
+        PhysicalEntity(label="ceiling light", state="ON", location="ceiling"),
+    ]
+    rep_movie = ConsequenceEngine.evaluate(world_movie, "Let's watch a movie")
+    assert rep_movie.intention_type == IntentionType.MOVIE
+    assert rep_movie.headline == "Cinema & Entertainment Mode"
+    assert any("glare" in i.consequence_text.lower() for i in rep_movie.items)
+
+
+def test_active_perception_and_why():
+    world = PhysicalWorldModel(session_id="ap_test")
+    world.entities = [
+        PhysicalEntity(label="unknown switch panel", state="UNKNOWN", confidence=0.55),
+        PhysicalEntity(label="iron", state="ON", confidence=0.88),
+    ]
+    report = ConsequenceEngine.evaluate(world, "Check my space")
+    assert len(report.active_perception_prompts) >= 1
+    assert any("panel" in p.needed_entity.lower() or "iron" in p.needed_entity.lower() for p in report.active_perception_prompts)
+
+    # Test Why Explanation
+    item = report.items[0]
+    explanation = ConsequenceEngine.generate_explanation_for_item(item, "Check my space")
+    assert explanation.entity_label == item.entity_label
+    assert len(explanation.observed_facts) >= 2
+
+
+def test_multilingual_code_switching_intent():
+    from src.core.consequence import classify_multilingual_intention
+
+    # Telugu / Telugish
+    itype, lang = classify_multilingual_intention("Nenu bayataki velthunna")
+    assert itype == IntentionType.LEAVING
+    assert lang == "te"
+
+    itype2, lang2 = classify_multilingual_intention("Padukodaniki velthunna")
+    assert itype2 == IntentionType.SLEEPING
+    assert lang2 == "te"
+
+    itype3, lang3 = classify_multilingual_intention("Room ni study ki ready cheyyi")
+    assert itype3 == IntentionType.STUDYING
+    assert lang3 == "te"
+
+    # Hindi / Hinglish
+    itype_hi, lang_hi = classify_multilingual_intention("Main sone ja raha hu")
+    assert itype_hi == IntentionType.SLEEPING
+    assert lang_hi == "hi"
+
+    itype_hi2, lang_hi2 = classify_multilingual_intention("Khana banane ja raha hu")
+    assert itype_hi2 == IntentionType.COOKING
+    assert lang_hi2 == "hi"
+

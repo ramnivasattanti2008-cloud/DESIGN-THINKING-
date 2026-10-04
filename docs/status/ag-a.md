@@ -58,11 +58,28 @@ Last updated: 2026-10-05
        - Successfully compiled and packaged `:app:assembleDebug` with Gradle 8.9 and JDK 17 into `dist/mirror.apk` (17.68 MB).
        - Direct download served on Web Studio (`http://<ip>:8080/mirror.apk`).
        - Created 1-click auto-detect installer scripts `install_phone.bat` and `install_phone.ps1` for ADB phone deployment.
-    11. **Comprehensive Test Suite**:
-       - **298 / 298 tests passing green** across the entire repository with zero failures and zero regressions (`src/core/tests/test_consequence.py`, `src/core/tests/test_world_model.py`, `tests/api/test_consequence_api.py`).
+    11. **Explainable AI "Why?" Engine (`POST /v1/consequence/why`)**:
+       - Detailed breakdown of causality for every consequence recommendation.
+       - Answers "Why does this matter?", observed sensor facts with confidence %, inferred conditions, safety invariants, and actionable recommendations.
+       - iOS 18 Cupertino bottom sheet modal slides up on card tap with spring physics.
+    12. **Hierarchical Mission Execution Planner (`POST /v1/missions/plan`)**:
+       - Multi-phase ordered execution plan with dependencies: Phase 1 Safety Hazards -> Phase 2 Device/Closure Controls -> Phase 3 Sensor Verification.
+       - Interactive mission timeline rendered directly in the Web Studio and Native Mobile client.
+    13. **Epistemic Partitioning Engine (`POST /v1/consequence/epistemic`)**:
+       - Categorizes physical observations into `KNOWN` (>=85% sensor confidence), `PROBABLE` (50-84%), and `UNKNOWN` (<50%).
+       - Triggers Active Perception Prompts when unknown operational parameters require looking around.
+    14. **Multilingual & Indian Code-Switching Engine (`POST /v1/translate/intent`)**:
+       - Intention parsing and classification for English, Telugu / Telugish ("Nenu bayataki velthunna", "Padukodaniki velthunna"), and Hindi / Hinglish ("Main sone ja raha hu", "Khana banane ja raha hu").
+       - Aura cute lady voice responds in context and runs consequence graph seamlessly.
+    15. **Failure Recovery Reasoner (`POST /v1/consequence/failure_recovery`)**:
+       - Closed-loop verification failure diagnosis explaining what failed, observed delta, and next safe step.
+    16. **Comprehensive Test Suite & Verification**:
+       - **308 / 308 pytest tests passing green** across the entire repository (0 failures, 0 errors).
+       - **24 Gradle Android unit test tasks passing green** (`:app:testDebugUnitTest`).
+       - Zero regressions, zero broken contracts.
 
 ## Half done
-- None.
+- None. Everything is complete, tested, and running live.
 
 ## Next
 - Claude review of PR `ag-a/live-web-studio`.
