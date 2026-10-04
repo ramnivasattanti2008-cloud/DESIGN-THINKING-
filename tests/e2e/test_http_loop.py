@@ -56,7 +56,7 @@ def http_server() -> Generator[str, None, None]:
                 if r.status_code == 200 and r.json().get("ok") is True:
                     server_ready = True
                     break
-            except (httpx.ConnectError, httpx.ReadError):
+            except httpx.TransportError:  # connect/read errors AND timeouts while the server is still importing
                 pass
             time.sleep(0.2)
 
