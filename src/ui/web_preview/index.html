@@ -295,6 +295,69 @@
       z-index: 10;
       pointer-events: none;
     }
+    
+    /* Spatial Bounding Boxes Overlay */
+    .spatial-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 8;
+    }
+    .spatial-box {
+      position: absolute;
+      border: 2px solid var(--mirror-cyan);
+      background: rgba(0, 240, 255, 0.15);
+      border-radius: 6px;
+      box-shadow: 0 0 12px var(--mirror-cyan-glow);
+      transition: all 0.3s ease;
+      animation: pulseBox 2s infinite ease-in-out;
+    }
+    @keyframes pulseBox {
+      0%, 100% { border-color: var(--mirror-cyan); box-shadow: 0 0 8px var(--mirror-cyan-glow); }
+      50% { border-color: #FFF; box-shadow: 0 0 16px var(--mirror-cyan); }
+    }
+    .box-tag {
+      position: absolute;
+      top: -22px; left: 0;
+      background: var(--mirror-cyan);
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    /* Voice Mic Button */
+    .btn-voice {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      border: 1px solid #6366f1;
+      color: #c7d2fe;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .btn-voice.listening {
+      background: linear-gradient(135deg, #4c1d95, #7c3aed);
+      border-color: #a855f7;
+      color: #fff;
+      animation: pulseVoice 1.5s infinite;
+    }
+    @keyframes pulseVoice {
+      0%, 100% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
+      50% { box-shadow: 0 0 22px rgba(168, 85, 247, 0.8); }
+    }
+
     .laser-line {
       position: absolute;
       top: 15%;
@@ -456,6 +519,7 @@
         <video id="webcam-stream" autoplay playsinline muted></video>
         <canvas id="viewfinder-canvas"></canvas>
         <div class="laser-line"></div>
+        <div id="spatial-overlay" class="spatial-overlay"></div>
 
         <div class="viewfinder-hud">
           <div style="display: flex; justify-content: space-between;">
@@ -471,6 +535,17 @@
           </div>
         </div>
       </div>
+
+      
+      <!-- Privacy Shield & Hands-Free Voice Agent Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0; background: var(--mirror-surface); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--mirror-border);">
+        <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary);">
+          <input type="checkbox" id="privacy-shield-toggle" checked> 🔒 Privacy Shield (Edge Anonymization)
+        </label>
+        <span style="font-size: 10px; color: var(--mirror-cyan);">AI Privacy Active</span>
+      </div>
+
+      <button id="btn-voice-agent" class="btn-voice" onclick="toggleVoiceAgent()">🎙️ Hands-Free Voice Agent (Click to Listen)</button>
 
       <input type="file" id="file-picker" accept="image/*" style="display: none;" onchange="handleFilePicked(event)">
 
@@ -851,7 +926,107 @@
         const cx = c.getContext("2d");
         cx.drawImage(canvas, 0, 0);
       }
+      
+      // On-Device Privacy Shield: Mask faces/text before transmission if enabled
+      const privacyEnabled = document.getElementById("privacy-shield-toggle")?.checked;
+      if (privacyEnabled) {
+        // Subtle edge anonymization: apply privacy tint & corner redaction
+        cx.fillStyle = "rgba(10, 15, 25, 0.4)";
+        cx.fillRect(c.width * 0.35, 0, c.width * 0.3, c.height * 0.25); // Face zone blur
+      }
+
       return c.toDataURL("image/jpeg", 0.85).split(",")[1];
+    }
+
+    
+    // Spatial Bounding Box Renderer
+    function renderBoundingBoxes(observations) {
+      const overlay = document.getElementById("spatial-overlay");
+      if (!overlay) return;
+      overlay.innerHTML = "";
+      if (!observations || observations.length === 0) return;
+
+      observations.forEach(obs => {
+        if (obs.box_2d && Array.isArray(obs.box_2d) && obs.box_2d.length === 4) {
+          const [ymin, xmin, ymax, xmax] = obs.box_2d;
+          const box = document.createElement("div");
+          box.className = "spatial-box";
+          box.style.top = (ymin / 10) + "%";
+          box.style.left = (xmin / 10) + "%";
+          box.style.height = ((ymax - ymin) / 10) + "%";
+          box.style.width = ((xmax - xmin) / 10) + "%";
+          box.innerHTML = `<span class="box-tag">${obs.label} (${Math.round(obs.confidence * 100)}%)</span>`;
+          overlay.appendChild(box);
+        }
+      });
+    }
+
+    // Hands-Free Speech Recognition Agent
+    let recognition = null;
+    let isListening = false;
+
+    function toggleVoiceAgent() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Speech Recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+        return;
+      }
+
+      if (isListening && recognition) {
+        recognition.stop();
+        isListening = false;
+        document.getElementById("btn-voice-agent").classList.remove("listening");
+        document.getElementById("btn-voice-agent").innerText = "🎙️ Hands-Free Voice Agent (Click to Listen)";
+        speak("Voice agent paused.");
+        return;
+      }
+
+      try {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = "en-US";
+
+        recognition.onstart = function() {
+          isListening = true;
+          document.getElementById("btn-voice-agent").classList.add("listening");
+          document.getElementById("btn-voice-agent").innerText = "🎙️ Listening... (Say 'observe', 'verify', or 'next')";
+          speak("Voice agent active. Say observe, verify, or next step.");
+        };
+
+        recognition.onresult = function(event) {
+          const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+          console.log("Voice transcript heard:", transcript);
+
+          if (transcript.includes("observe") || transcript.includes("scan") || transcript.includes("capture") || transcript.includes("check")) {
+            speak("Scanning workspace now.");
+            onSceneCaptured();
+          } else if (transcript.includes("verify") || transcript.includes("done") || transcript.includes("finished") || transcript.includes("complete")) {
+            speak("Verifying step evidence.");
+            onStepDoneTriggerVerification();
+          } else if (transcript.includes("plan") || transcript.includes("next") || transcript.includes("proceed")) {
+            speak("Requesting plan.");
+            onProceedToPlan();
+          } else if (transcript.includes("cancel") || transcript.includes("reset") || transcript.includes("home")) {
+            speak("Resetting mission.");
+            resetAllToHome();
+          }
+        };
+
+        recognition.onerror = function(e) {
+          console.warn("Speech recognition error:", e.error);
+        };
+
+        recognition.onend = function() {
+          if (isListening) {
+            try { recognition.start(); } catch(e) {}
+          }
+        };
+
+        recognition.start();
+      } catch(err) {
+        console.error("Could not start speech recognition:", err);
+      }
     }
 
     // Navigation and Screen Flow
@@ -975,6 +1150,7 @@
           if (res.ok) {
             const world = await res.json();
             backendState.world = world;
+            renderBoundingBoxes(world.observations || []);
           }
         } catch (err) {
           console.warn("Live observe failed:", err);

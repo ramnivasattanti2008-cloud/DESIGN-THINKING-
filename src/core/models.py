@@ -33,6 +33,7 @@ class Observation(BaseModel):
     confidence: float = Field(ge=0, le=1)
     where_hint: str = ""
     source_frame: str
+    box_2d: Optional[list[int]] = None
 
 
 class WorldState(BaseModel):

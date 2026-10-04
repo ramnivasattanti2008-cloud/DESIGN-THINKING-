@@ -47,10 +47,11 @@ class FakeModelClient:
 
 PROMPT = (
     "You are the perception module of a safety-first assistant. Look at the image(s) of a real "
-    "space. List the physical objects you can actually see, and any hazards. Use short lowercase "
-    "singular nouns. Prefer these words when they apply: {vocab}. "
+    "space. List the physical objects you can actually see, the primary work surface (e.g. desk surface, "
+    "countertop), and any hazards. Use short lowercase singular nouns. Prefer these words when they apply: {vocab}. "
     "Give an honest confidence 0-1 for each item; do not list things you cannot see. "
-    'Reply with JSON only: {{"objects":[{{"label":"cup","confidence":0.9,"where":"left of desk"}}]}}'
+    "When possible, include normalized 2D bounding box box_2d as [ymin, xmin, ymax, xmax] scaled 0 to 1000. "
+    'Reply with JSON only: {{"objects":[{{"label":"cup","confidence":0.9,"where":"left of desk","box_2d":[400,200,600,350]}}]}}'
 )
 
 
@@ -134,22 +135,72 @@ class GeminiModelClient:
         text = "".join(p.get("text", "") for p in (candidates[0].get("content") or {}).get("parts", []))
         return parse_observations(text, sent[0].id)
 
+    def plan_physical_step(self, goal: str, visible_objects: list[str], step_id: str) -> dict | None:
+        """Dynamic physical task decomposition via Gemini.
+        Returns a dict with instruction, tier (A0, A1, A2, A3), tier_reason, and expected_evidence,
+        or None if model is unavailable or cannot formulate a checkable step.
+        """
+        planning_prompt = (
+            f"You are the physical reasoning planner for a safety-first real-world assistant. "
+            f"The user wants to achieve this goal: '{goal}'. "
+            f"Currently visible physical objects in the workspace: {', '.join(visible_objects) or 'none'}. "
+            f"Propose the SINGLE immediate next physical action step to move towards the goal. "
+            f"Rules:\n"
+            f"- The action must be concrete, physical, and reversible (e.g. move an item, place an item, wipe a surface).\n"
+            f"- If a hazard exists or goal is dangerous (electrical wiring, high heat, chemicals), tier MUST be A3.\n"
+            f"- Otherwise tier should be A1 (low-risk physical action) or A0 (informational).\n"
+            f"- expected_evidence MUST contain 1-2 visible checkable strings in the grammar: 'X visible' or 'no X visible' "
+            f"where X is a short lowercase singular noun (e.g. 'notebook visible' or 'no cup visible').\n"
+            f"Reply with JSON only:\n"
+            f'{{"instruction": "Place the notebook in the center of the desk.", "tier": "A1", "tier_reason": "place work item", "expected_evidence": ["notebook visible"]}}'
+        )
+        try:
+            r = self._http.post(
+                GEMINI_URL.format(model=self.model),
+                headers={"x-goog-api-key": self._key, "content-type": "application/json"},
+                json={"contents": [{"role": "user", "parts": [{"text": planning_prompt}]}],
+                      "generationConfig": {"temperature": 0.2, "responseMimeType": "application/json"}},
+                timeout=15.0,
+            )
+            r.raise_for_status()
+            data = r.json()
+            candidates = data.get("candidates") or []
+            if not candidates:
+                return None
+            text = "".join(p.get("text", "") for p in (candidates[0].get("content") or {}).get("parts", []))
+            m = re.search(r"\{.*\}", text, re.S)
+            if not m:
+                return None
+            parsed = json.loads(m.group(0))
+            if "instruction" in parsed and "expected_evidence" in parsed:
+                return parsed
+        except Exception:
+            return None
+        return None
+
 
 def parse_observations(text: str, frame_id: str) -> list[Observation]:
     """Schema-check the model output. Anything malformed is an error, never a guess."""
-    m = re.search(r"\{.*\}", text, re.S)
+    m = re.search(r"(\[.*\]|\{.*\})", text, re.S)
     if not m:
         raise ModelError("model reply had no JSON")
     try:
         data = json.loads(m.group(0))
-        items = data["objects"]
+        items = data if isinstance(data, list) else data["objects"]
         out = []
         for i, o in enumerate(items):
             conf = float(o["confidence"])
             if not 0.0 <= conf <= 1.0:
                 raise ValueError("confidence out of range")
+            box_2d = o.get("box_2d")
+            if box_2d is not None:
+                if not isinstance(box_2d, list) or len(box_2d) != 4 or not all(isinstance(x, (int, float)) for x in box_2d):
+                    box_2d = None
+                else:
+                    box_2d = [int(x) for x in box_2d]
             out.append(Observation(id=f"{frame_id}-{i}", label=str(o["label"]).strip().lower(),
                                    confidence=conf, where_hint=str(o.get("where", "")),
+                                   box_2d=box_2d,
                                    source_frame=frame_id))
         return out
     except (KeyError, TypeError, ValueError) as e:

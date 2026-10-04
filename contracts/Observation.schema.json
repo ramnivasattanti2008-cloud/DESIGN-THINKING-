@@ -22,6 +22,21 @@
     "source_frame": {
       "title": "Source Frame",
       "type": "string"
+    },
+    "box_2d": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Box 2D"
     }
   },
   "required": [
