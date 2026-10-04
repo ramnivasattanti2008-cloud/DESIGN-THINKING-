@@ -12,6 +12,7 @@ Every tool needs to know who it is. Start each new session with one line:
 
 - Antigravity account 1: "You are seat `ag-a`. Read AGENTS.md and start."
 - Antigravity account 2: "You are seat `ag-b`. Read AGENTS.md and start."
+- Antigravity account 3: "You are seat `ag-c`. Read AGENTS.md and start."
 - AI Studio account 1: "You are seat `studio-a`." then paste AGENTS.md, ROLES.md and PROJECT_STATE.md.
 - AI Studio account 2: "You are seat `studio-b`." then paste the same three files.
 

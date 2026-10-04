@@ -5,7 +5,8 @@ Folder ownership is what keeps two tools from editing the same file. The folders
 | Path | Owner | Notes |
 |---|---|---|
 | `/` (repo root files, config, CI, dependencies) | `claude` | Ask for changes, don't make them |
-| `src/core/`, `src/api/` | `claude` | Logic, data handling, backend |
+| `src/core/` | `claude` | Core logic and data handling |
+| `src/api/`, `db/`, `deploy/` | `ag-c` | API endpoints, schema and migrations, hosting config. Contracts agreed with `claude` first |
 | `src/ui/`, `public/`, `assets/` | `ag-a` | Screens, components, styling |
 | `tests/`, `.github/workflows/` | `ag-b` | Tests, CI. Workflow changes go through `claude` for review |
 | `research/`, `data/`, `prompts/`, `experiments/` | `studio-a` | Every claim needs a source in `research/sources.md` |
@@ -22,6 +23,6 @@ Need something from another lane? Put it in your status file under "Blockers / r
 These are guidelines, not hard limits. Ram can reassign work whenever it makes sense.
 
 - **claude**: design decisions, tricky logic, reviewing, tying pieces together.
-- **ag-a / ag-b**: Antigravity works well on a task that has a clear spec. Give it small, well-defined jobs and check the output.
+- **ag-a / ag-b / ag-c**: Antigravity works well on a task that has a clear spec. Give it small, well-defined jobs and check the output.
 - **studio-a / studio-b**: AI Studio is a good place to explore, compare options and draft. It doesn't see the repo on its own, so Ram pastes in the relevant files, and what comes back goes into a branch and PR like everything else.
 - **copilot**: inline help while Ram types.
