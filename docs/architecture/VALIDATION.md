@@ -7,13 +7,13 @@ What was run, what passed, and what was not checked. Nothing here is estimated.
 | Check | Command / method | Result |
 |---|---|---|
 | Backend and policy tests | `python -m pytest` (Python 3.13) | 283 passed, 0 skipped (includes the planner, API-hardening, Gemini-provider and guard tests, 7 end-to-end tests that start a real uvicorn process, and the session-log writer). Uses the fake provider, so this proves policy and loop logic, not real perception |
-| Android unit tests | `./gradlew :app:testDebugUnitTest` on commit `f192e26` (Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17) | 30 passed, 0 failed (17 controller state machine including 5 photo-consent rules, 13 parsing, server-address, API-key header and photo-quality) |
-| Android debug build | `./gradlew :app:assembleDebug` on commit `f192e26` | Builds. APKs for the emulator address and the Wi-Fi address were produced (git-ignored `dist/`) |
+| Android unit tests | `./gradlew :app:testDebugUnitTest` on commit `eec3a6d` (Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17) | 30 passed, 0 failed (17 controller state machine including 5 photo-consent rules, 13 parsing, server-address, API-key header and photo-quality) |
+| Android debug build | `./gradlew :app:assembleDebug` on commit `eec3a6d` | Builds. APKs for the emulator address and the Wi-Fi address were produced (git-ignored `dist/`) |
 | Full loop over real HTTP | uvicorn on port 8000, scripted client, fake provider (run earlier in the session) | Blocked goal refused; plan before any observation returned `needs_observation`; failed check `not_verified`; blurry frame `cannot_tell`; cup removed `verified`; final plan `completed`. Every outcome is also driven through `TestClient` in `src/core/tests/test_contract_responses.py` |
 | Independent CI on GitHub (clean Linux runners) | commit `10f5623`, branch `claude/architecture` | Android CI: all steps succeeded (JDK 17, SDK 34, `:app:testDebugUnitTest`, `:app:assembleDebug`, artifacts uploaded): https://github.com/ramnivasattanti2008-cloud/DESIGN-THINKING-/actions/runs/37196263936. MIRROR CI (pytest): success: https://github.com/ramnivasattanti2008-cloud/DESIGN-THINKING-/actions/runs/37196263870 |
 | API shapes | contract tests | Every response body validates against a model, and the committed JSON Schemas must equal the generated ones |
 
-The Android sources are those of `f192e26`; later commits touch docs only.
+The Android sources are those of `eec3a6d` (including `ag-a`'s themed components from PR #9); later commits touch docs only.
 
 History worth knowing: the commit before `8a6a185` (`0a5b11a`) did not compile because of `CameraViewScreen.kt:171`. `ag-a` fixed it in `b901585`. The compiler also caught one real bug of mine earlier (a `/*` inside a comment).
 
