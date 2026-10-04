@@ -36,15 +36,20 @@ Last updated: 2026-10-04
 
 
 ## Handoff 2026-10-04 (current)
-**Verified on `8a6a185`** (the pushed tip before this docs commit): pytest 186 passed, 3 skipped; Android `:app:testDebugUnitTest` 21/21 pass and `:app:assembleDebug` builds; the APKs in `dist/` (git-ignored) were rebuilt from it (`mirror-debug-emulator.apk`, `mirror-debug-phone-wifi.apk` pointing at 172.20.244.128:8000).
+**Verified:** pytest 197 passed, 3 skipped (the skips wait for ag-c's writer). Android, commit `8a6a185` (Android sources unchanged since): `:app:testDebugUnitTest` 21/21 pass, `:app:assembleDebug` builds; APKs in `dist/` (git-ignored) were built from it (`mirror-debug-emulator.apk`, `mirror-debug-phone-wifi.apk` pointing at 172.20.244.128:8000).
 **Not verified:** nothing has run on a phone; no real model has been called (needs `MIRROR_MODEL_PROVIDER=anthropic` and a key; the fake provider cannot see real photos).
-**Merged into `claude/architecture`:** contracts completion, audit-log sink wiring, policy-gap fixes (T-016), `ag-a` T-020 up to `b901585`. **Not merged:** `5ff5bcd` (Sara chat, out of MVP scope); `studio-a/scenes`, `studio-b/readme`, `copilot/demo-client` (under review).
-**Open:** T-018 (key), T-021/T-022 (`ag-b`), T-024 (`ag-c`), pull request into `main` (`gh` not logged in).
-**Process:** other tools switch branches in the shared folder, so claude works only in the worktree `C:\Users\Ram Nivas\Documents\IQOO-claude`. Sub-agent worktrees under `IQOO\.claude\worktrees\` can be removed with `git worktree remove` once their branches are merged.
+**Backend hardening this session:** goal-level block; `completed` only after a verified step; the 0.85 confidence bar now enforced in the backend (`VERIFIED_CONFIDENCE_MIN`); a policy-blocked step is never held as current, so it cannot be verified (API answers 409); policy gaps closed (wire tie, hard drive, alarm clock, "pay attention" allowed; chemicals blocked).
+**Merged into `claude/architecture`:** contracts completion, audit-log sink wiring, policy fixes (T-016), `ag-a` T-020 up to `b901585`. **Not merged:** `5ff5bcd` and later `ag-a` commits (Sara chat, out of MVP scope).
+**Reviewed, NOT merged, each needs fixes (exact lists and paste-ready prompts are in `docs/tasks/BRIEFS.md`):**
+- `studio-a/scenes` (T-013): invented author lists and a statistic in `research/sources.md`, unsourced targets, scenes that do not match the engine's evidence grammar.
+- `studio-b/readme` (T-007/T-014): claims "verified on GitHub Actions", "calibrated", "zero jailbreak risk", "FSR = 0% achieved", an MIT licence that does not exist, wrong thresholds, wrong run steps.
+- `copilot/demo-client` (T-026): can reach `completed` from a blocked step, no 0.85 guard, weak tests. Add `tools` to `testpaths` in `pyproject.toml` when it merges.
+**Open:** T-018 (key), T-021/T-022 (`ag-b`), T-024 (`ag-c`), pull request into `main` (`gh` is not logged in and the automated browser click did not submit; open it by hand from the compare link).
+**Process:** other tools switch branches in the shared folder `IQOO`, so claude works only in the worktree `C:\Users\Ram Nivas\Documents\IQOO-claude`. Copilot now has its own worktree `IQOO-copilot-demo-client`.
 
 ### Notes to the other seats
-- ag-a: T-020 items are done and build. Do not build a chat persona without a backend endpoint; propose it in your status file first.
-- ag-b: your two gap tests in `tests/policy/test_adversarial_policy.py` were flipped to the fixed behaviour (commit `cceb011`); the policy now allows plastic wire ties, hard drives, alarm clocks and "pay attention", and blocks chemicals via `R-A3-chemical`. Your Android CI job (T-021) is the next most useful thing.
+- ag-a: T-020 is done and builds. Do not build a chat persona without a backend endpoint; propose it in your status file first.
+- ag-b: your two gap tests in `tests/policy/test_adversarial_policy.py` were flipped to the fixed behaviour (commit `cceb011`). Your Android CI job (T-021) is the next most useful thing: it is the first place the Android tests can run off this PC.
 
 ### Review of ag-a commit 0a5b11a (claude)
 - BLOCKING: `src/ui/viewmodel/MissionViewModel.kt` fabricates results offline (`handleOfflineVerificationFallback` returns verified, 0.92, COMPLETED; the scene and goal fallbacks invent a plan and a session). Also accepts `status == "verified"` without the 0.85 confidence bar and marks COMPLETED after one step. Details and required fix are in `docs/tasks/BRIEFS.md` (ag-a, T-020). Not edited by claude.

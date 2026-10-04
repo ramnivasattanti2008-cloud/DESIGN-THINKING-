@@ -11,7 +11,7 @@ MIRROR is a phone-first real-world AI agent that helps people act in unfamiliar 
 Updated 2026-10-04. Branch `claude/architecture` (not yet merged into `main`; the pull request has not been opened).
 
 - Contains: architecture docs; the FastAPI backend (policy gate A0-A3 with default deny and a chemical rule, one-step planner, evidence verifier with confidence and `cannot_tell`, optional audit-log sink, JSON Schemas for every API response with a drift test); the Android module (`src/mobile` integration plus `src/ui` screens, built together); `ag-a`'s UI cleanup (T-020) up to commit `b901585`; `ag-b`'s tests and pytest CI.
-- Under review, not merged: `studio-a/scenes` (T-013), `studio-b/readme` (T-007, T-014), `copilot/demo-client` (T-026).
+- Reviewed and sent back for fixes, not merged: `studio-a/scenes` (T-013, invented citations), `studio-b/readme` (T-007, T-014, unsupported claims), `copilot/demo-client` (T-026, can show success from a blocked step). The fix lists are in `docs/tasks/BRIEFS.md`.
 - Rejected for the MVP: `ag-a`'s commit `5ff5bcd` (a "Sara" chat persona). The backend has no chat endpoint, so it could only show canned replies.
 - Not delivered yet: `ag-b` Android CI job and HTTP end-to-end test (T-021, T-022), `ag-c` session-log writer (T-024).
 
