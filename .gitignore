@@ -27,3 +27,4 @@ build/
 *.apk
 .gradle-test.log
 .kotlin/
+.verify/

@@ -30,6 +30,19 @@ Backend address is baked in at build time:
 
 Debug builds allow plain http for this; release builds should use https.
 
+## Troubleshooting (Windows)
+
+**`java.io.IOException: Unable to establish loopback connection` (cause `Invalid argument: connect`)** while Gradle runs. Seen on the dev PC: Java's internal pipe uses Unix-domain sockets in the temp folder, and that fails when the temp path is an 8.3 short name such as `C:\Users\RAMNIV~1\...` (user folder with a space). Plain network sockets are fine, so the Python backend is unaffected. Fix: point every Java process at a folder with no spaces.
+
+```bash
+mkdir /c/mirror-tmp
+export JAVA_TOOL_OPTIONS="-Djdk.net.unixdomain.tmpdir=C:/mirror-tmp"
+export GRADLE_OPTS="-Xmx2g -Dfile.encoding=UTF-8"
+./gradlew :app:testDebugUnitTest --no-daemon
+```
+
+`JAVA_TOOL_OPTIONS` matters: Gradle's compiler worker is a separate JVM and does not inherit `GRADLE_OPTS`. If Gradle forks a daemon that dies ("first result from the daemon was empty"), remove the `org.gradle.jvmargs` line locally so it runs in-process. For Android Studio, put `-Djdk.net.unixdomain.tmpdir=C:/mirror-tmp` in `~/.gradle/gradle.properties` under `org.gradle.jvmargs` (not the repo file; the path is machine specific).
+
 ## The loop in the app
 
 `HOME` goal -> `CAMERA` real photo -> backend `observe` + `plan` -> `SUMMARY` -> `PLAN` -> `EXECUTING` (person does the step) -> real photo -> backend `verify` -> `VERIFICATION` -> accept (only if verified with confidence >= 0.85) -> next plan, until the backend reports `completed`.
