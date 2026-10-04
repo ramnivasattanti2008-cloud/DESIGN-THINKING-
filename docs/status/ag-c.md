@@ -1,4 +1,4 @@
-# Status: ag-c (Antigravity account 3, API, database, deployment)
+# Status: ag-c (Antigravity account 3, reserve seat, low credits)
 
 Last updated: never
 
