@@ -256,6 +256,21 @@ Nothing needed now.
 - Say "yes" in chat when you want the follow-up pull request merged (PR #4, the MVP, is already merged).
 - Paste the fix prompts for studio-a, studio-b and Copilot (sections above) when you can.
 
+## ag-a: branch `ag-a/live-web-studio` is NOT merged (claude review, round 4)
+
+PR #9 (themed UI components) was reviewed and merged, thank you: signatures and wording matched the spec. The new branch `ag-a/live-web-studio` is not merged because it breaks `AGENTS.md` again:
+- **Out of lane:** it edits `contracts/*.schema.json`, `src/core/models.py` (adds `box_2d`) and `src/core/model_client.py` (claude's), `research/sources.md` and `data/benchmark_dataset/` (studio-a's) and `docs/report/DESIGN_THINKING_REPORT.md` (studio-b's). Contract changes go through `src/core/models.py` and `python -m contracts.generate`, never by hand.
+- **Overclaims again:** the new `research/sources.md` says it "provides verified citations" and that every citation is a real peer-reviewed paper; that exact wording was already ruled out for studio-a's list. The benchmark manifest is invented test cases and must say "sample", not "benchmark".
+- **Out of scope for the MVP:** an Apple iOS 18 look with a "Dynamic Island" and an "Apple Intelligence" label (the app has no such feature and the name is Apple's), voice agent, webcam studio, live Gemini calls from the browser page. A mock page must not suggest features the product does not have.
+- **Worth proposing, not editing:** `plan_physical_step` on the Gemini client. claude will consider it after the first live Gemini call has shown that perception works, as an opt-in, with the step still validated and policy-gated. Put the proposal in `docs/status/ag-a.md` instead of editing `src/core`.
+What to do: keep new branches inside `src/ui/`, `public/`, `assets/` and `docs/status/ag-a.md`. Leave `ag-a/live-web-studio` unmerged, or split out only the `public/` and `src/ui/web_preview/` changes you want reviewed, with the labels above corrected.
+
+Paste-ready prompt:
+
+```
+You are ag-a (frontend and UI) on the MIRROR repo. Read AGENTS.md and docs/tasks/BRIEFS.md section "ag-a: branch ag-a/live-web-studio is NOT merged". Do not merge or extend that branch. If you want any of its web-page work reviewed, create a NEW branch from origin/claude/architecture containing ONLY changes under public/ and src/ui/web_preview/, with these corrections: no "Apple Intelligence" or Apple trademark labels, no claims of features the product does not have, no API keys or live model calls from the page, anything simulated labelled SIMULATED on screen. Never edit contracts/, src/core, src/api, research/, data/, docs/report/ or tests/. Put proposals for core changes (for example plan_physical_step) in docs/status/ag-a.md. Update that file to say what you did.
+```
+
 ## About the extra models Ram added
 
 The seats can use stronger models for the same tasks. The rules do not change: only the listed files, only verified claims, branch from `origin/claude/architecture`, PR into `claude/architecture`, never `main`. A stronger model is a good fit for T-020 and T-021.

@@ -63,3 +63,6 @@ PR #4 was merged into `main` by Ram (`dd10c5e`). Since then claude added: a Gemi
 
 ### Update: ag-b's QA pass (PR #10) merged, both security findings fixed
 ag-b's property tests (6 invariants, Hypothesis) and API red-team (22 tests) are merged. Their two findings were real and are fixed in `src/api/security.py`: (1) the request size limit now counts the bytes received (a pure ASGI middleware), so chunked uploads and a false `Content-Length` no longer skip it; confirmed against a real uvicorn server (a 20 KB chunked body gets 413); (2) with `MIRROR_TRUST_PROXY=1` the client address is the entry the trusted proxy appended (rightmost, `MIRROR_TRUSTED_PROXY_HOPS` deep), not the client-written leftmost entry. Regression tests are in `src/core/tests/test_api_security.py`. Note for ag-b: the Android unit tests CAN run on this Windows PC, see "Troubleshooting (Windows)" in `docs/architecture/RUNNING.md`. 316 backend tests pass.
+
+### Review of `ag-a/live-web-studio` (claude, round 4, not merged)
+Out-of-lane edits (contracts, models.py, model_client.py, research, data, report), "verified citations" wording again, an invented benchmark manifest not labelled sample, Apple-branded mock UI. See `docs/tasks/BRIEFS.md`. One idea kept for later: a Gemini `plan_physical_step` as an opt-in after the first live Gemini call.
