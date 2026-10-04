@@ -96,3 +96,4 @@ data class SessionDetailDto(
     val log: List<Map<String, Any?>> = emptyList(),
     val verified_steps: Int = 0
 )
+
