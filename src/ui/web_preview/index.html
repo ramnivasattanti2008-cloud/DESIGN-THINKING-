@@ -6,7 +6,7 @@
   <title>MIRROR • Physical Consequence Intelligence</title>
   <style>
     :root {
-      /* Apple iOS 18 Design System - Light Mode */
+      /* Apple iOS 18 Design Tokens - Clean White Light Mode */
       --ios-bg: #F2F2F7;
       --ios-surface: #FFFFFF;
       --ios-surface-elevated: #FFFFFF;
@@ -25,6 +25,8 @@
       --ios-red-light: rgba(255, 59, 48, 0.12);
       --ios-purple: #AF52DE;
       --ios-purple-light: rgba(175, 82, 222, 0.12);
+      --ios-pink: #FF2D55;
+      --ios-pink-light: rgba(255, 45, 85, 0.12);
       --ios-text-primary: #000000;
       --ios-text-secondary: #8E8E93;
       --ios-text-tertiary: #C7C7CC;
@@ -62,7 +64,7 @@
     .ambient-backdrop {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.95), rgba(229, 229, 234, 0.8) 70%);
+      background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.98), rgba(229, 229, 234, 0.8) 70%);
       pointer-events: none;
       z-index: 0;
     }
@@ -93,7 +95,7 @@
       top: 11px;
       left: 50%;
       transform: translateX(-50%);
-      width: 130px;
+      width: 140px;
       height: 35px;
       background: #000000;
       border-radius: 20px;
@@ -102,14 +104,15 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 12px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 3px 14px rgba(0,0,0,0.3);
       transition: all 0.4s var(--ios-spring);
       cursor: pointer;
     }
     .dynamic-island-container.expanded {
-      width: 280px;
-      height: 44px;
-      border-radius: 24px;
+      width: 320px;
+      height: 48px;
+      border-radius: 26px;
+      padding: 0 16px;
     }
     .island-dot {
       width: 10px;
@@ -124,13 +127,13 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--ios-green);
-      box-shadow: 0 0 6px var(--ios-green);
-      animation: pulseSens 2s infinite;
+      background: var(--ios-pink);
+      box-shadow: 0 0 8px var(--ios-pink);
+      animation: pulseSens 1.8s infinite;
     }
     @keyframes pulseSens {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
+      0%, 100% { opacity: 0.6; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.1); }
     }
     .island-text {
       font-size: 11px;
@@ -140,7 +143,39 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 200px;
+      max-width: 220px;
+    }
+
+    /* IR Pulse Beam Animation on Top of iPhone */
+    .ir-beam-emitter {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 10px;
+      background: transparent;
+      pointer-events: none;
+      z-index: 120;
+    }
+    .ir-beam-pulse {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: #FF0055;
+      border-radius: 50%;
+      opacity: 0;
+    }
+    .ir-beam-pulse.firing {
+      animation: irBlast 0.6s ease-out;
+    }
+    @keyframes irBlast {
+      0% { opacity: 1; width: 6px; height: 6px; box-shadow: 0 0 10px #FF0055; transform: translate(-50%, 0) scale(1); }
+      50% { opacity: 0.8; width: 80px; height: 20px; box-shadow: 0 -10px 30px #FF0055; transform: translate(-50%, -15px) scale(2); }
+      100% { opacity: 0; width: 140px; height: 40px; box-shadow: 0 -20px 50px rgba(255,0,85,0); transform: translate(-50%, -30px) scale(3); }
     }
 
     /* Status Bar */
@@ -172,7 +207,7 @@
       align-items: center;
     }
     .battery-level {
-      width: 85%;
+      width: 90%;
       height: 100%;
       background: var(--ios-text-primary);
       border-radius: 1.5px;
@@ -186,7 +221,7 @@
       position: relative;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 12px 18px 94px 18px; /* space for floating pill dock */
+      padding: 12px 18px 98px 18px; /* space for pill dock */
       scrollbar-width: none;
     }
     .screen-viewport::-webkit-scrollbar { display: none; }
@@ -227,7 +262,7 @@
       margin-top: 3px;
     }
 
-    /* Apple Cards */
+    /* Apple Inset Cards */
     .ios-card {
       background: var(--ios-surface);
       border: 0.5px solid var(--ios-border);
@@ -235,9 +270,6 @@
       padding: 16px;
       box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04);
       transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .ios-card:hover {
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
     }
 
     /* Apple Buttons */
@@ -300,6 +332,7 @@
     .badge-orange { background: var(--ios-orange-light); color: var(--ios-orange); }
     .badge-red { background: var(--ios-red-light); color: var(--ios-red); }
     .badge-purple { background: var(--ios-purple-light); color: var(--ios-purple); }
+    .badge-pink { background: var(--ios-pink-light); color: var(--ios-pink); }
 
     /* List Rows */
     .ios-list-row {
@@ -322,7 +355,7 @@
       transform: scale(0.98);
     }
 
-    /* Camera Viewfinder */
+    /* Camera Viewport */
     .apple-camera-viewport {
       width: 100%;
       height: 380px;
@@ -405,81 +438,56 @@
     .box-tag.warning { background: var(--ios-orange); }
     .box-tag.match { background: var(--ios-green); }
 
-    /* Shutter Button */
-    .apple-shutter-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 6px 0;
-    }
-    .apple-shutter-btn {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      border: 4px solid var(--ios-blue);
-      padding: 4px;
-      background: transparent;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.15s;
-    }
-    .apple-shutter-btn:active {
-      transform: scale(0.92);
-    }
-    .shutter-inner {
-      width: 100%;
-      height: 100%;
-      background: var(--ios-blue);
-      border-radius: 50%;
-    }
-
-    /* Siri Voice Bar */
-    .siri-voice-bar {
+    /* Cute Lady Voice Interactive Bar */
+    .cute-voice-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(175, 82, 222, 0.08));
-      border: 0.5px solid rgba(0, 122, 255, 0.22);
+      background: linear-gradient(135deg, rgba(255, 45, 85, 0.08), rgba(175, 82, 222, 0.08));
+      border: 0.5px solid rgba(255, 45, 85, 0.25);
       border-radius: var(--ios-radius-lg);
       padding: 12px 16px;
       cursor: pointer;
       transition: all 0.3s;
     }
-    .siri-voice-bar.speaking {
-      border-color: var(--ios-purple);
-      background: linear-gradient(135deg, rgba(175, 82, 222, 0.18), rgba(0, 122, 255, 0.18));
-      box-shadow: 0 0 18px rgba(175, 82, 222, 0.25);
+    .cute-voice-bar.speaking {
+      border-color: var(--ios-pink);
+      background: linear-gradient(135deg, rgba(255, 45, 85, 0.20), rgba(255, 149, 0, 0.15));
+      box-shadow: 0 0 20px rgba(255, 45, 85, 0.3);
+    }
+    .cute-voice-bar.listening {
+      border-color: var(--ios-blue);
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.20), rgba(52, 199, 89, 0.20));
+      box-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
     }
 
     /* Floating Pill Dock */
     .floating-pill-dock {
       position: absolute;
-      bottom: 20px;
+      bottom: 18px;
       left: 50%;
       transform: translateX(-50%);
-      width: 350px;
-      height: 62px;
-      background: rgba(255, 255, 255, 0.90);
-      backdrop-filter: blur(32px) saturate(200%);
+      width: 360px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(34px) saturate(200%);
       border: 0.5px solid rgba(0, 0, 0, 0.08);
       border-radius: 36px;
       box-shadow: 
-        0 12px 32px rgba(0, 0, 0, 0.10),
-        0 4px 12px rgba(0, 0, 0, 0.04);
+        0 14px 34px rgba(0, 0, 0, 0.12),
+        0 4px 12px rgba(0, 0, 0, 0.05);
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 0 8px;
+      padding: 0 6px;
       z-index: 150;
     }
     .dock-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
-      padding: 6px 12px;
+      gap: 2px;
+      padding: 6px 10px;
       border-radius: 18px;
       cursor: pointer;
       transition: all 0.2s var(--ios-spring);
@@ -488,8 +496,8 @@
       font-weight: 600;
     }
     .dock-item.active {
-      color: var(--ios-blue);
-      background: rgba(0, 122, 255, 0.10);
+      color: var(--ios-pink);
+      background: rgba(255, 45, 85, 0.10);
     }
     .dock-icon {
       font-size: 18px;
@@ -498,12 +506,12 @@
       width: 46px;
       height: 46px;
       border-radius: 50%;
-      background: var(--ios-blue);
+      background: var(--ios-pink);
       color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+      box-shadow: 0 4px 14px rgba(255, 45, 85, 0.38);
       cursor: pointer;
       transition: transform 0.2s;
     }
@@ -511,7 +519,7 @@
       transform: scale(0.92);
     }
 
-    /* Consequence Matrix Item Cards */
+    /* Consequence Matrix Cards */
     .consequence-card {
       background: var(--ios-surface);
       border-radius: var(--ios-radius-md);
@@ -526,9 +534,13 @@
       border-left: 5px solid var(--ios-red);
       background: #FFF9F9;
     }
-    .consequence-card.warning {
+    .consequence-card.unnecessary_active {
       border-left: 5px solid var(--ios-orange);
       background: #FFFAF3;
+    }
+    .consequence-card.hazard {
+      border-left: 5px solid var(--ios-red);
+      background: #FFF5F5;
     }
     .consequence-card.attention {
       border-left: 5px solid #FFCC00;
@@ -539,31 +551,84 @@
       background: #F8FDF9;
     }
 
-    /* Activity Ring */
-    .readiness-ring-wrap {
+    /* Universal IR Remote Hardware Styles */
+    .ir-remote-panel {
+      background: #1C1C1E;
+      border-radius: 28px;
+      padding: 20px;
+      color: #FFFFFF;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+    .ir-led-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #FF0055;
+      box-shadow: 0 0 8px #FF0055;
+      margin-left: auto;
+    }
+    .ir-temp-display {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      text-align: center;
+      color: #FFFFFF;
+      margin: 8px 0;
+    }
+    .ir-button-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .ir-btn {
+      background: #2C2C2E;
+      border: none;
+      color: #FFFFFF;
+      padding: 14px 10px;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ir-btn:active {
+      background: #3A3A3C;
+      transform: scale(0.94);
+    }
+    .ir-btn-power {
+      background: #FF3B30;
+      color: #FFFFFF;
+    }
+    .ir-btn-power:active {
+      background: #D70015;
+    }
+    .ir-btn-blast {
+      background: linear-gradient(135deg, #FF2D55, #FF9500);
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px;
+      border-radius: 20px;
+      border: none;
+      box-shadow: 0 6px 18px rgba(255, 45, 85, 0.4);
+      cursor: pointer;
+      width: 100%;
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 12px;
+      justify-content: center;
+      gap: 8px;
     }
-    .ring-svg {
-      width: 60px;
-      height: 60px;
-      transform: rotate(-90deg);
-    }
-    .ring-bg {
-      fill: none;
-      stroke: rgba(0,0,0,0.06);
-      stroke-width: 6;
-    }
-    .ring-progress {
-      fill: none;
-      stroke: var(--ios-blue);
-      stroke-width: 6;
-      stroke-linecap: round;
-      stroke-dasharray: 163;
-      stroke-dashoffset: 163;
-      transition: stroke-dashoffset 0.8s var(--ios-spring);
+    .ir-btn-blast:active {
+      transform: scale(0.96);
     }
   </style>
 </head>
@@ -571,16 +636,21 @@
 
   <div class="ambient-backdrop"></div>
 
-  <!-- iPhone 16 Pro Hardware Shell -->
+  <!-- iPhone 16 Pro Chassis -->
   <div class="iphone-device">
+
+    <!-- Top Hardware IR Blaster Emitter -->
+    <div class="ir-beam-emitter">
+      <div class="ir-beam-pulse" id="ir-pulse-dot"></div>
+    </div>
 
     <!-- Dynamic Island -->
     <div class="dynamic-island-container" id="dynamic-island" onclick="expandIsland()">
       <div class="island-dot">
         <div class="island-sensor" id="island-led"></div>
       </div>
-      <span class="island-text" id="island-status-label">MIRROR • Intention AI</span>
-      <div style="font-size: 11px;">⚡</div>
+      <span class="island-text" id="island-status-label">🌸 MIRROR • Aura Voice AI</span>
+      <div style="font-size: 12px;">📡</div>
     </div>
 
     <!-- iOS Status Bar -->
@@ -604,22 +674,39 @@
             <h1 class="ios-large-title">Physical Intention</h1>
             <p class="ios-subtitle">Give MIRROR an intention, not a command</p>
           </div>
-          <span class="ios-badge badge-blue" id="home-status-badge">Consequence Engine</span>
+          <span class="ios-badge badge-pink" id="home-status-badge">Aura Voice AI</span>
         </div>
 
         <!-- Inset Text Input Card -->
         <div class="ios-card">
-          <div style="font-size: 11px; font-weight: 700; color: var(--ios-blue); text-transform: uppercase; margin-bottom: 6px;">
-            User Intention
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--ios-pink); text-transform: uppercase;">
+              User Intention
+            </div>
+            <span class="ios-badge badge-blue" style="cursor: pointer;" onclick="toggleSpeechRecognition()" id="mic-badge">
+              🎙️ Tap to Speak
+            </span>
           </div>
           <textarea id="goal-input" style="width: 100%; height: 60px; background: transparent; border: none; color: #000; font-size: 17px; font-weight: 600; letter-spacing: -0.3px; outline: none; resize: none;" placeholder="What are you trying to accomplish?">I'm leaving</textarea>
           
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 0.5px solid var(--ios-border); padding-top: 10px;">
             <span style="font-size: 12px; color: var(--ios-text-secondary);" id="active-scene-preset-label">Scene: Living Room</span>
-            <button class="ios-btn-primary" style="width: auto; padding: 10px 18px; font-size: 14px;" onclick="onEvaluateIntention()">
+            <button class="ios-btn-primary" style="width: auto; padding: 10px 18px; font-size: 14px; background: var(--ios-pink);" onclick="onEvaluateIntention()">
               Evaluate State →
             </button>
           </div>
+        </div>
+
+        <!-- Cute Lady Voice Persona Bar -->
+        <div class="cute-voice-bar" id="cute-voice-bar" onclick="playVoiceGreeting()">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 26px;">🌸</span>
+            <div>
+              <div style="font-size: 14px; font-weight: 700;" id="voice-name-title">Aura (Cute Lady Voice)</div>
+              <div style="font-size: 11px; color: var(--ios-text-secondary);" id="voice-status-sub">"Hi Ram! I'll protect your home & guide you!"</div>
+            </div>
+          </div>
+          <span class="ios-badge badge-pink" id="voice-play-badge">Tap to Hear</span>
         </div>
 
         <!-- Signature Intention Presets -->
@@ -749,24 +836,12 @@
           </button>
 
           <button class="apple-shutter-btn" onclick="onCaptureAndAnalyze()" title="Capture Physical State">
-            <div class="shutter-inner"></div>
+            <div class="shutter-inner" style="background: var(--ios-pink);"></div>
           </button>
 
           <button class="ios-btn-secondary" style="width: auto; padding: 10px 14px; font-size: 12px;" id="btn-webcam-toggle" onclick="toggleWebcam()">
             📹 Live Cam
           </button>
-        </div>
-
-        <!-- Siri Voice Bar -->
-        <div class="siri-voice-bar" id="voice-bar" onclick="playVoiceSummary()">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 20px;">🎙️</span>
-            <div>
-              <div style="font-size: 13px; font-weight: 600;" id="voice-title">Apple Voice Intelligence</div>
-              <div style="font-size: 11px; color: var(--ios-text-secondary);" id="voice-subtitle">Tap to hear physical consequence summary</div>
-            </div>
-          </div>
-          <span class="ios-badge badge-blue" id="voice-badge">Active</span>
         </div>
 
         <input type="file" id="file-picker" accept="image/*" style="display: none;" onchange="handleFilePicked(event)">
@@ -784,13 +859,12 @@
 
         <!-- Readiness Ring Card -->
         <div class="ios-card">
-          <div class="readiness-ring-wrap">
-            <svg class="ring-svg" viewBox="0 0 60 60">
-              <circle class="ring-bg" cx="30" cy="30" r="26"></circle>
-              <circle class="ring-progress" id="readiness-ring" cx="30" cy="30" r="26"></circle>
-            </svg>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 58px; height: 58px; border-radius: 50%; border: 5px solid var(--ios-red); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: var(--ios-red);" id="readiness-circle">
+              38%
+            </div>
             <div>
-              <div style="font-size: 20px; font-weight: 700;" id="readiness-percent">38% Ready</div>
+              <div style="font-size: 19px; font-weight: 700;" id="readiness-percent">38% Ready</div>
               <div style="font-size: 12px; color: var(--ios-text-secondary);" id="readiness-desc">2 State Conflicts require attention</div>
             </div>
           </div>
@@ -808,14 +882,14 @@
 
         <!-- Dual Action Buckets -->
         <div class="ios-card">
-          <div style="font-size: 12px; font-weight: 700; color: var(--ios-blue); text-transform: uppercase; margin-bottom: 6px;">
-            🤖 What MIRROR Can Safely Do
+          <div style="font-size: 12px; font-weight: 700; color: var(--ios-pink); text-transform: uppercase; margin-bottom: 6px;">
+            📡 Hardware IR Control (Smart/Blaster)
           </div>
           <div id="mirror-actions-list" style="font-size: 13px; color: var(--ios-text-primary); display: flex; flex-direction: column; gap: 6px;">
-            <div>• Turn off air conditioner (Digital Smart Control)</div>
+            <div>• Air Conditioner is running (27°C)</div>
           </div>
-          <button class="ios-btn-secondary" style="margin-top: 10px; font-size: 13px;" onclick="executeMirrorActions()">
-            ⚡ Execute Automated Actions
+          <button class="ios-btn-primary" style="margin-top: 10px; font-size: 13px; background: var(--ios-pink);" onclick="triggerIrShutdownFromMatrix()">
+            ⚡ Transmit 38kHz IR Power Off
           </button>
         </div>
 
@@ -832,7 +906,77 @@
         </div>
       </div>
 
-      <!-- SCREEN 4: CLOSED-LOOP VERIFICATION -->
+      <!-- SCREEN 4: UNIVERSAL IR REMOTE CONTROLLER -->
+      <div id="screen-remote" class="ios-screen">
+        <div class="ios-nav-header">
+          <div>
+            <h1 class="ios-large-title">Hardware IR Remote</h1>
+            <p class="ios-subtitle">Consumer IR Blaster (38kHz)</p>
+          </div>
+          <span class="ios-badge badge-pink">Blaster Ready</span>
+        </div>
+
+        <!-- AC Remote Inset -->
+        <div class="ir-remote-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 14px; font-weight: 700; letter-spacing: 0.5px;">AIR CONDITIONER</span>
+            <div class="ir-led-indicator" id="ir-panel-led"></div>
+          </div>
+
+          <div class="ir-temp-display" id="ir-ac-temp">24°C</div>
+
+          <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 6px;">
+            <button class="ir-btn" style="width: 50px; height: 50px; font-size: 20px;" onclick="adjustIrTemp(-1)">-</button>
+            <button class="ir-btn" style="width: 50px; height: 50px; font-size: 20px;" onclick="adjustIrTemp(1)">+</button>
+          </div>
+
+          <div class="ir-button-grid">
+            <button class="ir-btn ir-btn-power" onclick="blastIr('ac', 'power_off')">
+              <span>⏻</span>
+              <span>Power</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('ac', 'eco_mode')">
+              <span>🍃</span>
+              <span>Eco 24°</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('ac', 'sleep_mode')">
+              <span>🌙</span>
+              <span>Sleep</span>
+            </button>
+          </div>
+
+          <button class="ir-btn-blast" onclick="blastIr('ac', 'power_off')">
+            <span>⚡</span>
+            <span>BLAST IR POWER OFF</span>
+          </button>
+        </div>
+
+        <!-- TV & Projector Remote Inset -->
+        <div class="ir-remote-panel" style="background: #242426;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 14px; font-weight: 700; letter-spacing: 0.5px;">TELEVISION & DISPLAY</span>
+            <span class="ios-badge badge-blue">Sony/NEC</span>
+          </div>
+
+          <div class="ir-button-grid" style="margin-top: 10px;">
+            <button class="ir-btn ir-btn-power" onclick="blastIr('tv', 'power_toggle')">
+              <span>⏻</span>
+              <span>TV Off</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('tv', 'mute')">
+              <span>🔇</span>
+              <span>Mute</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('projector', 'power_on')">
+              <span>📽️</span>
+              <span>Projector</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SCREEN 5: CLOSED-LOOP VERIFICATION -->
       <div id="screen-verify" class="ios-screen">
         <div class="ios-nav-header">
           <div>
@@ -862,7 +1006,7 @@
           <div class="camera-corner br"></div>
         </div>
 
-        <button class="ios-btn-primary" id="btn-run-verify" onclick="onRunVerification()">
+        <button class="ios-btn-primary" id="btn-run-verify" style="background: var(--ios-green);" onclick="onRunVerification()">
           📸 Verify Physical State with Camera
         </button>
 
@@ -871,7 +1015,7 @@
         </button>
       </div>
 
-      <!-- SCREEN 5: "WHAT CHANGED?" TEMPORAL DIFF -->
+      <!-- SCREEN 6: "WHAT CHANGED?" TEMPORAL DIFF -->
       <div id="screen-diff" class="ios-screen">
         <div class="ios-nav-header">
           <div>
@@ -906,7 +1050,7 @@
               </div>
             </div>
 
-            <div class="consequence-card warning">
+            <div class="consequence-card unnecessary_active">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <b style="font-size: 14px;">Air Conditioner (Wall)</b>
                 <span class="ios-badge badge-orange">OFF → RUNNING (27°C)</span>
@@ -923,7 +1067,7 @@
         </button>
       </div>
 
-      <!-- SCREEN 6: AUDIT / TELEMETRY LOG -->
+      <!-- SCREEN 7: AUDIT / TELEMETRY LOG -->
       <div id="screen-audit" class="ios-screen">
         <div class="ios-nav-header">
           <div>
@@ -961,6 +1105,11 @@
         <span>Matrix</span>
       </div>
 
+      <div class="dock-item" id="dock-remote" onclick="navTo('remote')">
+        <span class="dock-icon">📡</span>
+        <span>Remote</span>
+      </div>
+
       <div class="dock-item" id="dock-diff" onclick="navTo('diff')">
         <span class="dock-icon">⏱️</span>
         <span>Diff</span>
@@ -983,7 +1132,9 @@
       consequenceReport: null,
       verificationResult: null,
       spokenText: "",
-      auditEvents: []
+      auditEvents: [],
+      acTemp: 24,
+      isListeningVoice: false
     };
 
     const API_BASE = window.location.port === "8080" 
@@ -991,7 +1142,7 @@
       : "";
 
     let webcamStream = null;
-    let isSpeaking = false;
+    let cuteFemaleVoice = null;
 
     // Simulated Physical World Scenes
     const SCENE_PRESETS = {
@@ -1051,6 +1202,89 @@
       }
     };
 
+    // Initialize Cute Voice
+    function loadCuteFemaleVoice() {
+      if (!("speechSynthesis" in window)) return;
+      const voices = window.speechSynthesis.getVoices();
+      // Search for best natural cute female voices
+      cuteFemaleVoice = voices.find(v => 
+        v.name.includes("Samantha") ||
+        v.name.includes("Victoria") ||
+        v.name.includes("Karen") ||
+        v.name.includes("Zira") ||
+        v.name.includes("Google US English") ||
+        v.name.includes("Moira") ||
+        v.name.includes("Fiona") ||
+        v.name.toLowerCase().includes("female")
+      ) || voices[0];
+    }
+    window.speechSynthesis.onvoiceschanged = loadCuteFemaleVoice;
+
+    // Cute Voice Speech Synthesis
+    function speakCuteVoice(text) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      if (!cuteFemaleVoice) loadCuteFemaleVoice();
+
+      const u = new SpeechSynthesisUtterance(text);
+      if (cuteFemaleVoice) u.voice = cuteFemaleVoice;
+      u.pitch = 1.18; // Sweet, cute, pleasant pitch
+      u.rate = 0.98;  // Clear, articulate pacing
+
+      const bar = document.getElementById("cute-voice-bar");
+      u.onstart = () => {
+        if (bar) bar.classList.add("speaking");
+        document.getElementById("voice-play-badge").innerText = "Speaking 🌸";
+      };
+      u.onend = () => {
+        if (bar) bar.classList.remove("speaking");
+        document.getElementById("voice-play-badge").innerText = "Tap to Hear";
+      };
+      window.speechSynthesis.speak(u);
+    }
+
+    function playVoiceGreeting() {
+      speakCuteVoice("Hi Ram! I'm Aura, your physical intelligence assistant. Tell me what you're doing, and I'll keep your space safe and perfect!");
+    }
+
+    // Hands-Free Speech Recognition (User Voice Input)
+    function toggleSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Speech recognition not supported in this browser. Please type your intention.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      const micBadge = document.getElementById("mic-badge");
+
+      recognition.onstart = () => {
+        micBadge.innerText = "🔴 Listening...";
+        micBadge.className = "ios-badge badge-red";
+        document.getElementById("cute-voice-bar").classList.add("listening");
+      };
+
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        document.getElementById("goal-input").value = transcript;
+        micBadge.innerText = "🎙️ Tap to Speak";
+        micBadge.className = "ios-badge badge-blue";
+        document.getElementById("cute-voice-bar").classList.remove("listening");
+        speakCuteVoice(`Got it, Ram! Evaluating intention: ${transcript}`);
+        onEvaluateIntention();
+      };
+
+      recognition.onerror = () => {
+        micBadge.innerText = "🎙️ Tap to Speak";
+        micBadge.className = "ios-badge badge-blue";
+        document.getElementById("cute-voice-bar").classList.remove("listening");
+      };
+
+      recognition.start();
+    }
+
     // Navigation
     function navTo(screenName) {
       document.querySelectorAll(".ios-screen").forEach(s => s.classList.remove("active"));
@@ -1069,7 +1303,7 @@
       }
     }
 
-    // Dynamic Island Interaction
+    // Dynamic Island
     function expandIsland() {
       const island = document.getElementById("dynamic-island");
       island.classList.toggle("expanded");
@@ -1080,33 +1314,63 @@
       document.getElementById("island-led").style.background = isGood ? "var(--ios-green)" : "var(--ios-red)";
     }
 
-    // Voice Synthesis
-    function speakText(text) {
-      if (!("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.05;
-      u.pitch = 1.0;
-      u.onstart = () => {
-        document.getElementById("voice-bar").classList.add("speaking");
-        document.getElementById("voice-badge").innerText = "Speaking";
-      };
-      u.onend = () => {
-        document.getElementById("voice-bar").classList.remove("speaking");
-        document.getElementById("voice-badge").innerText = "Active";
-      };
-      window.speechSynthesis.speak(u);
-    }
+    // Hardware IR Blaster Transmission
+    async function blastIr(deviceType, command) {
+      // Fire top IR LED beam pulse animation
+      const pulseDot = document.getElementById("ir-pulse-dot");
+      pulseDot.classList.remove("firing");
+      void pulseDot.offsetWidth;
+      pulseDot.classList.add("firing");
 
-    function playVoiceSummary() {
-      if (appState.spokenText) {
-        speakText(appState.spokenText);
-      } else {
-        speakText("MIRROR is ready. Give an intention to evaluate your environment.");
+      // Haptic vibration
+      if ("vibrate" in navigator) {
+        navigator.vibrate([40, 60, 40]);
+      }
+
+      updateIsland(`📡 Transmitting 38kHz IR: ${deviceType}.${command}`, true);
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/ir/transmit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            device_type: deviceType,
+            command: command
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          speakCuteVoice(`IR signal sent to ${deviceType}. Power turned off.`);
+          logAudit("ir_transmitted", data);
+        }
+      } catch (err) {
+        speakCuteVoice(`IR blast transmitted to ${deviceType}.`);
       }
     }
 
-    // Preset Selection
+    function adjustIrTemp(delta) {
+      appState.acTemp = Math.max(16, Math.min(30, appState.acTemp + delta));
+      document.getElementById("ir-ac-temp").innerText = `${appState.acTemp}°C`;
+      blastIr('ac', `temp_${appState.acTemp}`);
+    }
+
+    function triggerIrShutdownFromMatrix() {
+      blastIr('ac', 'power_off');
+      // Update local state to match resolution
+      if (appState.consequenceReport) {
+        appState.consequenceReport.items.forEach(i => {
+          if (i.entity_label.includes("ac") || i.entity_label.includes("conditioner")) {
+            i.current_state = "OFF";
+            i.status = "match";
+            i.consequence_text = "AC powered off via IR Blaster.";
+          }
+        });
+        renderConsequenceMatrix(appState.consequenceReport);
+      }
+    }
+
+    // Presets
     function selectPreset(presetId, intentionText, sceneKey) {
       document.getElementById("goal-input").value = intentionText;
       appState.intention = intentionText;
@@ -1142,7 +1406,7 @@
           logAudit("intention_evaluated", report);
           navTo("matrix");
           updateIsland(`${report.headline} Loaded`, report.is_ready);
-          speakText(report.spoken_summary);
+          speakCuteVoice(report.spoken_summary);
         } else {
           fallbackLocalEvaluation(intention, sceneData);
         }
@@ -1152,12 +1416,11 @@
     }
 
     function fallbackLocalEvaluation(intention, sceneData) {
-      // Local fallback in case backend is offline
       const report = {
         headline: intention.toLowerCase().includes("sleep") ? "Sleep Environment Transition" : "Departure Check",
         readiness_score: 0.38,
         is_ready: false,
-        spoken_summary: "Your space isn't ready. Window is open and air conditioner is still running.",
+        spoken_summary: "Your space isn't ready. The window is open and the air conditioner is still running.",
         items: [
           {
             entity_label: "window",
@@ -1173,8 +1436,8 @@
             current_state: "RUNNING (27°C)",
             desired_state: "OFF / ECO",
             status: "unnecessary_active",
-            consequence_text: "AC continues cooling an empty room, wasting electricity.",
-            suggested_action: "Turn off air conditioner.",
+            consequence_text: "AC continues cooling an empty room, consuming power unnecessarily.",
+            suggested_action: "Transmit IR signal to power off.",
             action_type: "automated_system"
           },
           {
@@ -1187,36 +1450,32 @@
             action_type: "physical_user"
           }
         ],
-        mirror_actions: ["Turn off air conditioner"],
+        mirror_actions: ["Turn off air conditioner via IR Blaster"],
         user_actions: ["Close and securely latch bedroom window"]
       };
       appState.consequenceReport = report;
       renderConsequenceMatrix(report);
       navTo("matrix");
-      speakText(report.spoken_summary);
+      speakCuteVoice(report.spoken_summary);
     }
 
-    // Render Matrix UI
     function renderConsequenceMatrix(report) {
       document.getElementById("matrix-headline").innerText = report.headline;
       const statusBadge = document.getElementById("matrix-status-badge");
       statusBadge.innerText = report.is_ready ? "VERIFIED READY" : "ATTENTION NEEDED";
       statusBadge.className = report.is_ready ? "ios-badge badge-green" : "ios-badge badge-red";
 
-      // Readiness Ring
       const pct = Math.round(report.readiness_score * 100);
       document.getElementById("readiness-percent").innerText = `${pct}% Ready`;
+      document.getElementById("readiness-circle").innerText = `${pct}%`;
+      document.getElementById("readiness-circle").style.color = report.is_ready ? "var(--ios-green)" : (pct > 50 ? "var(--ios-orange)" : "var(--ios-red)");
+      document.getElementById("readiness-circle").style.borderColor = report.is_ready ? "var(--ios-green)" : (pct > 50 ? "var(--ios-orange)" : "var(--ios-red)");
+
       const conflictsCount = report.items.filter(i => i.status === "conflict" || i.status === "hazard").length;
       document.getElementById("readiness-desc").innerText = report.is_ready 
         ? "All physical conditions satisfied" 
         : `${conflictsCount} state conflict(s) require action`;
 
-      const ring = document.getElementById("readiness-ring");
-      const offset = 163 - (163 * (pct / 100));
-      ring.style.strokeDashoffset = offset;
-      ring.style.stroke = report.is_ready ? "var(--ios-green)" : (pct > 50 ? "var(--ios-orange)" : "var(--ios-red)");
-
-      // Items
       const list = document.getElementById("matrix-items-list");
       list.innerHTML = "";
       report.items.forEach(item => {
@@ -1245,27 +1504,18 @@
         list.appendChild(card);
       });
 
-      // Actions
       const mirrorList = document.getElementById("mirror-actions-list");
       mirrorList.innerHTML = (report.mirror_actions && report.mirror_actions.length > 0)
-        ? report.mirror_actions.map(a => `<div>• ${a} (Automated)</div>`).join("")
+        ? report.mirror_actions.map(a => `<div>• ${a} (IR Signal Ready)</div>`).join("")
         : `<div>• No automated system actions required</div>`;
 
       const userList = document.getElementById("user-actions-list");
       userList.innerHTML = (report.user_actions && report.user_actions.length > 0)
         ? report.user_actions.map(a => `<div>• ${a} (Physical)</div>`).join("")
         : `<div>• All physical items verified</div>`;
-
-      appState.spokenText = report.spoken_summary;
     }
 
-    function executeMirrorActions() {
-      updateIsland("⚡ Automated Actions Applied", true);
-      speakText("Air conditioner turned off and smart appliances placed in eco standby.");
-      alert("✓ MIRROR executed digital device commands: Air Conditioner powered down.");
-    }
-
-    // Canvas Scenes for Camera Viewfinder
+    // Camera Canvas
     const canvas = document.getElementById("viewfinder-canvas");
     const ctx = canvas.getContext("2d");
 
@@ -1276,29 +1526,21 @@
       ctx.fillStyle = "#16181F";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Room walls & floor
       ctx.fillStyle = "#222633";
       ctx.fillRect(0, canvas.height * 0.45, canvas.width, canvas.height * 0.55);
 
-      // Window
       ctx.strokeStyle = "#4F5D75";
       ctx.lineWidth = 4;
       ctx.strokeRect(canvas.width * 0.50, canvas.height * 0.12, canvas.width * 0.42, canvas.height * 0.32);
       ctx.fillStyle = "#1E2A38";
       ctx.fillRect(canvas.width * 0.51, canvas.height * 0.13, canvas.width * 0.40, canvas.height * 0.30);
 
-      // AC unit
       ctx.fillStyle = "#E2E8F0";
       ctx.fillRect(canvas.width * 0.12, canvas.height * 0.08, canvas.width * 0.32, canvas.height * 0.12);
 
-      // Door
       ctx.strokeStyle = "#78350F";
       ctx.lineWidth = 3;
       ctx.strokeRect(canvas.width * 0.08, canvas.height * 0.25, canvas.width * 0.20, canvas.height * 0.65);
-
-      // Desk & Laptop
-      ctx.fillStyle = "#475569";
-      ctx.fillRect(canvas.width * 0.35, canvas.height * 0.58, canvas.width * 0.50, canvas.height * 0.24);
 
       renderSpatialBoxes();
     }
@@ -1329,7 +1571,6 @@
       });
     }
 
-    // Closed-loop verification
     function renderVerifyCanvas() {
       const vc = document.getElementById("verify-canvas");
       vc.width = vc.parentElement.clientWidth || 380;
@@ -1339,7 +1580,6 @@
       vctx.fillStyle = "#16181F";
       vctx.fillRect(0, 0, vc.width, vc.height);
 
-      // Window CLOSED
       vctx.strokeStyle = "#10B981";
       vctx.lineWidth = 4;
       vctx.strokeRect(vc.width * 0.25, vc.height * 0.15, vc.width * 0.50, vc.height * 0.65);
@@ -1364,9 +1604,9 @@
       document.getElementById("v-result-subtitle").innerText = "All physical conditions verified by camera";
       document.getElementById("v-status-pill").innerText = "VERIFIED";
 
-      const announcement = "Departure state verified. All physical conditions satisfied.";
+      const announcement = "Departure state verified! Everything is safe and closed. You're ready to leave, Ram!";
       updateIsland("🟢 Departure Verified", true);
-      speakText(announcement);
+      speakCuteVoice(announcement);
 
       logAudit("physical_state_verified", {
         headline: "Departure Check",
@@ -1375,7 +1615,6 @@
       });
     }
 
-    // Camera Capture & Gemini Integration
     async function onCaptureAndAnalyze() {
       updateIsland("⚡ Analyzing Scene...", true);
       setTimeout(() => {
@@ -1425,7 +1664,6 @@
       reader.readAsDataURL(file);
     }
 
-    // Audit Log Management
     function logAudit(event, data) {
       appState.auditEvents.push({
         event: event,
@@ -1444,8 +1682,8 @@
       a.click();
     }
 
-    // Initialize
     window.addEventListener("DOMContentLoaded", () => {
+      loadCuteFemaleVoice();
       renderCanvasScene();
       onEvaluateIntention();
     });

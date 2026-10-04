@@ -42,8 +42,16 @@ Last updated: 2026-10-05
        - Closed-loop camera verification screen with Apple Green verified banner.
        - Web Speech API TTS voicing instructions and announcements aloud.
        - 1-click tamper-proof audit JSON exporter.
-    6. **Comprehensive Test Suite**:
-       - **296 / 296 tests passing green** across the entire repository with zero failures and zero regressions (`src/core/tests/test_consequence.py`, `src/core/tests/test_world_model.py`, `tests/api/test_consequence_api.py`).
+    6. **Consumer IR Blaster Hardware Integration (`src/mobile/src/main/kotlin/com/mirror/mobile/ir/IrBlasterController.kt`)**:
+       - Android `ConsumerIrManager` controller transmitting 38kHz NEC and Sony IR codes for Air Conditioners, TVs, and Projectors.
+       - Added `TRANSMIT_IR`, `RECORD_AUDIO`, and `VIBRATE` permissions to `AndroidManifest.xml`.
+       - FastAPI endpoints: `GET /v1/ir/devices` and `POST /v1/ir/transmit`.
+    7. **Aura Cute Lady Voice & Speech-to-Text (`src/ui/web_preview/index.html` & `public/index.html`)**:
+       - Natural, sweet, polite female voice persona ("Aura") with Web Speech API TTS (`pitch: 1.18`, `rate: 0.98`).
+       - Hands-free Web Speech API recognition: tap the mic or speak an intention aloud; MIRROR listens, reasons, and speaks back!
+       - Dedicated `📡 Remote` dock tab with interactive Universal IR Remote (AC Temp/Power dial, TV Mute/Power, Projector toggle, top IR LED beam pulse animation).
+    8. **Comprehensive Test Suite**:
+       - **297 / 297 tests passing green** across the entire repository with zero failures and zero regressions (`src/core/tests/test_consequence.py`, `src/core/tests/test_world_model.py`, `tests/api/test_consequence_api.py`).
 
 ## Half done
 - None.
@@ -60,6 +68,8 @@ Last updated: 2026-10-05
 - `src/core/consequence.py`
 - `src/core/model_client.py`
 - `src/api/main.py`
+- `src/mobile/src/main/AndroidManifest.xml`
+- `src/mobile/src/main/kotlin/com/mirror/mobile/ir/IrBlasterController.kt`
 - `src/ui/web_preview/index.html`
 - `public/index.html`
 - `src/core/tests/test_world_model.py`

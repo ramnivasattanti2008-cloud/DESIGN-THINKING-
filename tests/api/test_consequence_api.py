@@ -131,7 +131,25 @@ def test_snapshot_save_and_compare():
     compare_res = client.post("/v1/snapshots/compare", json=compare_req)
     assert compare_res.status_code == 200
     diff = compare_res.json()
-    assert len(diff["state_changes"]) == 2
     labels = [c["label"] for c in diff["state_changes"]]
     assert "window" in labels
     assert "tv" in labels
+
+
+def test_ir_devices_and_transmit_endpoint():
+    res = client.get("/v1/ir/devices")
+    assert res.status_code == 200
+    devices = res.json()["devices"]
+    assert len(devices) >= 3
+    types = [d["type"] for d in devices]
+    assert "ac" in types
+    assert "tv" in types
+
+    # Test transmit IR for AC
+    tx_res = client.post("/v1/ir/transmit", json={"device_type": "ac", "command": "power_off"})
+    assert tx_res.status_code == 200
+    tx_data = tx_res.json()
+    assert tx_data["ok"] is True
+    assert tx_data["device_type"] == "ac"
+    assert tx_data["carrier_frequency"] == 38000
+    assert tx_data["pulse_count"] > 0

@@ -128,7 +128,7 @@ class AnthropicModelClient:
 
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"  # UNVERIFIED against the live API; override with MIRROR_MODEL_NAME
+DEFAULT_GEMINI_MODEL = "gemini-flash-latest"
 _MODEL_NAME_OK = re.compile(r"[A-Za-z0-9._-]{1,80}")
 
 

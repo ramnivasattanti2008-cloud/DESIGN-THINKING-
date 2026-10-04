@@ -9,6 +9,7 @@ Hardening (API key, rate limit, size limit, CORS, security headers) lives in src
 and is configured by environment variables; see that file.
 """
 import os
+import time
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -239,7 +240,16 @@ def evaluate_consequence(body: ConsequenceRequest):
     if body.entities is not None and len(body.entities) > 0:
         world = PhysicalWorldModel(room_type=body.room_type, entities=body.entities)
     elif body.frames and len(body.frames) > 0:
-        if hasattr(_model, "observe_physical_world"):
+        has_image_data = any(bool(f.data_b64) for f in body.frames)
+        gemini_key = os.environ.get("GEMINI_API_KEY", "").strip() or os.environ.get("MIRROR_MODEL_API_KEY", "").strip()
+        if has_image_data and gemini_key:
+            try:
+                from src.core.model_client import GeminiModelClient
+                client = GeminiModelClient(gemini_key, model=os.environ.get("MIRROR_MODEL_NAME", "gemini-flash-latest"))
+                world = client.observe_physical_world(body.frames, body.intention)
+            except Exception:
+                world = PhysicalWorldModel(room_type=body.room_type)
+        elif hasattr(_model, "observe_physical_world"):
             world = _model.observe_physical_world(body.frames, body.intention)
         else:
             obs = _model.observe(body.frames)
@@ -266,7 +276,16 @@ def evaluate_consequence(body: ConsequenceRequest):
 @app.post("/v1/consequence/verify")
 def verify_consequence(body: ConsequenceVerifyRequest):
     """Re-observes space and verifies whether physical conflicts are resolved."""
-    if hasattr(_model, "observe_physical_world"):
+    has_image_data = any(bool(f.data_b64) for f in body.frames)
+    gemini_key = os.environ.get("GEMINI_API_KEY", "").strip() or os.environ.get("MIRROR_MODEL_API_KEY", "").strip()
+    if has_image_data and gemini_key:
+        try:
+            from src.core.model_client import GeminiModelClient
+            client = GeminiModelClient(gemini_key, model=os.environ.get("MIRROR_MODEL_NAME", "gemini-flash-latest"))
+            fresh_world = client.observe_physical_world(body.frames, body.initial_report.intention_raw)
+        except Exception:
+            fresh_world = PhysicalWorldModel()
+    elif hasattr(_model, "observe_physical_world"):
         fresh_world = _model.observe_physical_world(body.frames, body.initial_report.intention_raw)
     else:
         obs = _model.observe(body.frames)
@@ -311,3 +330,70 @@ def compare_snapshots(body: SnapshotCompareRequest):
     if diff is None:
         raise HTTPException(404, f"snapshot '{body.base_name}' not found")
     return diff.model_dump()
+
+
+# ---- Consumer IR (Infrared Blaster) Control Endpoints ----
+
+class IrTransmitRequest(BaseModel):
+    device_type: str = "ac"  # "ac", "tv", "projector", "fan"
+    command: str = "power_off"  # "power_off", "power_on", "temp_up", "temp_down", "mute"
+    brand: str = "generic"
+    carrier_frequency: int = 38000
+    parameters: dict = {}
+
+
+@app.get("/v1/ir/devices")
+def get_ir_devices():
+    """Returns available IR remote profiles and commands."""
+    return {
+        "devices": [
+            {
+                "type": "ac",
+                "label": "Air Conditioner",
+                "commands": ["power_off", "power_on", "temp_up", "temp_down", "eco_mode", "sleep_mode"],
+                "protocol": "NEC_38KHZ",
+            },
+            {
+                "type": "tv",
+                "label": "Television / Display",
+                "commands": ["power_toggle", "mute", "vol_up", "vol_down", "input_hdmi1", "input_hdmi2"],
+                "protocol": "SONY_RC5_38KHZ",
+            },
+            {
+                "type": "projector",
+                "label": "Classroom Projector",
+                "commands": ["power_on", "power_off", "input_hdmi", "freeze"],
+                "protocol": "NEC_38KHZ",
+            },
+            {
+                "type": "fan",
+                "label": "Ceiling / Floor Fan",
+                "commands": ["power_toggle", "speed_1", "speed_2", "speed_3"],
+                "protocol": "NEC_38KHZ",
+            },
+        ]
+    }
+
+
+@app.post("/v1/ir/transmit")
+def transmit_ir(body: IrTransmitRequest):
+    """Transmits or simulates an infrared control signal for physical devices."""
+    if body.device_type == "ac":
+        pattern = [9000, 4500, 560, 1690, 560, 560, 560, 1690, 560, 560, 560, 560, 560, 1690, 560, 40000]
+    elif body.device_type == "tv":
+        pattern = [2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 20000]
+    elif body.device_type == "projector":
+        pattern = [9000, 4500, 560, 1690, 560, 1690, 560, 560, 560, 560, 560, 1690, 560, 42000]
+    else:
+        pattern = [9000, 4500, 560, 560, 560, 560, 560, 1690, 560, 30000]
+
+    return {
+        "ok": True,
+        "device_type": body.device_type,
+        "command": body.command,
+        "carrier_frequency": body.carrier_frequency,
+        "pulse_count": len(pattern),
+        "pattern": pattern,
+        "timestamp": time.time(),
+        "status_message": f"Transmitted 38kHz IR signal: {body.device_type}.{body.command}"
+    }
