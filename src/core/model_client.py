@@ -17,6 +17,7 @@ from typing import Protocol
 import httpx
 
 from .models import Frame, Observation
+from .world_model import PhysicalEntity, PhysicalWorldModel
 
 API_URL = "https://api.anthropic.com/v1/messages"
 API_VERSION = "2023-06-01"
@@ -43,6 +44,44 @@ class FakeModelClient:
                                        confidence=float(conf) if conf else 0.9,
                                        source_frame=frame.id))
         return out
+
+    def observe_physical_world(self, frames: list[Frame], intention: str = "") -> PhysicalWorldModel:
+        entities: list[PhysicalEntity] = []
+        for frame in frames:
+            for i, raw in enumerate(frame.fake_labels):
+                parts = raw.split(":")
+                label = parts[0].strip().lower()
+                state = "NORMAL"
+                conf = 0.9
+                loc = "scene"
+                if len(parts) >= 2:
+                    second = parts[1].strip()
+                    try:
+                        conf = float(second)
+                    except ValueError:
+                        state = second.upper()
+                if len(parts) >= 3:
+                    try:
+                        conf = float(parts[2].strip())
+                    except ValueError:
+                        loc = parts[2].strip()
+
+                is_dev = any(k in label for k in ("ac", "air conditioner", "tv", "light", "lamp", "stove", "projector", "laptop"))
+                is_haz = any(k in label for k in ("wire", "cable", "flame", "leak", "fire"))
+
+                entities.append(PhysicalEntity(
+                    id=f"{frame.id}-{i}",
+                    label=label,
+                    state=state,
+                    location=loc,
+                    confidence=conf,
+                    is_device=is_dev,
+                    is_hazard=is_haz,
+                ))
+        return PhysicalWorldModel(
+            session_id=frames[0].id if frames else "session",
+            entities=entities,
+        )
 
 
 PROMPT = (
@@ -177,6 +216,92 @@ class GeminiModelClient:
         except Exception:
             return None
         return None
+
+    def observe_physical_world(self, frames: list[Frame], intention: str = "") -> PhysicalWorldModel:
+        parts: list[dict] = []
+        sent: list[Frame] = []
+        for f in frames:
+            if f.data_b64:
+                parts.append({"inline_data": {"mime_type": f.media_type, "data": f.data_b64}})
+                sent.append(f)
+        if not sent:
+            return PhysicalWorldModel(session_id=frames[0].id if frames else "session")
+        prompt_text = (
+            f"You are MIRROR: Physical Consequence Intelligence for everyday life. "
+            f"Analyze the image of this physical space with respect to user intention: '{intention or 'general check'}'. "
+            f"Identify all physical objects, devices, fixtures (windows, doors, AC, stove, screens, lamps, cables), and surfaces. "
+            f"For each, determine: label (lowercase noun), state ('OPEN', 'CLOSED', 'ON', 'OFF', 'CHARGING', 'CLEAR', 'CLUTTERED'), "
+            f"location, confidence (0-1), box_2d [ymin, xmin, ymax, xmax] (0-1000), is_device (bool), is_hazard (bool), properties (dict). "
+            f'Reply with JSON only:\n{{"room_type": "room", "entities": [{{"label": "window", "state": "OPEN", "location": "wall", "confidence": 0.95, "box_2d": [100, 200, 400, 600], "is_device": false, "is_hazard": false}}]}}'
+        )
+        parts.append({"text": prompt_text})
+        try:
+            r = self._http.post(
+                GEMINI_URL.format(model=self.model),
+                headers={"x-goog-api-key": self._key, "content-type": "application/json"},
+                json={"contents": [{"role": "user", "parts": parts}],
+                      "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}},
+                timeout=15.0,
+            )
+            r.raise_for_status()
+            data = r.json()
+            candidates = data.get("candidates") or []
+            if not candidates:
+                raise ModelError("Gemini returned no answer")
+            text = "".join(p.get("text", "") for p in (candidates[0].get("content") or {}).get("parts", []))
+            return parse_physical_world(text, sent[0].id)
+        except Exception:
+            # Fallback to standard observe and convert
+            obs = self.observe(frames)
+            entities = []
+            for o in obs:
+                lbl = o.label
+                state = "NORMAL"
+                if "open" in lbl: state = "OPEN"
+                elif "closed" in lbl: state = "CLOSED"
+                elif "on" in lbl: state = "ON"
+                elif "off" in lbl: state = "OFF"
+                entities.append(PhysicalEntity(
+                    id=o.id,
+                    label=lbl,
+                    state=state,
+                    location=o.where_hint or "scene",
+                    confidence=o.confidence,
+                    box_2d=o.box_2d,
+                    is_device=any(k in lbl for k in ("ac", "air conditioner", "tv", "light", "lamp", "stove")),
+                ))
+            return PhysicalWorldModel(session_id=sent[0].id, entities=entities)
+
+
+def parse_physical_world(text: str, session_id: str) -> PhysicalWorldModel:
+    m = re.search(r"\{.*\}", text, re.S)
+    if not m:
+        raise ModelError("physical world reply had no JSON")
+    try:
+        data = json.loads(m.group(0))
+        room_type = data.get("room_type", "room")
+        raw_entities = data.get("entities", [])
+        entities: list[PhysicalEntity] = []
+        for i, item in enumerate(raw_entities):
+            conf = float(item.get("confidence", 0.9))
+            box_2d = item.get("box_2d")
+            if box_2d is not None and (not isinstance(box_2d, list) or len(box_2d) != 4):
+                box_2d = None
+            entities.append(PhysicalEntity(
+                id=f"{session_id}-{i}",
+                label=str(item.get("label", "")).strip().lower(),
+                category=str(item.get("category", "object")),
+                state=str(item.get("state", "UNKNOWN")).upper(),
+                location=str(item.get("location", "")),
+                confidence=max(0.0, min(1.0, conf)),
+                box_2d=box_2d,
+                properties=item.get("properties", {}),
+                is_device=bool(item.get("is_device", False)),
+                is_hazard=bool(item.get("is_hazard", False)),
+            ))
+        return PhysicalWorldModel(session_id=session_id, room_type=room_type, entities=entities)
+    except Exception as e:
+        raise ModelError(f"failed to parse physical world: {e}") from e
 
 
 def parse_observations(text: str, frame_id: str) -> list[Observation]:

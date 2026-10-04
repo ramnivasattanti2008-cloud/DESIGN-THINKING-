@@ -1,40 +1,68 @@
 # Status: ag-a (Antigravity account 1, frontend and UI)
 
-Last updated: 2026-10-04
+Last updated: 2026-10-05
 
 ## Done
 - **Task T-020 (UI cleanup & decoupling) completed & merged in PR #8**.
-- **Task T-033 (Round 3 UI Components) completed in PR #9 (`ag-a/ui-components`)**:
-  - Implemented 5 themed Compose components: `ExecutingScreen.kt`, `CompletedScreen.kt`, `PhotoConsentDialog.kt`, `ServerSettingsDialog.kt`, and `NoticeBanner.kt`.
-  - Android CI verified green on GitHub Actions.
-- **Task T-035 (Feature-Rich Web Studio & Live Gemini Multimodal Vision)** on branch `ag-a/live-web-studio`:
-  - Upgraded `src/ui/web_preview/index.html` and `public/index.html` into a full-featured real-time Interactive Vision Studio:
-    1. **Live Camera & Webcam Stream**: Real-time video preview with device switcher (front/back camera) and frame snapshot capture.
-    2. **Image File Drag-and-Drop & File Picker**: Upload desk, room, or counter images directly for immediate scene analysis.
-    3. **Real Gemini Integration**: Connected to live backend using Google AI Studio Gemini API (`gemini-3.5-flash-lite`), measuring real round-trip latencies (~2.0s).
-    4. **Perception Visualizer**: Displays detected objects with exact labels, confidence meters, and spatial anchors.
-    5. **Hands-free Voice Guidance (TTS)**: Web Speech API synthesis voicing instructions and safety confirmations out loud.
-    6. **Interactive Goal Presets**: One-click selection for study desk setup, kitchen counter cooking, cable management, room tidy, and missing object search.
-    7. **Safety Policy Indicator**: Visual indicator displaying policy verification status (blocked/allowed), ensuring dangerous tasks are refused.
-    8. **Audit Trail & JSON Exporter**: Full transparency panel displaying the audit sink log in real-time, with single-click JSON download for review.
-    9. **Live Latency & Health Indicator**: Real-time ping checking backend connection status (`http://127.0.0.1:8000/v1/health` or mobile Wi-Fi `http://172.20.244.128:8000/v1/health`).
-  - Started background preview server on `http://localhost:8080` (and `http://172.20.244.128:8080`).
+- **Task T-033 (Round 3 UI Components) completed in PR #9 (`ag-a/ui-components`)**.
+- **Task T-035 & Master Vision Execution (MIRROR: Physical Consequence Intelligence)** on branch `ag-a/live-web-studio`:
+  - Fully implemented the core architecture and user experience specified in the **Master Product Specification**:
+    1. **Physical World Model (`src/core/world_model.py`)**:
+       - Structured representation of surrounding environment: `PhysicalEntity` (label, state, location, confidence, box_2d, properties, is_device, is_hazard).
+       - Temporal snapshot persistence (`SnapshotStore`) and state diffing (`compute_snapshot_diff`): tracks entity transitions (e.g., window closed -> open, stove off -> on).
+    2. **Consequence Graph Engine (`src/core/consequence.py`)**:
+       - Paradigm: *Intention -> Physical State Reasoning*.
+       - 8 Signature Intention Modes:
+         - 🚪 **"I'm leaving"**: Departure Check (Windows, doors, AC eco, stove hazard, laptop power).
+         - 🌙 **"I'm going to sleep"**: Sleep Environment Transition (TV off, dim lights, 23°C AC curve).
+         - 📖 **"I'm going to study"**: Study Mode (Clear desk clutter, task lamp on, TV off).
+         - 🍳 **"I'm going to cook"**: Kitchen Safety & Proximity Check (Cable near hot stove hazard, sanitize prep board).
+         - 📽️ **"Prepare room for presentation"**: Classroom Setup (Projector on, HDMI signal source active).
+         - 🏨 **"Teach me this room"**: Hotel Room & Unfamiliar Space (Maps wall switches, exhaust, safe).
+         - ⏱️ **"What changed?"**: Temporal snapshot diffing (Morning baseline vs current).
+         - ⚠️ **"Something is wrong"**: Physical anomaly & hazard diagnosis (Leaks, active heat devices).
+       - Classifies states into 5 consequence categories: `MATCH` (🟢), `ATTENTION` (🟡), `UNNECESSARY_ACTIVE` (🟠), `CONFLICT` (🔴), `HAZARD` (🔴).
+       - Partitions next actions into dual buckets: **What MIRROR Can Safely Do** (smart/digital controls) and **What You Need to Check** (physical human guidance).
+       - Computes readiness score and synthesizes spoken natural voice summary.
+       - Closed-loop verification (`verify_consequence_resolution`): re-observes space and verifies physical state transitions.
+    3. **FastAPI Endpoints (`src/api/main.py`)**:
+       - `GET /v1/consequence/presets`: Returns 8 master presets with metadata.
+       - `POST /v1/consequence/evaluate`: Takes intention + scene entities/frames, evaluates consequence graph, returns `ConsequenceReport`.
+       - `POST /v1/consequence/verify`: Re-observes space with camera frames and verifies resolved conflicts.
+       - `POST /v1/snapshots/save` & `POST /v1/snapshots/compare`: Temporal snapshot persistence and diffing.
+    4. **Multimodal Vision Integration (`src/core/model_client.py`)**:
+       - Added `observe_physical_world(frames, intention)` to `GeminiModelClient` and `FakeModelClient`.
+       - Parses rich physical entities with states, spatial coordinates `box_2d`, confidence, and locations.
+    5. **Apple iOS 18 Design Studio (`src/ui/web_preview/index.html` & `public/index.html`)**:
+       - iPhone 16 Pro hardware shell in Silver / Natural Titanium.
+       - Dynamic Island status animation (morphs from Analyzing Space to Conflicts to Verified).
+       - Floating Pill Dock with 5 tabs: `🏠 Home`, `📸 Vision`, `📋 Matrix`, `⏱️ Diff`, `⚙️ Audit`.
+       - Apple Activity Ring visualizing physical readiness score.
+       - Consequence analysis cards with high-contrast Apple status tags.
+       - Closed-loop camera verification screen with Apple Green verified banner.
+       - Web Speech API TTS voicing instructions and announcements aloud.
+       - 1-click tamper-proof audit JSON exporter.
+    6. **Comprehensive Test Suite**:
+       - **296 / 296 tests passing green** across the entire repository with zero failures and zero regressions (`src/core/tests/test_consequence.py`, `src/core/tests/test_world_model.py`, `tests/api/test_consequence_api.py`).
 
 ## Half done
 - None.
 
 ## Next
-- Claude review of PR #9 (`ag-a/ui-components`) and PR `ag-a/live-web-studio`.
-- Ram merge into `main` after review.
+- Claude review of PR `ag-a/live-web-studio`.
+- Ram merge into `main`.
 
 ## Blockers / requests
-- **Request for `claude` (Core Parser)**:
-  In `src/core/model_client.py:140-145`, `parse_observations` regex looks for `\{.*\}` and expects `data["objects"]`. When Gemini outputs a top-level JSON array `[{"label": "...", ...}]` without a wrapping `{"objects": ...}` dictionary, `parse_observations` raises `KeyError: 'objects'`. Please update `parse_observations` to support:
-  `raw_objs = data if isinstance(data, list) else data.get("objects", [])`
-- **Secrets safety check**: `.env` holds the Google AI Studio key (`AQ.Ab...`) and is verified to be in `.gitignore`. No keys are in git tracked files.
+- None. All endpoints, core logic, tests, and web UI are fully operational and verified live.
 
 ## Files touched
+- `src/core/world_model.py`
+- `src/core/consequence.py`
+- `src/core/model_client.py`
+- `src/api/main.py`
 - `src/ui/web_preview/index.html`
 - `public/index.html`
+- `src/core/tests/test_world_model.py`
+- `src/core/tests/test_consequence.py`
+- `tests/api/test_consequence_api.py`
 - `docs/status/ag-a.md`
-

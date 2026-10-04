@@ -15,10 +15,14 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from src.api.security import RateLimiter, install_security, rate_limiter, verify_api_key  # noqa: F401
+from src.core.consequence import (
+    ConsequenceEngine, ConsequenceReport, IntentionType, verify_consequence_resolution
+)
 from src.core.engine import CLUTTER, HAZARDS, NEEDS, Session
 from src.core.log_port import SessionLogSink
 from src.core.model_client import ModelError, build_model_client
 from src.core.models import Frame, PlanOutcome
+from src.core.world_model import PhysicalEntity, PhysicalWorldModel, snapshot_store
 
 DEFAULT_MAX_SESSIONS = 1000
 
@@ -134,3 +138,176 @@ def get_session(sid: str):
     s = _get(sid)
     return {"goal": s.goal, "world": s.world, "current": s.current, "log": s.log,
             "verified_steps": s.verified_steps}
+
+
+# ---- Physical Consequence Intelligence Endpoints ----
+
+class ConsequenceRequest(BaseModel):
+    intention: str
+    frames: list[Frame] | None = None
+    entities: list[PhysicalEntity] | None = None
+    room_type: str = "room"
+
+
+class ConsequenceVerifyRequest(BaseModel):
+    initial_report: ConsequenceReport
+    frames: list[Frame]
+
+
+class SnapshotSaveRequest(BaseModel):
+    name: str
+    entities: list[PhysicalEntity]
+    room_type: str = "room"
+
+
+class SnapshotCompareRequest(BaseModel):
+    base_name: str
+    current_entities: list[PhysicalEntity]
+
+
+@app.get("/v1/consequence/presets")
+def consequence_presets():
+    """Returns the 8 master intention presets for Physical Consequence Intelligence."""
+    return {
+        "presets": [
+            {
+                "id": "leaving",
+                "title": "I'm leaving",
+                "icon": "🚪",
+                "desc": "Departure state check & energy audit (doors, windows, AC, stove)",
+                "example": "I'm leaving for the weekend",
+            },
+            {
+                "id": "sleeping",
+                "title": "I'm going to sleep",
+                "icon": "🌙",
+                "desc": "Sleep environment transition (TV off, dim lights, AC sleep curve)",
+                "example": "I'm going to sleep now",
+            },
+            {
+                "id": "studying",
+                "title": "I'm going to study",
+                "icon": "📖",
+                "desc": "Focus environment prep (clear desk clutter, desk lamp on, TV off)",
+                "example": "Get my desk ready to study",
+            },
+            {
+                "id": "cooking",
+                "title": "I'm going to cook",
+                "icon": "🍳",
+                "desc": "Kitchen hazard proximity & prep hygiene (cables away from heat, sanitized board)",
+                "example": "I'm going to cook dinner",
+            },
+            {
+                "id": "presentation",
+                "title": "Prepare room for presentation",
+                "icon": "📽️",
+                "desc": "Classroom & AV equipment setup (projector on, HDMI signal ready)",
+                "example": "Prepare this room for my presentation",
+            },
+            {
+                "id": "teach_room",
+                "title": "Teach me this room",
+                "icon": "🏨",
+                "desc": "Unfamiliar space & control mapping (exhaust, thermostat, master switches)",
+                "example": "Teach me this room and its controls",
+            },
+            {
+                "id": "what_changed",
+                "title": "What changed?",
+                "icon": "⏱️",
+                "desc": "Temporal snapshot diffing (morning vs now, opened windows, moved objects)",
+                "example": "What changed since morning?",
+            },
+            {
+                "id": "something_wrong",
+                "title": "Something is wrong",
+                "icon": "⚠️",
+                "desc": "Physical anomaly diagnosis & hazard inspection (leaks, active heaters)",
+                "example": "Something is wrong in this room",
+            },
+        ]
+    }
+
+
+@app.post("/v1/consequence/evaluate")
+def evaluate_consequence(body: ConsequenceRequest):
+    """Evaluates physical world state against an intention and returns the Consequence Graph."""
+    if not body.intention.strip():
+        raise HTTPException(422, "intention cannot be empty")
+
+    if body.entities is not None and len(body.entities) > 0:
+        world = PhysicalWorldModel(room_type=body.room_type, entities=body.entities)
+    elif body.frames and len(body.frames) > 0:
+        if hasattr(_model, "observe_physical_world"):
+            world = _model.observe_physical_world(body.frames, body.intention)
+        else:
+            obs = _model.observe(body.frames)
+            entities = [
+                PhysicalEntity(
+                    id=o.id,
+                    label=o.label,
+                    state="ON" if "on" in o.label else "OPEN" if "open" in o.label else "NORMAL",
+                    location=o.where_hint or "scene",
+                    confidence=o.confidence,
+                    box_2d=o.box_2d,
+                )
+                for o in obs
+            ]
+            world = PhysicalWorldModel(room_type=body.room_type, entities=entities)
+    else:
+        # Template world model for evaluation
+        world = PhysicalWorldModel(room_type=body.room_type)
+
+    report = ConsequenceEngine.evaluate(world, body.intention)
+    return report.model_dump()
+
+
+@app.post("/v1/consequence/verify")
+def verify_consequence(body: ConsequenceVerifyRequest):
+    """Re-observes space and verifies whether physical conflicts are resolved."""
+    if hasattr(_model, "observe_physical_world"):
+        fresh_world = _model.observe_physical_world(body.frames, body.initial_report.intention_raw)
+    else:
+        obs = _model.observe(body.frames)
+        entities = [
+            PhysicalEntity(
+                id=o.id,
+                label=o.label,
+                state="CLOSED" if "closed" in o.label else "OFF" if "off" in o.label else "NORMAL",
+                confidence=o.confidence,
+                box_2d=o.box_2d,
+            )
+            for o in obs
+        ]
+        fresh_world = PhysicalWorldModel(entities=entities)
+
+    verified, unresolved = verify_consequence_resolution(body.initial_report, fresh_world)
+    return {
+        "verified": verified,
+        "unresolved": unresolved,
+        "spoken_announcement": (
+            f"{body.initial_report.headline} verified. All physical conditions satisfied."
+            if verified
+            else f"Still not verified: {', '.join(unresolved)}"
+        ),
+        "fresh_entities": [e.model_dump() for e in fresh_world.entities],
+    }
+
+
+@app.post("/v1/snapshots/save")
+def save_snapshot(body: SnapshotSaveRequest):
+    """Saves a named physical world snapshot."""
+    world = PhysicalWorldModel(room_type=body.room_type, entities=body.entities)
+    snapshot_store.save_snapshot(body.name, world)
+    return {"ok": True, "saved_snapshot": body.name, "entity_count": len(body.entities)}
+
+
+@app.post("/v1/snapshots/compare")
+def compare_snapshots(body: SnapshotCompareRequest):
+    """Compares current physical entities against a saved snapshot."""
+    current_world = PhysicalWorldModel(entities=body.current_entities)
+    diff = snapshot_store.compare(body.base_name, current_world)
+    if diff is None:
+        raise HTTPException(404, f"snapshot '{body.base_name}' not found")
+    return diff.model_dump()
