@@ -12,14 +12,14 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-004 | Draft the research plan and source list | studio-a | todo | `research/` | |
 | T-005 | Set up test tooling and a CI workflow | ag-b | done | `tests/`, `.github/workflows/` | |
 | T-006 | First UI sketch based on the agreed user flow | ag-a | todo | `src/ui/` | |
-| T-007 | README skeleton and report outline (on `studio-b/readme`) | studio-b | review | `README.md`, `docs/report/` | |
+| T-007 | README skeleton and report outline  (PR #7 re-reviewed: round 2 fixes in `docs/tasks/BRIEFS.md`) | studio-b | review | `README.md`, `docs/report/` | |
 | T-009 | Architecture docs: scope, modules, safety policy, verification, integration checklist | claude | review | `docs/architecture/` | `claude/architecture` |
 | T-008 | Draft the API contract and database schema once the stack is chosen | claude | review | `src/api/`, `db/`, `contracts/` | `claude/architecture` |
 | T-010 | Android Gradle skeleton (`src/mobile/`), include `:ui` from `src/ui`, camera capture + API client against `contracts/`. Kotlin compiles, unit tests pass, APK builds (Android module builds, 21 unit tests pass, debug APK builds; not run on a phone) | claude | review | `src/mobile/` | |
 | T-011 | Wire `src/ui` screens to the backend: replace mock data with `/v1` calls once T-010 lands (superseded: the app host in `src/mobile` calls the backend; `ag-a`'s own client/view model are excluded from the Android build) | ag-a | done | `src/ui/` | |
 | T-012 | Policy red-team tests: add adversarial goals to `src/core/tests` style, report gaps in your status file (do not edit `src/core/policy.py`) (two gaps it found are closed by T-016) | ag-b | done | `tests/policy/` | |
 | T-013 | Labelled before/after scene set for verification (`cannot_tell` cases included), every item marked real or sample  (PR #6 re-reviewed: round 2 fixes listed in `docs/tasks/BRIEFS.md`; check with `tools/check_scenes.py`) | studio-a | review | `data/`, `research/` | |
-| T-014 | README with how to run the backend and tests (see `docs/architecture/`) (on `studio-b/readme`, being reviewed) | studio-b | review | `README.md` | |
+| T-014 | README with how to run the backend and tests (see `docs/architecture/`)  (PR #7 re-reviewed: round 2 fixes in `docs/tasks/BRIEFS.md`) | studio-b | review | `README.md` | |
 | T-015 | CI workflow: install `.[dev]`, run `pytest` | ag-b | done | `.github/workflows/` | |
 | T-016 | Policy gaps from ag-b's red-team report: wire-tie over-block, add chemical rule, with tests (closed on `claude/architecture`; ag-b's two gap tests flipped to the fixed behaviour) | claude | review | `src/core/policy.py`, `src/core/tests/` | |
 | T-017 | Wire the session log into the engine once T-024 lands (sink wired; the real session-log writer tests now pass) | claude | done | `src/core/engine.py`, `src/api/` | |
