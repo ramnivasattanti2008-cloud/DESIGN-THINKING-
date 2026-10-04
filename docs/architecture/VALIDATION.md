@@ -6,7 +6,7 @@ What was run, what passed, and what was not checked. Nothing here is estimated.
 
 | Check | Command / method | Result |
 |---|---|---|
-| Backend and policy tests | `python -m pytest` (Python 3.13) | 283 passed, 0 skipped (includes the planner, API-hardening, Gemini-provider and guard tests, 7 end-to-end tests that start a real uvicorn process, and the session-log writer). Uses the fake provider, so this proves policy and loop logic, not real perception |
+| Backend and policy tests | `python -m pytest` (Python 3.13) | 316 passed, 0 skipped (includes the planner, API-hardening, Gemini-provider, guard, property-based and API red-team tests, 7 end-to-end tests that start a real uvicorn process, and the session-log writer). Uses the fake provider, so this proves policy and loop logic, not real perception |
 | Android unit tests | `./gradlew :app:testDebugUnitTest` on commit `eec3a6d` (Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17) | 30 passed, 0 failed (17 controller state machine including 5 photo-consent rules, 13 parsing, server-address, API-key header and photo-quality) |
 | Android debug build | `./gradlew :app:assembleDebug` on commit `eec3a6d` | Builds. APKs for the emulator address and the Wi-Fi address were produced (git-ignored `dist/`) |
 | Full loop over real HTTP | uvicorn on port 8000, scripted client, fake provider (run earlier in the session) | Blocked goal refused; plan before any observation returned `needs_observation`; failed check `not_verified`; blurry frame `cannot_tell`; cup removed `verified`; final plan `completed`. Every outcome is also driven through `TestClient` in `src/core/tests/test_contract_responses.py` |

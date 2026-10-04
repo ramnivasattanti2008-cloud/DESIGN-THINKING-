@@ -36,7 +36,7 @@ Status values: `todo`, `doing`, `review`, `done`, `blocked`.
 | T-031 | Android: server address and API key editable on the phone | claude | review | `src/mobile/` | `claude/architecture` |
 | T-032 | Phone test: first real run with a real model (guide: `docs/architecture/DEVICE_TEST.md`) | Ram | todo | none | |
 | T-033 | UI components for the new flow (executing, completed, photo consent, server settings, notice banner), see `docs/tasks/BRIEFS.md` Round 3 (delivered in PR #9, reviewed, merged and swapped into the app host; Android build and 30 unit tests pass) | ag-a | done | `src/ui/screens/`, `src/ui/components/` | `ag-a/ui-components` |
-| T-034 | Property-based invariant tests and an API red-team pass | ag-b | todo | `tests/property/`, `tests/api/` | `ag-b/property-tests` |
+| T-034 | Property-based invariant tests and an API red-team pass (merged from PR #10; its two security findings are fixed) | ag-b | done | `tests/property/`, `tests/api/` | `ag-b/property-tests` |
 
 Detailed briefs and paste-ready prompts for each seat are in `docs/tasks/BRIEFS.md`. T-013 (studio-a) and T-007/T-014 (studio-b) stand as listed.
 

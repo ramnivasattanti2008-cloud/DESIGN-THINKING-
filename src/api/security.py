@@ -6,8 +6,14 @@ and security headers. Everything is configured by environment variables and is s
                                 "Authorization: Bearer <key>"). Unset means an open dev server.
   MIRROR_RATE_LIMIT_PER_MINUTE  per client, default 60; 0 switches the limiter off (used by tests).
   MIRROR_TRUST_PROXY            1 = read the client address from X-Forwarded-For. Only set this
-                                behind a proxy you control, otherwise clients can fake their address.
-  MIRROR_MAX_BODY_BYTES         request size limit, default 8 MiB (a photo is a few hundred KiB).
+                                behind a proxy you control, and only if that proxy APPENDS the address
+                                it saw (nginx $proxy_add_x_forwarded_for, most cloud load balancers).
+                                The entry that proxy added (rightmost) is used; anything to its left
+                                was written by the client and is ignored.
+  MIRROR_TRUSTED_PROXY_HOPS     how many trusted proxies sit in front of the server, default 1.
+  MIRROR_MAX_BODY_BYTES         request size limit, default 8 MiB (a photo is a few hundred KiB). Enforced
+                                on the bytes actually received, so a missing or false Content-Length
+                                (chunked upload) does not get past it.
   MIRROR_ALLOWED_ORIGINS        comma separated browser origins. Empty (default) means no CORS
                                 headers at all; a native app does not need them.
 
@@ -118,11 +124,22 @@ def check_production_config() -> None:
                            "Refusing to start an unauthenticated production server.")
 
 
+def _trusted_hops() -> int:
+    try:
+        return max(1, int(os.environ.get("MIRROR_TRUSTED_PROXY_HOPS", "1")))
+    except ValueError:
+        return 1
+
+
 def client_key(request: Request) -> str:
+    """Who is calling, for rate limiting. Behind a trusted proxy that appends the address it saw,
+    the entry `hops` from the right is the real client; everything to its left was written by the
+    client itself and is ignored (that is what a leftmost lookup got wrong)."""
     if _truthy("MIRROR_TRUST_PROXY"):
-        forwarded = request.headers.get("x-forwarded-for", "")
-        if forwarded.strip():
-            return forwarded.split(",")[0].strip()
+        parts = [p.strip() for p in request.headers.get("x-forwarded-for", "").split(",") if p.strip()]
+        hops = _trusted_hops()
+        if len(parts) >= hops:
+            return parts[-hops]
     return request.client.host if request.client else "unknown"
 
 
@@ -131,6 +148,33 @@ def _max_body() -> int:
         return int(os.environ.get("MIRROR_MAX_BODY_BYTES", DEFAULT_MAX_BODY))
     except ValueError:
         return DEFAULT_MAX_BODY
+
+
+class BodyLimitMiddleware:
+    """Pure ASGI guard that counts the bytes of a request body as they arrive. A client that sends
+    no Content-Length (chunked upload) or a false one cannot get past the size limit; the refusal
+    is an HTTPException raised from receive(), which the app turns into a normal 413 reply."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        limit = _max_body()
+        received = 0
+
+        async def limited_receive():
+            nonlocal received
+            message = await receive()
+            if message["type"] == "http.request":
+                received += len(message.get("body", b""))
+                if received > limit:
+                    raise HTTPException(status_code=413, detail="Request body too large.")
+            return message
+
+        await self.app(scope, limited_receive, send)
 
 
 SECURITY_HEADERS = {
@@ -151,6 +195,11 @@ def install_security(app: FastAPI) -> None:
     check_production_config()
     if not os.environ.get("MIRROR_API_KEY", "").strip():
         logger.warning("MIRROR_API_KEY is not set: the API is open (development mode).")
+
+    # Order matters. Added first, so it sits INSIDE the header middleware below: BaseHTTPMiddleware
+    # reads the body inside an anyio task group that would wrap our refusal in an exception group
+    # (FastAPI would then answer 400 instead of 413).
+    app.add_middleware(BodyLimitMiddleware)
 
     @app.middleware("http")
     async def _guard(request: Request, call_next):

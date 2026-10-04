@@ -125,3 +125,60 @@ def test_every_session_route_needs_the_key_when_one_is_set_but_health_does_not()
         assert bearer.status_code == 200
         wrong = c.post("/v1/sessions", json={"goal": "study"}, headers={"X-API-Key": "nope"})
         assert wrong.status_code == 401
+
+
+# ---- fixes for ag-b's red-team findings (T-034) ----
+
+def chunks(total, size=100):
+    def gen():
+        sent = 0
+        while sent < total:
+            n = min(size, total - sent)
+            sent += n
+            yield b"x" * n
+    return gen()
+
+
+def test_a_chunked_upload_cannot_skip_the_size_limit():
+    with mock.patch.dict(os.environ, {"MIRROR_MAX_BODY_BYTES": "1000"}):
+        c = TestClient(tiny_app())
+        r = c.post("/echo", content=chunks(5000), headers={"content-type": "application/json"})
+        assert r.status_code == 413
+        assert r.headers["x-content-type-options"] == "nosniff"  # the refusal still carries the headers
+        small = c.post("/echo", content=b'{"a": 1}', headers={"content-type": "application/json"})
+        assert small.status_code == 200
+
+
+def test_a_false_content_length_cannot_skip_the_size_limit():
+    with mock.patch.dict(os.environ, {"MIRROR_MAX_BODY_BYTES": "1000"}):
+        c = TestClient(tiny_app())
+        r = c.post("/echo", content=b'{"data": "' + b"x" * 5000 + b'"}',
+                   headers={"content-type": "application/json", "Content-Length": "chunked"})
+        assert r.status_code == 413
+
+
+def test_left_forwarded_for_entries_written_by_the_client_are_ignored():
+    rate_limiter.rpm = 1
+    with mock.patch.dict(os.environ, {"MIRROR_TRUST_PROXY": "1", "MIRROR_TRUSTED_PROXY_HOPS": "1"}):
+        c = TestClient(tiny_app())
+        # same real client (rightmost, added by the proxy), different forged left entries
+        assert c.get("/ping", headers={"X-Forwarded-For": "9.9.9.9, 1.1.1.1"}).status_code == 200
+        assert c.get("/ping", headers={"X-Forwarded-For": "8.8.8.8, 1.1.1.1"}).status_code == 429
+        # a genuinely different client still has its own quota
+        assert c.get("/ping", headers={"X-Forwarded-For": "8.8.8.8, 2.2.2.2"}).status_code == 200
+
+
+def test_two_trusted_proxies_use_the_second_entry_from_the_right():
+    rate_limiter.rpm = 1
+    with mock.patch.dict(os.environ, {"MIRROR_TRUST_PROXY": "1", "MIRROR_TRUSTED_PROXY_HOPS": "2"}):
+        c = TestClient(tiny_app())
+        assert c.get("/ping", headers={"X-Forwarded-For": "7.7.7.7, 1.1.1.1, 10.0.0.5"}).status_code == 200
+        assert c.get("/ping", headers={"X-Forwarded-For": "6.6.6.6, 1.1.1.1, 10.0.0.9"}).status_code == 429
+
+
+def test_too_few_entries_fall_back_to_the_socket_address():
+    rate_limiter.rpm = 1
+    with mock.patch.dict(os.environ, {"MIRROR_TRUST_PROXY": "1", "MIRROR_TRUSTED_PROXY_HOPS": "3"}):
+        c = TestClient(tiny_app())
+        assert c.get("/ping", headers={"X-Forwarded-For": "1.1.1.1"}).status_code == 200
+        assert c.get("/ping", headers={"X-Forwarded-For": "2.2.2.2"}).status_code == 429  # same socket address

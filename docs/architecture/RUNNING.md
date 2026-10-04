@@ -24,8 +24,9 @@ Configured by environment variables, safe by default (code: `src/api/security.py
 | `MIRROR_ENV=production` | A missing `MIRROR_API_KEY` becomes a startup error instead of a silently open server |
 | `MIRROR_API_KEY` | When set, every route except `/v1/health` needs it (`X-API-Key` header or `Authorization: Bearer ...`). Unset means an open development server and a warning in the log |
 | `MIRROR_RATE_LIMIT_PER_MINUTE` | Per client, default 60. `0` switches it off (the test suite does this) |
-| `MIRROR_TRUST_PROXY=1` | Take the client address from `X-Forwarded-For`. Only behind a proxy you control, otherwise clients can fake their address |
-| `MIRROR_MAX_BODY_BYTES` | Request size limit, default 8 MiB (a photo is a few hundred KiB) |
+| `MIRROR_TRUST_PROXY=1` | Take the client address from `X-Forwarded-For`. Only behind a proxy you control that APPENDS the address it saw (nginx `$proxy_add_x_forwarded_for`, most cloud load balancers). The entry that proxy added (rightmost) is used; entries to its left are written by the client and ignored |
+| `MIRROR_TRUSTED_PROXY_HOPS` | How many trusted proxies sit in front of the server, default 1 |
+| `MIRROR_MAX_BODY_BYTES` | Request size limit, default 8 MiB (a photo is a few hundred KiB). Counted on the bytes actually received, so a missing or false `Content-Length` (chunked upload) does not get past it |
 | `MIRROR_MAX_SESSIONS` | Sessions kept in memory, default 1000 (the oldest is dropped) |
 | `MIRROR_ALLOWED_ORIGINS` | Comma separated browser origins. Empty (default) means no CORS headers; a native app does not need them |
 | `MIRROR_SESSION_DB` | SQLite path for the optional audit log (no photos are ever written) |

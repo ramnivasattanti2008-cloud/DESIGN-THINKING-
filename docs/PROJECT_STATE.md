@@ -19,7 +19,7 @@ Updated 2026-10-04. PR #4 merged `claude/architecture` into `main` at `ef1faf2` 
 
 ## What works (measured 2026-10-04)
 
-- `python -m pytest`: 283 passed, 0 skipped (includes the planner, API-hardening, Gemini-provider and guard tests, 7 HTTP end-to-end tests that start a real uvicorn process, and the session-log writer). Fake provider only, so this proves the policy and loop logic, not real perception.
+- `python -m pytest`: 316 passed, 0 skipped (includes the planner, API-hardening, Gemini-provider, guard, property-based and API red-team tests, 7 HTTP end-to-end tests that start a real uvicorn process, and the session-log writer). Fake provider only, so this proves the policy and loop logic, not real perception.
 - Independent check: GitHub Actions on commit `10f5623` ran the Python suite and the whole Android job (unit tests, debug APK) on clean Linux runners: both succeeded (see `VALIDATION.md` for the run links).
 - Android, commit `eec3a6d` (Gradle 8.9, AGP 8.5.2, Kotlin 2.0.20, JDK 17): `:app:testDebugUnitTest` 30 tests pass (17 controller state machine including the photo-consent rules, 13 parsing, server-address, API-key header and photo-quality) and `:app:assembleDebug` builds. Debug APKs for the emulator and for the Wi-Fi address were built from it (git-ignored `dist/`).
 - The full loop over real HTTP with the fake provider (refusal, no view yet, not verified, cannot tell, verified, completed) was run against uvicorn earlier in the session and is covered by the contract tests.
