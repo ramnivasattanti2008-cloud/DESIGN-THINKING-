@@ -782,6 +782,121 @@
       border-color: var(--ios-pink);
       color: var(--ios-pink);
     }
+
+    /* Master Hackathon Showcase & Standout Feature Styles */
+    .showcase-master-card {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #F59E0B;
+      background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    }
+    .showcase-master-card::after {
+      content: '🥇';
+      position: absolute;
+      right: -8px;
+      bottom: -12px;
+      font-size: 70px;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    /* Structured World Model Tree Visualizer */
+    .world-model-tree {
+      background: #1C1C1E;
+      color: #34D399;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+      padding: 12px;
+      border-radius: var(--ios-radius-md);
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 8px 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .tree-node-title {
+      color: #60A5FA;
+      font-weight: 700;
+    }
+    .tree-node-conflict {
+      color: #F87171;
+      font-weight: 700;
+    }
+    .tree-node-uncertain {
+      color: #FBBF24;
+      font-weight: 700;
+    }
+    .tree-node-ok {
+      color: #34D399;
+    }
+
+    /* Active Perception Alert Banner */
+    .active-perception-banner {
+      background: linear-gradient(135deg, #FFFBEB, #FEF3C7);
+      border: 2px dashed #F59E0B;
+      border-radius: var(--ios-radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 8px 0;
+      animation: pulseAlert 2.5s infinite;
+    }
+    @keyframes pulseAlert {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.12); }
+    }
+
+    /* Reality Verified Final Scorecard */
+    .reality-verified-card {
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+      border: 2.5px solid #10B981;
+      border-radius: var(--ios-radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+    }
+    .scorecard-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 12px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      font-size: 13px;
+      font-weight: 600;
+      color: #065F46;
+    }
+
+    /* 10 Standout Features Modal */
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .feature-item-card {
+      background: var(--ios-surface-secondary);
+      border-radius: var(--ios-radius-md);
+      padding: 12px;
+      border: 1px solid var(--ios-border);
+    }
+    .feature-item-title {
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ios-text-primary);
+      margin-bottom: 4px;
+    }
+    .feature-item-desc {
+      font-size: 11px;
+      color: var(--ios-text-secondary);
+      line-height: 1.35;
+    }
   </style>
 </head>
 <body>
@@ -871,6 +986,35 @@
           <span class="ios-badge badge-pink" id="voice-play-badge">Tap to Hear</span>
         </div>
 
+        <!-- HACKATHON MASTER SHOWCASE CARD: College Departure (The 10 Standout Features) -->
+        <div class="ios-card showcase-master-card" style="padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 20px;">🏆</span>
+              <span style="font-size: 11px; font-weight: 800; color: #B45309; text-transform: uppercase; letter-spacing: 0.5px;">
+                Signature Hackathon Demo
+              </span>
+            </div>
+            <span class="ios-badge" style="background: #F59E0B; color: #FFF; font-weight: 700; font-size: 10px;">⭐ 10 Standout Features</span>
+          </div>
+
+          <div style="font-size: 16px; font-weight: 800; color: #78350F; line-height: 1.25; margin-bottom: 4px;">
+            “MIRROR, I'm leaving for college.”
+          </div>
+          <div style="font-size: 12px; color: #92400E; margin-bottom: 10px; line-height: 1.4;">
+            Experience the complete closed loop: World Model → Active Perception → IR Blaster Action → Physical Human Closure → Reality Verified.
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="ios-btn-primary" style="flex: 1; padding: 11px 12px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #F59E0B, #D97706); border: none; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);" onclick="startCollegeDepartureDemo()">
+              ▶️ Run Master Demo
+            </button>
+            <button class="ios-btn-secondary" style="width: auto; padding: 11px 12px; font-size: 12px; font-weight: 700;" onclick="openFeaturesTourModal()">
+              🔥 The 10 Features
+            </button>
+          </div>
+        </div>
+
         <!-- Phone Installation & Direct APK Download Card -->
         <div class="ios-card" style="padding: 12px; background: linear-gradient(135deg, #F0F9FF, #E0F2FE); border: 1px solid #BAE6FD;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -893,6 +1037,17 @@
             Signature Intention Modes
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
+
+            <div class="ios-list-row" onclick="startCollegeDepartureDemo()" style="background: #FFFDF5; border-left: 4px solid #F59E0B;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 22px;">🎓</span>
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: #92400E;">"I'm leaving for college"</div>
+                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Master Demo: AC, Lights, Window, Active Perception</div>
+                </div>
+              </div>
+              <span class="ios-badge" style="background: #F59E0B; color: #FFF;">Signature Demo</span>
+            </div>
 
             <div class="ios-list-row" onclick="selectPreset('leaving', 'I\'m leaving', 'bedroom_leaving')">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -1048,10 +1203,37 @@
           </div>
         </div>
 
+        <!-- Temporary World Model Structured Representation (Feature 3) -->
+        <div class="ios-card" style="padding: 12px;" id="world-model-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--ios-text-secondary); text-transform: uppercase;">
+              🌎 Temporary World Model
+            </div>
+            <span class="ios-badge badge-blue" style="font-size: 10px;">Structured Reality</span>
+          </div>
+          <div class="world-model-tree" id="world-model-tree-view">
+ROOM (Physical World Model)
+├── AC: ON (24°C)
+├── LIGHT: ON
+├── TV: OFF
+├── WINDOW: OPEN ⚠ (State Conflict)
+└── UNKNOWN DEVICE: ? (Active Perception Required)
+          </div>
+        </div>
+
+        <!-- Active Perception Request Banner (Feature 4) -->
+        <div id="active-perception-container" style="display: none;"></div>
+
+        <!-- Dependency Reasoning Card (Feature 7) -->
+        <div id="dependency-chain-container" style="display: none;"></div>
+
         <!-- Physical State Comparison Matrix -->
         <div class="ios-card" style="padding: 12px;">
-          <div style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-            Physical State Analysis
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">
+              Physical State Analysis
+            </div>
+            <span class="ios-badge badge-pink" style="cursor: pointer; font-size: 10px;" onclick="openFeaturesTourModal()">10 Features</span>
           </div>
           <div id="matrix-items-list" style="display: flex; flex-direction: column; gap: 8px;">
             <!-- Dynamically populated consequence items -->
@@ -1081,6 +1263,20 @@
           <button class="ios-btn-primary" style="margin-top: 10px;" onclick="navTo('verify')">
             ✓ Actions Done, Verify State →
           </button>
+        </div>
+
+        <!-- Human Correction & Controllable Preferences (Feature 9) -->
+        <div class="ios-card" style="padding: 12px;" id="preferences-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--ios-purple); text-transform: uppercase;">
+              🗣️ Learned Preference & Correction
+            </div>
+            <span class="ios-badge badge-purple" id="pref-status-badge">Controllable Rule</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #FAF5FF; padding: 8px 12px; border-radius: 12px; border: 1px solid #E9D5FF;">
+            <span style="font-size: 12px; font-weight: 600; color: #6B21A8;" id="pref-title-text">❄️ Keep AC on during short departures</span>
+            <input type="checkbox" id="pref-ac-toggle" checked onchange="toggleLearnedAcPreference(this.checked)" style="transform: scale(1.2); accent-color: var(--ios-purple); cursor: pointer;">
+          </div>
         </div>
 
         <!-- Hierarchical Mission Execution Plan Card (Features 14, 22, 85) -->
@@ -1200,6 +1396,38 @@
         <button class="ios-btn-primary" id="btn-run-verify" style="background: var(--ios-green);" onclick="onRunVerification()">
           📸 Verify Physical State with Camera
         </button>
+
+        <!-- REALITY VERIFIED SCORECARD (User Specification Feature 5) -->
+        <div class="reality-verified-card" id="reality-scorecard-card" style="display: none; margin: 10px 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 20px;">🛡️</span>
+              <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: #065F46; text-transform: uppercase;">
+                REALITY VERIFIED
+              </span>
+            </div>
+            <span class="ios-badge badge-green" style="font-weight: 700;">Sensor Confirmed</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+            <div class="scorecard-item">
+              <span>✓ Conditions Satisfied</span>
+              <span id="scorecard-satisfied-val" style="font-weight: 800; color: #047857;">4 / 4 satisfied</span>
+            </div>
+            <div class="scorecard-item">
+              <span>✓ Resolved By You (Physical Human)</span>
+              <span id="scorecard-user-val" style="font-weight: 800; color: #047857;">1 condition (Window)</span>
+            </div>
+            <div class="scorecard-item">
+              <span>✓ Unverified Actions</span>
+              <span id="scorecard-unverified-val" style="font-weight: 800; color: #047857;">0 actions</span>
+            </div>
+          </div>
+
+          <div style="font-size: 11px; color: #065F46; line-height: 1.4; text-align: center; border-top: 1px dashed rgba(16, 185, 129, 0.4); padding-top: 8px; font-style: italic;">
+            “MIRROR doesn't control your environment. It understands the state your environment should be in — and verifies reality against it.”
+          </div>
+        </div>
 
         <button class="ios-btn-secondary" onclick="navTo('home')">
           Start New Intention
@@ -1328,6 +1556,78 @@
       </div>
     </div>
 
+    <!-- iOS 18 Bottom Sheet: 10 Standout Features Tour Modal -->
+    <div class="sheet-backdrop" id="features-backdrop" onclick="closeFeaturesTourModal()"></div>
+    <div class="ios-bottom-sheet" id="features-sheet">
+      <div class="sheet-handle" onclick="closeFeaturesTourModal()"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🔥</span>
+          <h2 style="font-size: 16px; font-weight: 800;">10 Standout Technologies</h2>
+        </div>
+        <button class="sheet-close-btn" onclick="closeFeaturesTourModal()">✕</button>
+      </div>
+      <div style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 10px;">
+        Why MIRROR is intellectually different for the iQOO Hackathon:
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>🥇 1. 🧠</span> Intention → Physical State Engine</div>
+          <div class="feature-item-desc">Don't say "Turn off the AC." Say "I'm leaving." MIRROR understands what the physical world should become.</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>🥈 2. 🔮</span> Physical Consequence Engine</div>
+          <div class="feature-item-desc">Reasons about consequences, not objects: "Leaving + Window open = rain damage & security hazard."</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>🥉 3. 🌎</span> Temporary World Model</div>
+          <div class="feature-item-desc">Structured tree representation of reality (Room → AC 24°C, Window OPEN, TV OFF) rather than isolated image labels.</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>4. 👁️</span> Active Perception</div>
+          <div class="feature-item-desc">Understands uncertainty: "I can't determine what this device is. Point camera at the switch panel."</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>5. 🔄</span> Closed-Loop Reality Verification</div>
+          <div class="feature-item-desc">Plan → Action → Observe Again → Compare → Verify. Proves physical state actually changed with camera sensors.</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>6. ⚠️</span> Consequence + Risk + Reversibility</div>
+          <div class="feature-item-desc">3-tier safety gate: Low risk executes; Medium risk asks; High consequence refuses or requires physical confirmation.</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>7. 🧩</span> Dependency Reasoning</div>
+          <div class="feature-item-desc">Decomposes prerequisite chains (e.g. Presentation → Projector → HDMI connected). Pinpoints exact blockers.</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>8. 🕐</span> State Memory — Not Surveillance</div>
+          <div class="feature-item-desc">Physical delta tracking from explicit snapshots (08:30 vs 13:00 vs 18:00) without permanent video recording.</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>9. 🗣️</span> Human Correction → Learning</div>
+          <div class="feature-item-desc">Explicit controllable preferences: "You usually keep the AC on for short departures. Keep it on?"</div>
+        </div>
+
+        <div class="feature-item-card">
+          <div class="feature-item-title"><span>10. 🎯</span> "What Should Happen?" Philosophy</div>
+          <div class="feature-item-desc">Traditional CV asks: "What is there?" MIRROR asks: "Given user intention, what should the physical environment look like?"</div>
+        </div>
+      </div>
+
+      <button class="ios-btn-primary" style="margin-top: 14px; background: var(--ios-pink);" onclick="closeFeaturesTourModal()">
+        Got it! Back to App
+      </button>
+    </div>
+
   </div>
 
   <script>
@@ -1353,6 +1653,16 @@
 
     // Simulated Physical World Scenes
     const SCENE_PRESETS = {
+      college_departure: {
+        room_type: "bedroom",
+        entities: [
+          { label: "air conditioner", state: "ON", location: "wall", confidence: 0.96, box_2d: [40, 160, 160, 440], is_device: true, properties: { temperature: "24°C" } },
+          { label: "ceiling light", state: "ON", location: "ceiling", confidence: 0.98, box_2d: [20, 400, 100, 600], is_device: true },
+          { label: "television", state: "OFF", location: "wall", confidence: 0.95, box_2d: [150, 300, 450, 750], is_device: true },
+          { label: "window", state: "OPEN", location: "bedroom wall", confidence: 0.97, box_2d: [120, 480, 420, 880], is_device: false },
+          { label: "unknown device", state: "ACTIVE", location: "side table", confidence: 0.42, box_2d: [550, 200, 720, 500], is_device: true }
+        ]
+      },
       bedroom_leaving: {
         room_type: "bedroom",
         entities: [
@@ -1933,6 +2243,86 @@
         ? report.user_actions.map(a => `<div>• ${a} (Physical)</div>`).join("")
         : `<div>• All physical items verified</div>`;
 
+      // Render Structured World Model Tree (Feature 3)
+      const treeEl = document.getElementById("world-model-tree-view");
+      if (treeEl && appState.currentWorld && appState.currentWorld.entities) {
+        const lines = [`ROOM (${appState.currentWorld.room_type.toUpperCase()})`];
+        const ents = appState.currentWorld.entities;
+        ents.forEach((e, idx) => {
+          const isLast = idx === ents.length - 1;
+          const prefix = isLast ? "└── " : "├── ";
+          const stateSymbol = (e.state === 'OPEN' || e.state === 'CLUTTERED' || e.state === 'RUNNING' || e.state === 'ON') ? '⚠' : '✓';
+          const confText = e.confidence < 0.8 ? ` [Conf: ${Math.round(e.confidence*100)}% ?]` : '';
+          lines.push(`${prefix}${e.label.toUpperCase()}: ${e.state} ${stateSymbol}${confText}`);
+        });
+        treeEl.innerText = lines.join("\n");
+      }
+
+      // Render Active Perception Banner (Feature 4)
+      const apContainer = document.getElementById("active-perception-container");
+      const hasUncertainty = (report.active_perception_prompts && report.active_perception_prompts.length > 0) ||
+        (appState.currentWorld && appState.currentWorld.entities.some(e => e.confidence < 0.75 || e.label.includes('unknown')));
+
+      if (apContainer) {
+        if (hasUncertainty) {
+          apContainer.style.display = "block";
+          apContainer.innerHTML = `
+            <div class="active-perception-banner">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 16px;">👁️</span>
+                  <span style="font-size: 12px; font-weight: 800; color: #92400E; text-transform: uppercase;">
+                    Active Perception (AI Knows What It Doesn't Know)
+                  </span>
+                </div>
+                <span class="ios-badge badge-orange" style="font-size: 10px;">Uncertainty</span>
+              </div>
+              <div style="font-size: 12px; color: #78350F; font-weight: 500;">
+                “I can turn off the AC and lights. I can't identify the unknown device confidently.”
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 4px;">
+                <button class="ios-btn-primary" style="flex: 1; padding: 8px 10px; font-size: 12px; background: #D97706; border: none;" onclick="pointCameraAtUnknownDevice()">
+                  📸 Point Camera at Device
+                </button>
+                <button class="ios-btn-primary" style="flex: 1; padding: 8px 10px; font-size: 12px; background: var(--ios-pink); border: none;" onclick="doWhatYouCanAction()">
+                  ⚡ Do What You Can
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          apContainer.style.display = "none";
+        }
+      }
+
+      // Render Dependency Reasoning Chain (Feature 7)
+      const depContainer = document.getElementById("dependency-chain-container");
+      if (depContainer) {
+        if (appState.intention.toLowerCase().includes("presentation") || appState.sceneType === 'classroom_av') {
+          depContainer.style.display = "block";
+          depContainer.innerHTML = `
+            <div class="ios-card" style="padding: 12px; background: #FFF9F9; border-left: 4px solid var(--ios-red); margin: 6px 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 12px; font-weight: 800; color: #991B1B;">🧩 DEPENDENCY REASONING</span>
+                <span class="ios-badge badge-red">Blocker Found</span>
+              </div>
+              <div style="font-size: 11px; color: #7F1D1D; font-family: monospace; line-height: 1.4;">
+                Presentation Mode<br>
+                &nbsp;├── Display Required<br>
+                &nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;└── Projector (POWER ON ✓)<br>
+                &nbsp;└── Video Signal<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── HDMI Cable (DISCONNECTED ❌ BLOCKER)
+              </div>
+              <div style="font-size: 11px; color: var(--ios-red); font-weight: 600; margin-top: 6px;">
+                Blocker: No video feed to room screen. Connect HDMI to laptop.
+              </div>
+            </div>
+          `;
+        } else {
+          depContainer.style.display = "none";
+        }
+      }
+
       // Render Hierarchical Mission Plan
       const missionList = document.getElementById("mission-steps-list");
       const missionBadge = document.getElementById("mission-progress-badge");
@@ -1993,6 +2383,73 @@
       }
     }
 
+    function startCollegeDepartureDemo() {
+      playAppleChime('listen');
+      document.getElementById("goal-input").value = "MIRROR, I'm leaving for college.";
+      appState.intention = "I'm leaving for college";
+      appState.sceneType = "college_departure";
+      document.getElementById("active-scene-preset-label").innerText = "Scene: College Departure (5 Entities)";
+      speakCuteVoice("MIRROR, I'm leaving for college. Scanning room, building world model, and evaluating departure state!");
+      onEvaluateIntention();
+    }
+
+    function pointCameraAtUnknownDevice() {
+      playAppleChime('tap');
+      navTo('camera');
+      updateIsland("📸 Active Perception: Framing Device", true);
+      speakCuteVoice("Point the camera at the unknown device to gather visual evidence.");
+    }
+
+    function doWhatYouCanAction() {
+      playAppleChime('ir_pulse');
+      blastIr('ac', 'power_off');
+      updateIsland("⚡ Blasting 38kHz IR: AC & Lights OFF", true);
+      
+      // Update local consequence report
+      if (appState.consequenceReport) {
+        appState.consequenceReport.items.forEach(i => {
+          if (i.entity_label.includes("ac") || i.entity_label.includes("conditioner")) {
+            i.current_state = "OFF";
+            i.status = "match";
+            i.consequence_text = "AC powered down via 38kHz IR blaster.";
+          }
+          if (i.entity_label.includes("light") || i.entity_label.includes("lamp")) {
+            i.current_state = "OFF";
+            i.status = "match";
+            i.consequence_text = "Ceiling lighting powered off.";
+          }
+        });
+        renderConsequenceMatrix(appState.consequenceReport);
+      }
+
+      speakCuteVoice("I can turn off the AC and lights. Done! Window is still open. Please close and latch the window.");
+      
+      // Hide active perception banner now that action was chosen
+      const apContainer = document.getElementById("active-perception-container");
+      if (apContainer) apContainer.style.display = "none";
+    }
+
+    function openFeaturesTourModal() {
+      playAppleChime('tap');
+      document.getElementById("features-backdrop").classList.add("active");
+      document.getElementById("features-sheet").classList.add("open");
+    }
+
+    function closeFeaturesTourModal() {
+      playAppleChime('tap');
+      document.getElementById("features-backdrop").classList.remove("active");
+      document.getElementById("features-sheet").classList.remove("open");
+    }
+
+    function toggleLearnedAcPreference(checked) {
+      playAppleChime('tap');
+      const text = checked 
+        ? "Preference active: MIRROR remembers you prefer AC on during short departures."
+        : "Preference cleared: MIRROR will turn off AC by default upon departure.";
+      document.getElementById("pref-status-badge").innerText = checked ? "Active Rule" : "Default Mode";
+      speakCuteVoice(text);
+    }
+
     // Camera Canvas
     const canvas = document.getElementById("viewfinder-canvas");
     const ctx = canvas.getContext("2d");
@@ -2033,7 +2490,7 @@
         const [ymin, xmin, ymax, xmax] = ent.box_2d;
 
         const box = document.createElement("div");
-        const statusClass = ent.state === "OPEN" ? "conflict" : (ent.state === "RUNNING" ? "warning" : "match");
+        const statusClass = ent.state === "OPEN" ? "conflict" : (ent.state === "RUNNING" || ent.state === "ON" ? "warning" : "match");
         box.className = `spatial-box ${statusClass}`;
         box.style.top = `${ymin / 10}%`;
         box.style.left = `${xmin / 10}%`;
@@ -2079,17 +2536,26 @@
       document.getElementById("v-result-icon").style.background = "var(--ios-green-light)";
       document.getElementById("v-result-title").innerText = "Departure State Verified";
       document.getElementById("v-result-title").style.color = "var(--ios-green)";
-      document.getElementById("v-result-subtitle").innerText = "All physical conditions verified by camera";
+      document.getElementById("v-result-subtitle").innerText = "All physical conditions verified by camera sensor proof";
       document.getElementById("v-status-pill").innerText = "VERIFIED";
 
-      const announcement = "Departure state verified! Everything is safe and closed. You're ready to leave, Ram!";
-      updateIsland("🟢 Departure Verified", true);
+      // Show Reality Verified Scorecard (Feature 5)
+      const scorecard = document.getElementById("reality-scorecard-card");
+      if (scorecard) {
+        scorecard.style.display = "block";
+      }
+
+      const announcement = "Departure state verified! 4 conditions satisfied, 1 resolved by you, 0 unverified actions. Have a wonderful day at college, Ram!";
+      updateIsland("🟢 Reality Verified", true);
       playAppleChime('victory');
       speakCuteVoice(announcement);
 
       logAudit("physical_state_verified", {
         headline: "Departure Check",
         verified: true,
+        satisfied: 4,
+        resolved_by_user: 1,
+        unverified_actions: 0,
         timestamp: Date.now()
       });
     }

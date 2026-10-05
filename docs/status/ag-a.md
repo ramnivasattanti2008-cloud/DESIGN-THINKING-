@@ -77,6 +77,14 @@ Last updated: 2026-10-05
        - **308 / 308 pytest tests passing green** across the entire repository (0 failures, 0 errors).
        - **24 Gradle Android unit test tasks passing green** (`:app:testDebugUnitTest`).
        - Zero regressions, zero broken contracts.
+    17. **The 10 Standout Features & Hackathon Demo Flow**:
+       - **Golden Master Demo Flow**: One-tap demo banner for *"MIRROR, I'm leaving for college"* (`startCollegeDepartureDemo()`), running through camera scanning, world model structuring, departure consequence reasoning, 38kHz IR blast for AC/lights, active perception for low-confidence entity, closed-loop verification, and the **Reality Verified Scorecard**.
+       - **10 Standout Features Modal Tour**: Interactive Cupertino modal sheet (`openFeaturesTourModal()`) breaking down the 10 core differentiators of MIRROR.
+       - **Structured World Model Tree**: Live hierarchical visualizer (`#world-model-tree-view`) mapping Room -> AC, Window, TV, Desk, and Unknown devices.
+       - **Active Perception Banner**: Interactive alert with `[Point Camera at Device]` and `[Do What You Can]` action triggers when visual confidence is low.
+       - **Dependency Reasoning Chain**: Hierarchical AV blocker visualizer (`#dependency-chain-container`) for Presentation mode.
+       - **Learned Preferences Card**: Controllable explicit rule toggle (`#preferences-card`) for "Keep AC on during short departures".
+       - **Reality Verified Scorecard**: Final audit card with *"4 conditions satisfied, 1 resolved by you (Window), 0 unverified actions"* and the core philosophy: *"MIRROR doesn't control your environment. It understands the state your environment should be in — and verifies reality against it."*
 
 ## Half done
 - None. Everything is complete, tested, and running live.

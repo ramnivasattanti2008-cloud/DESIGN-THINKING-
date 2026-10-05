@@ -562,6 +562,52 @@ class ConsequenceEngine:
                         box_2d=e.box_2d,
                     ))
 
+            elif any(k in lbl for k in ("tv", "television", "display")):
+                if state in ("ON", "ACTIVE"):
+                    items.append(ConsequenceItem(
+                        entity_label=e.label,
+                        current_state="ON",
+                        desired_state="OFF",
+                        status=ConsequenceStatus.UNNECESSARY_ACTIVE,
+                        severity="warning",
+                        consequence_text="Television remains running in an unoccupied room.",
+                        suggested_action="Turn off television.",
+                        action_type=ActionType.AUTOMATED_SYSTEM,
+                        location=e.location or "wall",
+                        confidence=e.confidence,
+                        box_2d=e.box_2d,
+                    ))
+                else:
+                    items.append(ConsequenceItem(
+                        entity_label=e.label,
+                        current_state="OFF",
+                        desired_state="OFF",
+                        status=ConsequenceStatus.MATCH,
+                        severity="info",
+                        consequence_text="Television is off.",
+                        suggested_action="No action needed.",
+                        action_type=ActionType.AUTOMATED_SYSTEM,
+                        location=e.location,
+                        confidence=e.confidence,
+                        box_2d=e.box_2d,
+                    ))
+
+            elif any(k in lbl for k in ("unknown", "unidentified", "panel", "switch")):
+                items.append(ConsequenceItem(
+                    entity_label=e.label,
+                    current_state=state,
+                    desired_state="VERIFIED",
+                    status=ConsequenceStatus.ATTENTION,
+                    severity="warning",
+                    consequence_text=f"Confidence too low ({int(e.confidence*100)}%) to safely identify device function.",
+                    suggested_action="Point camera at device to verify or confirm manual state.",
+                    action_type=ActionType.PHYSICAL_USER,
+                    location=e.location,
+                    confidence=e.confidence,
+                    box_2d=e.box_2d,
+                    requires_human_confirmation=True,
+                ))
+
         # Default fallback items if world had no entities detected yet
         if not items:
             items.append(ConsequenceItem(
