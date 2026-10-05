@@ -657,14 +657,20 @@
       padding: 16px 18px 28px;
       z-index: 100;
       transform: translateY(105%);
-      transition: transform 0.38s var(--ios-spring);
+      transition: transform 0.38s var(--ios-spring), opacity 0.2s;
       box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      pointer-events: none;
+      visibility: hidden;
+      opacity: 0;
     }
     .ios-bottom-sheet.open {
       transform: translateY(0);
+      pointer-events: auto;
+      visibility: visible;
+      opacity: 1;
     }
     .sheet-handle {
       width: 40px;
@@ -2338,6 +2344,193 @@ PHYSICAL WORLD MODEL
       <button class="ios-btn-primary" style="margin-top: 14px; background: #0284C7;" onclick="closeEpistemicModal()">
         Done
       </button>
+    </div>
+
+<!-- iOS 18 Bottom Sheet: Pair New Appliance Modal -->
+    <div class="sheet-backdrop" id="pair-backdrop" onclick="closePairDeviceModal()"></div>
+    <div class="ios-bottom-sheet" id="pair-sheet">
+      <div class="sheet-handle" onclick="closePairDeviceModal()"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">📡</span>
+          <h2 style="font-size: 16px; font-weight: 700;">Connect New Appliance</h2>
+        </div>
+        <button class="sheet-close-btn" onclick="closePairDeviceModal()">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Device Category</label>
+          <select id="pair-device-type" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); background: var(--ios-surface-secondary); font-size: 14px; font-weight: 600; margin-top: 4px;">
+            <option value="ac">❄️ Air Conditioner</option>
+            <option value="tv">📺 Television / Display</option>
+            <option value="lights">💡 Smart Lights & Lamp</option>
+            <option value="fan">🌀 Ceiling & Floor Fan</option>
+            <option value="projector">📽️ Classroom Projector</option>
+            <option value="soundbar">🔊 Soundbar & Audio</option>
+            <option value="heater">♨️ Space Heater (Safety Cutoff)</option>
+            <option value="purifier">🍃 Air Purifier</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Device Name</label>
+          <input type="text" id="pair-device-name" placeholder="e.g. Master Bedroom AC" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; margin-top: 4px; box-sizing: border-box;">
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Brand / Protocol</label>
+          <select id="pair-device-brand" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); background: var(--ios-surface-secondary); font-size: 14px; margin-top: 4px;">
+            <option value="Daikin (NEC 38kHz)">Daikin Inverter (NEC 38kHz)</option>
+            <option value="LG Electronics (38kHz)">LG Electronics (38kHz)</option>
+            <option value="Samsung (NEC 38kHz)">Samsung Smart (NEC 38kHz)</option>
+            <option value="Sony (RC5 38kHz)">Sony Bravia (RC5 38kHz)</option>
+            <option value="Voltas (38kHz)">Voltas All-Weather (38kHz)</option>
+            <option value="Philips (RC5 38kHz)">Philips Lighting / Audio</option>
+            <option value="Generic (NEC 38kHz)">Generic 38kHz NEC Carrier</option>
+          </select>
+        </div>
+
+        <div style="background: var(--ios-surface-secondary); padding: 12px; border-radius: 14px; border: 1px solid var(--ios-border);">
+          <div style="font-size: 12px; font-weight: 700; color: var(--ios-blue); margin-bottom: 4px;">📡 Hardware Transmitter Test</div>
+          <div style="font-size: 11px; color: var(--ios-text-secondary); margin-bottom: 8px;">Tap to transmit an IR test chirp and verify your appliance reacts.</div>
+          <button class="ios-btn-secondary" style="padding: 8px; font-size: 12px;" onclick="testPairingSignal()">
+            ⚡ Send Test Power Pulse
+          </button>
+        </div>
+
+        <button class="ios-btn-primary" style="margin-top: 6px;" onclick="savePairedDevice()">
+          ✓ Connect & Save Appliance
+        </button>
+      </div>
+    </div>
+
+
+    <!-- Mi Remote Step-by-Step Pairing Wizard (Cupertino Modal) -->
+    <div class="sheet-backdrop" id="mi-wizard-backdrop" onclick="closeMiPairingWizard()"></div>
+    <div class="ios-bottom-sheet" id="mi-wizard-sheet" style="max-height: 88%;">
+      <div class="sheet-handle" onclick="closeMiPairingWizard()"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;" id="wizard-top-icon">📡</span>
+          <h2 style="font-size: 16px; font-weight: 800;" id="wizard-title">Add Appliance Remote</h2>
+        </div>
+        <button class="sheet-close-btn" onclick="closeMiPairingWizard()">✕</button>
+      </div>
+
+      <!-- Step 1: Select Appliance Type -->
+      <div id="wizard-step-1" class="wizard-step">
+        <div style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 6px;">Select the type of appliance you want to control:</div>
+        <div class="appliance-category-grid">
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('ac', 'Air Conditioner', '❄️')">
+            <span class="appliance-cat-icon">❄️</span>
+            <span class="appliance-cat-label">AC</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('tv', 'Television', '📺')">
+            <span class="appliance-cat-icon">📺</span>
+            <span class="appliance-cat-label">TV</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('stb', 'Set-Top Box', '📦')">
+            <span class="appliance-cat-icon">📦</span>
+            <span class="appliance-cat-label">Set-Top Box</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('fan', 'Ceiling Fan', '🌀')">
+            <span class="appliance-cat-icon">🌀</span>
+            <span class="appliance-cat-label">Fan</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('lights', 'Smart Lights', '💡')">
+            <span class="appliance-cat-icon">💡</span>
+            <span class="appliance-cat-label">Lights</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('projector', 'Projector', '📽️')">
+            <span class="appliance-cat-icon">📽️</span>
+            <span class="appliance-cat-label">Projector</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('soundbar', 'A/V Audio', '🔊')">
+            <span class="appliance-cat-icon">🔊</span>
+            <span class="appliance-cat-label">Soundbar</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('heater', 'Space Heater', '🔥')">
+            <span class="appliance-cat-icon">🔥</span>
+            <span class="appliance-cat-label">Heater</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('purifier', 'Air Purifier', '🍃')">
+            <span class="appliance-cat-icon">🍃</span>
+            <span class="appliance-cat-label">Purifier</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Select Brand with Search & Popular Chips -->
+      <div id="wizard-step-2" class="wizard-step" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--ios-text-primary);" id="wizard-brand-prompt">Select Brand</span>
+          <button class="ios-badge badge-blue" style="cursor: pointer; border: none;" onclick="autoDetectBrandFromCamera()">📸 AI Auto-Detect</button>
+        </div>
+
+        <input type="text" id="wizard-brand-search" placeholder="Search brand e.g. Daikin, LG, Samsung, Voltas..." oninput="filterWizardBrands()" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; box-sizing: border-box;">
+
+        <div class="brand-chips-wrap" id="wizard-brand-chips">
+          <!-- Populated dynamically -->
+        </div>
+
+        <button class="ios-btn-secondary" style="margin-top: 10px;" onclick="goToWizardStep(1)">← Back to Appliances</button>
+      </div>
+
+      <!-- Step 3: Signature Mi Remote Code Testing Cycle -->
+      <div id="wizard-step-3" class="wizard-step" style="display: none;">
+        <div class="mi-test-box">
+          <div class="mi-code-profile-pill" id="mi-code-index-pill">Code Profile 1 of 16</div>
+          <div style="font-size: 15px; font-weight: 700;" id="mi-test-instruction">Point phone at your AC and press Power</div>
+          <div style="font-size: 12px; color: #A1A1AA;">Make sure nothing is blocking the top IR emitter.</div>
+
+          <button class="mi-test-pulse-btn" id="mi-test-pulse-btn" onclick="sendWizardTestPulse()">
+            <span>⏻</span>
+          </button>
+          <div style="font-size: 11px; color: #E4E4E7; font-weight: 600;">TAP TO TEST SIGNAL</div>
+
+          <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); width: 100%; padding-top: 12px; margin-top: 6px;">
+            <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Did the appliance respond (beep / toggle)?</div>
+            <div style="display: flex; gap: 10px; width: 100%;">
+              <button class="ios-btn-secondary" style="flex: 1; padding: 10px; background: rgba(255, 255, 255, 0.1); color: #FFF; border: none;" onclick="cycleNextCodeProfile(false)">
+                ❌ No, Next Code
+              </button>
+              <button class="ios-btn-primary" style="flex: 1; padding: 10px; background: #10B981; border: none;" onclick="cycleNextCodeProfile(true)">
+                ✅ Yes, It Responded
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="ios-btn-secondary" style="margin-top: 10px;" onclick="goToWizardStep(2)">← Back to Brand Selection</button>
+      </div>
+
+      <!-- Step 4: Name & Save Remote -->
+      <div id="wizard-step-4" class="wizard-step" style="display: none;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--ios-green); text-align: center; margin-bottom: 4px;">🎉 Remote Matched Successfully!</div>
+        <div style="font-size: 12px; color: var(--ios-text-secondary); text-align: center; margin-bottom: 12px;">Signal codes verified. Give your remote a name:</div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Remote Name</label>
+          <input type="text" id="wizard-final-name" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; margin-top: 4px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-top: 10px;">
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Room Location</label>
+          <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+            <button class="brand-chip-btn active" id="room-choice-living" onclick="selectWizardRoom('Living Room')">Living Room</button>
+            <button class="brand-chip-btn" id="room-choice-bedroom" onclick="selectWizardRoom('Bedroom')">Bedroom</button>
+            <button class="brand-chip-btn" id="room-choice-study" onclick="selectWizardRoom('Study')">Study</button>
+            <button class="brand-chip-btn" id="room-choice-office" onclick="selectWizardRoom('Office')">Office</button>
+          </div>
+        </div>
+
+        <button class="ios-btn-primary" style="margin-top: 18px; background: var(--ios-blue);" onclick="saveWizardRemoteAndFinish()">
+          ✓ Save Remote & Start Controlling
+        </button>
+      </div>
+
     </div>
 
   </div>
@@ -4194,8 +4387,12 @@ PHYSICAL WORLD MODEL
 
       currentlyExpandedRemoteId = id;
       const wrap = document.getElementById("expanded-virtual-remote");
+      const list = document.getElementById("connected-devices-list");
+      const omni = document.querySelector("#screen-remote .ios-card");
       if (!wrap) return;
 
+      if (list) list.style.display = "none";
+      if (omni) omni.style.display = "none";
       wrap.style.display = "block";
       const isOff = (dev.state || "OFF").toUpperCase() === "OFF";
 
@@ -4333,7 +4530,11 @@ PHYSICAL WORLD MODEL
     function closeDedicatedVirtualRemote() {
       currentlyExpandedRemoteId = null;
       const wrap = document.getElementById("expanded-virtual-remote");
+      const list = document.getElementById("connected-devices-list");
+      const omni = document.querySelector("#screen-remote .ios-card");
       if (wrap) wrap.style.display = "none";
+      if (list) list.style.display = "flex";
+      if (omni) omni.style.display = "block";
     }
 
     function adjustVirtualAcTemp(id, delta) {
@@ -4618,6 +4819,68 @@ PHYSICAL WORLD MODEL
       renderActivityTimeline();
       loadCuteFemaleVoice();
       initializeStandbyState();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetScreen = urlParams.get("screen") || window.location.hash.replace("#", "");
+      if (targetScreen) {
+        if (targetScreen === "wizard") {
+          navTo("remote");
+          setTimeout(openMiPairingWizard, 150);
+        } else if (targetScreen === "wizard_brand") {
+          navTo("remote");
+          openMiPairingWizard();
+          setTimeout(() => selectWizardAppliance("ac", "Air Conditioner", "❄️"), 150);
+        } else if (targetScreen === "wizard_test") {
+          navTo("remote");
+          openMiPairingWizard();
+          selectWizardAppliance("ac", "Air Conditioner", "❄️");
+          setTimeout(() => selectWizardBrand("Daikin"), 150);
+        } else {
+          navTo(targetScreen);
+        }
+      }
+      if (urlParams.get("remote") === "sample_ac") {
+        navTo("remote");
+        if (pairedDevices.length === 0) {
+          pairedDevices.push({
+            id: "dev_sample_ac",
+            name: "Living Room AC",
+            type: "ac",
+            category: "Air Conditioner",
+            brand: "Daikin",
+            room: "Living Room",
+            icon: "❄️",
+            state: "ON",
+            temp: 24,
+            mode: "COOL",
+            fan: "AUTO",
+            codeIndex: 3,
+            maxCodes: 14
+          });
+          renderPairedDevicesList();
+        }
+        setTimeout(() => openDedicatedVirtualRemote(pairedDevices[0].id), 150);
+      } else if (urlParams.get("remote") === "sample_tv") {
+        navTo("remote");
+        let tv = pairedDevices.find(d => d.type === "tv");
+        if (!tv) {
+          tv = {
+            id: "dev_sample_tv",
+            name: "Sony Bravia 4K",
+            type: "tv",
+            category: "Smart TV",
+            brand: "Sony",
+            room: "Living Room",
+            icon: "📺",
+            state: "ON",
+            codeIndex: 2,
+            maxCodes: 18
+          };
+          pairedDevices.push(tv);
+          renderPairedDevicesList();
+        }
+        setTimeout(() => openDedicatedVirtualRemote(tv.id), 150);
+      }
     });
 
     function initializeStandbyState() {
@@ -4926,193 +5189,6 @@ PHYSICAL WORLD MODEL
     }
 
   </script>
-
-    <!-- iOS 18 Bottom Sheet: Pair New Appliance Modal -->
-    <div class="sheet-backdrop" id="pair-backdrop" onclick="closePairDeviceModal()"></div>
-    <div class="ios-bottom-sheet" id="pair-sheet">
-      <div class="sheet-handle" onclick="closePairDeviceModal()"></div>
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 20px;">📡</span>
-          <h2 style="font-size: 16px; font-weight: 700;">Connect New Appliance</h2>
-        </div>
-        <button class="sheet-close-btn" onclick="closePairDeviceModal()">✕</button>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <div>
-          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Device Category</label>
-          <select id="pair-device-type" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); background: var(--ios-surface-secondary); font-size: 14px; font-weight: 600; margin-top: 4px;">
-            <option value="ac">❄️ Air Conditioner</option>
-            <option value="tv">📺 Television / Display</option>
-            <option value="lights">💡 Smart Lights & Lamp</option>
-            <option value="fan">🌀 Ceiling & Floor Fan</option>
-            <option value="projector">📽️ Classroom Projector</option>
-            <option value="soundbar">🔊 Soundbar & Audio</option>
-            <option value="heater">♨️ Space Heater (Safety Cutoff)</option>
-            <option value="purifier">🍃 Air Purifier</option>
-          </select>
-        </div>
-
-        <div>
-          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Device Name</label>
-          <input type="text" id="pair-device-name" placeholder="e.g. Master Bedroom AC" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; margin-top: 4px; box-sizing: border-box;">
-        </div>
-
-        <div>
-          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Brand / Protocol</label>
-          <select id="pair-device-brand" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); background: var(--ios-surface-secondary); font-size: 14px; margin-top: 4px;">
-            <option value="Daikin (NEC 38kHz)">Daikin Inverter (NEC 38kHz)</option>
-            <option value="LG Electronics (38kHz)">LG Electronics (38kHz)</option>
-            <option value="Samsung (NEC 38kHz)">Samsung Smart (NEC 38kHz)</option>
-            <option value="Sony (RC5 38kHz)">Sony Bravia (RC5 38kHz)</option>
-            <option value="Voltas (38kHz)">Voltas All-Weather (38kHz)</option>
-            <option value="Philips (RC5 38kHz)">Philips Lighting / Audio</option>
-            <option value="Generic (NEC 38kHz)">Generic 38kHz NEC Carrier</option>
-          </select>
-        </div>
-
-        <div style="background: var(--ios-surface-secondary); padding: 12px; border-radius: 14px; border: 1px solid var(--ios-border);">
-          <div style="font-size: 12px; font-weight: 700; color: var(--ios-blue); margin-bottom: 4px;">📡 Hardware Transmitter Test</div>
-          <div style="font-size: 11px; color: var(--ios-text-secondary); margin-bottom: 8px;">Tap to transmit an IR test chirp and verify your appliance reacts.</div>
-          <button class="ios-btn-secondary" style="padding: 8px; font-size: 12px;" onclick="testPairingSignal()">
-            ⚡ Send Test Power Pulse
-          </button>
-        </div>
-
-        <button class="ios-btn-primary" style="margin-top: 6px;" onclick="savePairedDevice()">
-          ✓ Connect & Save Appliance
-        </button>
-      </div>
-    </div>
-
-
-    <!-- Mi Remote Step-by-Step Pairing Wizard (Cupertino Modal) -->
-    <div class="sheet-backdrop" id="mi-wizard-backdrop" onclick="closeMiPairingWizard()"></div>
-    <div class="ios-bottom-sheet" id="mi-wizard-sheet" style="max-height: 88%;">
-      <div class="sheet-handle" onclick="closeMiPairingWizard()"></div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 22px;" id="wizard-top-icon">📡</span>
-          <h2 style="font-size: 16px; font-weight: 800;" id="wizard-title">Add Appliance Remote</h2>
-        </div>
-        <button class="sheet-close-btn" onclick="closeMiPairingWizard()">✕</button>
-      </div>
-
-      <!-- Step 1: Select Appliance Type -->
-      <div id="wizard-step-1" class="wizard-step">
-        <div style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 6px;">Select the type of appliance you want to control:</div>
-        <div class="appliance-category-grid">
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('ac', 'Air Conditioner', '❄️')">
-            <span class="appliance-cat-icon">❄️</span>
-            <span class="appliance-cat-label">AC</span>
-          </div>
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('tv', 'Television', '📺')">
-            <span class="appliance-cat-icon">📺</span>
-            <span class="appliance-cat-label">TV</span>
-          </div>
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('stb', 'Set-Top Box', '📦')">
-            <span class="appliance-cat-icon">📦</span>
-            <span class="appliance-cat-label">Set-Top Box</span>
-          </div>
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('fan', 'Ceiling Fan', '🌀')">
-            <span class="appliance-cat-icon">🌀</span>
-            <span class="appliance-cat-label">Fan</span>
-          </div>
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('lights', 'Smart Lights', '💡')">
-            <span class="appliance-cat-icon">💡</span>
-            <span class="appliance-cat-label">Lights</span>
-          </div>
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('projector', 'Projector', '📽️')">
-            <span class="appliance-cat-icon">📽️</span>
-            <span class="appliance-cat-label">Projector</span>
-          </div>
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('soundbar', 'A/V Audio', '🔊')">
-            <span class="appliance-cat-icon">🔊</span>
-            <span class="appliance-cat-label">Soundbar</span>
-          </div>
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('heater', 'Space Heater', '🔥')">
-            <span class="appliance-cat-icon">🔥</span>
-            <span class="appliance-cat-label">Heater</span>
-          </div>
-          <div class="appliance-cat-btn" onclick="selectWizardAppliance('purifier', 'Air Purifier', '🍃')">
-            <span class="appliance-cat-icon">🍃</span>
-            <span class="appliance-cat-label">Purifier</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 2: Select Brand with Search & Popular Chips -->
-      <div id="wizard-step-2" class="wizard-step" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span style="font-size: 13px; font-weight: 700; color: var(--ios-text-primary);" id="wizard-brand-prompt">Select Brand</span>
-          <button class="ios-badge badge-blue" style="cursor: pointer; border: none;" onclick="autoDetectBrandFromCamera()">📸 AI Auto-Detect</button>
-        </div>
-
-        <input type="text" id="wizard-brand-search" placeholder="Search brand e.g. Daikin, LG, Samsung, Voltas..." oninput="filterWizardBrands()" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; box-sizing: border-box;">
-
-        <div class="brand-chips-wrap" id="wizard-brand-chips">
-          <!-- Populated dynamically -->
-        </div>
-
-        <button class="ios-btn-secondary" style="margin-top: 10px;" onclick="goToWizardStep(1)">← Back to Appliances</button>
-      </div>
-
-      <!-- Step 3: Signature Mi Remote Code Testing Cycle -->
-      <div id="wizard-step-3" class="wizard-step" style="display: none;">
-        <div class="mi-test-box">
-          <div class="mi-code-profile-pill" id="mi-code-index-pill">Code Profile 1 of 16</div>
-          <div style="font-size: 15px; font-weight: 700;" id="mi-test-instruction">Point phone at your AC and press Power</div>
-          <div style="font-size: 12px; color: #A1A1AA;">Make sure nothing is blocking the top IR emitter.</div>
-
-          <button class="mi-test-pulse-btn" id="mi-test-pulse-btn" onclick="sendWizardTestPulse()">
-            <span>⏻</span>
-          </button>
-          <div style="font-size: 11px; color: #E4E4E7; font-weight: 600;">TAP TO TEST SIGNAL</div>
-
-          <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); width: 100%; padding-top: 12px; margin-top: 6px;">
-            <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Did the appliance respond (beep / toggle)?</div>
-            <div style="display: flex; gap: 10px; width: 100%;">
-              <button class="ios-btn-secondary" style="flex: 1; padding: 10px; background: rgba(255, 255, 255, 0.1); color: #FFF; border: none;" onclick="cycleNextCodeProfile(false)">
-                ❌ No, Next Code
-              </button>
-              <button class="ios-btn-primary" style="flex: 1; padding: 10px; background: #10B981; border: none;" onclick="cycleNextCodeProfile(true)">
-                ✅ Yes, It Responded
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <button class="ios-btn-secondary" style="margin-top: 10px;" onclick="goToWizardStep(2)">← Back to Brand Selection</button>
-      </div>
-
-      <!-- Step 4: Name & Save Remote -->
-      <div id="wizard-step-4" class="wizard-step" style="display: none;">
-        <div style="font-size: 16px; font-weight: 800; color: var(--ios-green); text-align: center; margin-bottom: 4px;">🎉 Remote Matched Successfully!</div>
-        <div style="font-size: 12px; color: var(--ios-text-secondary); text-align: center; margin-bottom: 12px;">Signal codes verified. Give your remote a name:</div>
-
-        <div>
-          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Remote Name</label>
-          <input type="text" id="wizard-final-name" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; margin-top: 4px; box-sizing: border-box;">
-        </div>
-
-        <div style="margin-top: 10px;">
-          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Room Location</label>
-          <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
-            <button class="brand-chip-btn active" id="room-choice-living" onclick="selectWizardRoom('Living Room')">Living Room</button>
-            <button class="brand-chip-btn" id="room-choice-bedroom" onclick="selectWizardRoom('Bedroom')">Bedroom</button>
-            <button class="brand-chip-btn" id="room-choice-study" onclick="selectWizardRoom('Study')">Study</button>
-            <button class="brand-chip-btn" id="room-choice-office" onclick="selectWizardRoom('Office')">Office</button>
-          </div>
-        </div>
-
-        <button class="ios-btn-primary" style="margin-top: 18px; background: var(--ios-blue);" onclick="saveWizardRemoteAndFinish()">
-          ✓ Save Remote & Start Controlling
-        </button>
-      </div>
-
-    </div>
 
 </body>
 </html>
