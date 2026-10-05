@@ -12,6 +12,28 @@ import os
 import re
 import time
 
+import sys
+
+def _load_env_file():
+    if "pytest" in sys.modules or "PYTEST_CURRENT_TEST" in os.environ:
+        return
+    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    k, v = line.split("=", 1)
+                    k, v = k.strip(), v.strip().strip("\"'")
+                    if k not in os.environ:
+                        os.environ[k] = v
+        except Exception:
+            pass
+
+_load_env_file()
+
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -282,7 +304,7 @@ def evaluate_consequence(body: ConsequenceRequest):
         if has_image_data and gemini_key:
             try:
                 from src.core.model_client import GeminiModelClient
-                client = GeminiModelClient(gemini_key, model=os.environ.get("MIRROR_MODEL_NAME", "gemini-flash-latest"))
+                client = GeminiModelClient(gemini_key, model=os.environ.get("MIRROR_MODEL_NAME", "gemini-3.1-flash-lite"))
                 world = client.observe_physical_world(body.frames, body.intention)
             except Exception:
                 world = PhysicalWorldModel(room_type=body.room_type)
@@ -307,7 +329,9 @@ def evaluate_consequence(body: ConsequenceRequest):
         world = PhysicalWorldModel(room_type=body.room_type)
 
     report = ConsequenceEngine.evaluate(world, body.intention)
-    return report.model_dump()
+    out = report.model_dump()
+    out["entities"] = [e.model_dump() for e in world.entities]
+    return out
 
 
 @app.post("/v1/consequence/verify")
@@ -318,7 +342,7 @@ def verify_consequence(body: ConsequenceVerifyRequest):
     if has_image_data and gemini_key:
         try:
             from src.core.model_client import GeminiModelClient
-            client = GeminiModelClient(gemini_key, model=os.environ.get("MIRROR_MODEL_NAME", "gemini-flash-latest"))
+            client = GeminiModelClient(gemini_key, model=os.environ.get("MIRROR_MODEL_NAME", "gemini-3.1-flash-lite"))
             fresh_world = client.observe_physical_world(body.frames, body.initial_report.intention_raw)
         except Exception:
             fresh_world = PhysicalWorldModel()

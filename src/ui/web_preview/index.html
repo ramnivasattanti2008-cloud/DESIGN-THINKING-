@@ -1030,6 +1030,15 @@
               🔥 The 10 Features
             </button>
           </div>
+
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button class="ios-btn-secondary" style="flex: 1; padding: 8px 6px; font-size: 11px; font-weight: 700; background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE;" onclick="openMissionPlanModal()">
+              📋 Mission Planner
+            </button>
+            <button class="ios-btn-secondary" style="flex: 1; padding: 8px 6px; font-size: 11px; font-weight: 700; background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0;" onclick="openEpistemicModal()">
+              🧠 Epistemic Partition
+            </button>
+          </div>
         </div>
 
         <!-- AI OMNI-CONTROL COMMAND CARD -->
@@ -1678,6 +1687,15 @@ ROOM (Physical World Model)
           </div>
         </div>
 
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <button class="ios-btn-secondary" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700;" onclick="saveSnapshot('morning_baseline')">
+            📸 Save Baseline
+          </button>
+          <button class="ios-btn-primary" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700; background: #EA580C;" onclick="compareSnapshot('morning_baseline')">
+            🔍 Compare Baseline
+          </button>
+        </div>
+
         <div class="ios-card" style="padding: 12px;">
           <div style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase; margin-bottom: 8px;">
             Detected Physical Transitions
@@ -1849,6 +1867,46 @@ ROOM (Physical World Model)
 
       <button class="ios-btn-primary" style="margin-top: 14px; background: var(--ios-pink);" onclick="closeFeaturesTourModal()">
         Got it! Back to App
+      </button>
+    </div>
+
+    <!-- iOS 18 Bottom Sheet: Hierarchical Mission Plan -->
+    <div class="sheet-backdrop" id="mission-backdrop" onclick="closeMissionPlanModal()"></div>
+    <div class="ios-bottom-sheet" id="mission-sheet">
+      <div class="sheet-handle" onclick="closeMissionPlanModal()"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">📋</span>
+          <h2 style="font-size: 16px; font-weight: 800;">Hierarchical Mission Plan</h2>
+        </div>
+        <button class="sheet-close-btn" onclick="closeMissionPlanModal()">✕</button>
+      </div>
+      <div style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 10px;">
+        Ordered multi-phase execution graph with safety dependencies
+      </div>
+      <div id="mission-sheet-body"></div>
+      <button class="ios-btn-primary" style="margin-top: 14px; background: #4F46E5;" onclick="closeMissionPlanModal()">
+        Done
+      </button>
+    </div>
+
+    <!-- iOS 18 Bottom Sheet: Epistemic World Partition -->
+    <div class="sheet-backdrop" id="epistemic-backdrop" onclick="closeEpistemicModal()"></div>
+    <div class="ios-bottom-sheet" id="epistemic-sheet">
+      <div class="sheet-handle" onclick="closeEpistemicModal()"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🧠</span>
+          <h2 style="font-size: 16px; font-weight: 800;">Epistemic State Partition</h2>
+        </div>
+        <button class="sheet-close-btn" onclick="closeEpistemicModal()">✕</button>
+      </div>
+      <div style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 10px;">
+        Certainty partitioning: Known vs Probable vs Unknown (Active Perception triggers)
+      </div>
+      <div id="epistemic-sheet-body"></div>
+      <button class="ios-btn-primary" style="margin-top: 14px; background: #0284C7;" onclick="closeEpistemicModal()">
+        Done
       </button>
     </div>
 
@@ -2924,6 +2982,108 @@ ROOM (Physical World Model)
       const scorecard = document.getElementById("reality-scorecard-card");
       const resCard = document.getElementById("v-result-card");
 
+      updateIsland("⚡ Verifying Space State with Camera Proof...", true);
+
+      const vc = document.getElementById("verify-canvas");
+      let vB64 = null;
+      try {
+        if (vc) vB64 = vc.toDataURL("image/jpeg", 0.85).split(",")[1];
+      } catch(e) {}
+
+      const vFrames = isSuccess ? [
+        {
+          id: "v_frame_success_" + Date.now(),
+          media_type: "image/jpeg",
+          data_b64: vB64,
+          fake_labels: ["window:closed:0.98", "air conditioner:off:0.96", "door:closed:0.99"]
+        }
+      ] : [
+        {
+          id: "v_frame_failed_" + Date.now(),
+          media_type: "image/jpeg",
+          data_b64: vB64,
+          fake_labels: ["window:open:0.97", "air conditioner:off:0.96", "door:closed:0.99"]
+        }
+      ];
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/consequence/verify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            initial_report: appState.consequenceReport || {
+              session_id: "demo",
+              intention_raw: appState.intention || "I'm leaving",
+              headline: "Departure Check",
+              readiness_score: 0.5,
+              is_ready: false,
+              items: [
+                {
+                  entity_label: "window",
+                  current_state: isSuccess ? "CLOSED" : "OPEN",
+                  desired_state: "CLOSED",
+                  status: isSuccess ? "match" : "conflict",
+                  consequence_text: "Window must be closed.",
+                  suggested_action: "Close window.",
+                  action_type: "physical_user",
+                  confidence: 0.98,
+                  verified: isSuccess
+                }
+              ]
+            },
+            frames: vFrames
+          })
+        });
+
+        if (res.ok) {
+          const verifyData = await res.json();
+          if (!verifyData.verified) {
+            updateIsland("⚠️ Verification Failed: Delta Mismatch", false);
+            playAppleChime('tap');
+            resCard.style.borderLeftColor = "var(--ios-red)";
+            document.getElementById("v-result-icon").innerText = "❌";
+            document.getElementById("v-result-icon").style.color = "var(--ios-red)";
+            document.getElementById("v-result-icon").style.background = "#FEE2E2";
+            document.getElementById("v-result-title").innerText = "Verification Incomplete";
+            document.getElementById("v-result-title").style.color = "var(--ios-red)";
+            document.getElementById("v-result-subtitle").innerText = `Unresolved: ${verifyData.unresolved.join(", ")}`;
+            document.getElementById("v-status-pill").innerText = "FAILED";
+            document.getElementById("v-status-pill").className = "ios-badge badge-red";
+
+            if (failCard) {
+              failCard.style.display = "block";
+              document.getElementById("v-fail-headline").innerText = `Still detected unverified: ${verifyData.unresolved.join(", ")}.`;
+            }
+            if (scorecard) scorecard.style.display = "none";
+
+            speakCuteVoice(verifyData.spoken_announcement || "Verification failed! Physical state does not match desired goal.");
+            logAudit("verification_failed_delta", verifyData);
+            return;
+          } else {
+            if (failCard) failCard.style.display = "none";
+            resCard.style.borderLeftColor = "var(--ios-green)";
+            document.getElementById("v-result-icon").innerText = "✓";
+            document.getElementById("v-result-icon").style.color = "var(--ios-green)";
+            document.getElementById("v-result-icon").style.background = "var(--ios-green-light)";
+            document.getElementById("v-result-title").innerText = "Departure State Verified";
+            document.getElementById("v-result-title").style.color = "var(--ios-green)";
+            document.getElementById("v-result-subtitle").innerText = "All physical conditions verified by camera sensor proof";
+            document.getElementById("v-status-pill").innerText = "VERIFIED";
+            document.getElementById("v-status-pill").className = "ios-badge badge-green";
+
+            if (scorecard) scorecard.style.display = "block";
+
+            updateIsland("🟢 Reality Verified", true);
+            playAppleChime('victory');
+            speakCuteVoice(verifyData.spoken_announcement || "All physical conditions verified. Have a wonderful day!");
+            logAudit("physical_state_verified", verifyData);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Verify API error:", err);
+      }
+
       if (!isSuccess) {
         updateIsland("⚠️ Verification Failed: Delta Mismatch", false);
         playAppleChime('tap');
@@ -2958,10 +3118,7 @@ ROOM (Physical World Model)
       document.getElementById("v-status-pill").innerText = "VERIFIED";
       document.getElementById("v-status-pill").className = "ios-badge badge-green";
 
-      // Show Reality Verified Scorecard (Feature 5)
-      if (scorecard) {
-        scorecard.style.display = "block";
-      }
+      if (scorecard) scorecard.style.display = "block";
 
       const announcement = "Departure state verified! 4 conditions satisfied, 1 resolved by you, 0 unverified actions. Have a wonderful day at college, Ram!";
       updateIsland("🟢 Reality Verified", true);
@@ -2979,10 +3136,73 @@ ROOM (Physical World Model)
     }
 
     async function onCaptureAndAnalyze() {
-      updateIsland("⚡ Analyzing Scene...", true);
-      setTimeout(() => {
-        onEvaluateIntention();
-      }, 700);
+      updateIsland("⚡ Scanning Physical Space with Gemini Vision...", true);
+      playAppleChime('tap');
+
+      if (webcamStream) {
+        const v = document.getElementById("webcam-stream");
+        if (v && v.videoWidth > 0) {
+          canvas.width = v.videoWidth;
+          canvas.height = v.videoHeight;
+          ctx.drawImage(v, 0, 0);
+        }
+      }
+
+      let frameB64 = null;
+      try {
+        frameB64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+      } catch (e) {
+        console.warn("Canvas export fallback:", e);
+      }
+
+      const intention = appState.intention || document.getElementById("goal-input").value.trim() || "I'm leaving";
+      const sceneData = SCENE_PRESETS[appState.sceneType] || SCENE_PRESETS.bedroom_leaving;
+
+      const payload = {
+        intention: intention,
+        room_type: sceneData.room_type
+      };
+
+      if (frameB64 && (webcamStream || document.getElementById("camera-mode-badge").innerText.includes("Photo") || document.getElementById("camera-mode-badge").innerText.includes("Live"))) {
+        payload.frames = [{
+          id: "cam_capture_" + Date.now(),
+          media_type: "image/jpeg",
+          data_b64: frameB64
+        }];
+      } else {
+        payload.entities = sceneData.entities;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/consequence/evaluate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const report = await res.json();
+          appState.consequenceReport = report;
+          if (report.entities && report.entities.length > 0) {
+            appState.currentWorld = {
+              room_type: sceneData.room_type,
+              entities: report.entities
+            };
+            renderBoundingBoxes(report.entities);
+            renderWorldModelTree(report.entities);
+          }
+          renderConsequenceMatrix(report);
+          logAudit("camera_physical_evaluated", report);
+          navTo("matrix");
+          updateIsland(`${report.headline} Verified`, report.is_ready);
+          speakCuteVoice(report.spoken_summary);
+          return;
+        }
+      } catch (err) {
+        console.warn("Camera evaluate failed, falling back:", err);
+      }
+
+      onEvaluateIntention();
     }
 
     function toggleWebcam() {
@@ -3050,6 +3270,291 @@ ROOM (Physical World Model)
       renderCanvasScene();
       onEvaluateIntention();
     });
+
+    // Hierarchical Mission Planner (Features 14, 22, 85)
+    async function openMissionPlanModal() {
+      playAppleChime('tap');
+      updateIsland("📋 Generating Ordered Mission Plan...", true);
+      document.getElementById("mission-backdrop").classList.add("active");
+      document.getElementById("mission-sheet").classList.add("open");
+      const bodyEl = document.getElementById("mission-sheet-body");
+      bodyEl.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--ios-text-secondary);">Calculating dependency phases...</div>';
+
+      const entities = (appState.currentWorld && appState.currentWorld.entities)
+        ? appState.currentWorld.entities
+        : (SCENE_PRESETS[appState.sceneType] ? SCENE_PRESETS[appState.sceneType].entities : []);
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/missions/plan`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            intention: appState.intention || "I'm leaving",
+            room_type: appState.currentWorld ? appState.currentWorld.room_type : "room",
+            entities: entities
+          })
+        });
+
+        if (res.ok) {
+          const plan = await res.json();
+          renderMissionPlan(plan);
+          speakCuteVoice(`Hierarchical mission planned in ${plan.phases ? plan.phases.length : 3} phases.`);
+          logAudit("mission_plan_generated", plan);
+          return;
+        }
+      } catch (e) {
+        console.warn("Mission plan fetch fallback:", e);
+      }
+
+      renderMissionPlan({
+        mission_goal: appState.intention || "I'm leaving",
+        phases: [
+          { phase_number: 1, name: "Critical Safety & Hazards", priority: 1, actions: ["Verify stove off", "Check flammable items away from heat"] },
+          { phase_number: 2, name: "Device & Closure Controls", priority: 2, actions: ["Blast 38kHz IR: Air Conditioner OFF", "Close bedroom window securely"] },
+          { phase_number: 3, name: "Sensor Proof Verification", priority: 3, actions: ["Closed-loop camera scan", "Confirm all invariants satisfied"] }
+        ]
+      });
+    }
+
+    function renderMissionPlan(plan) {
+      const bodyEl = document.getElementById("mission-sheet-body");
+      const steps = plan.steps || [];
+      let html = `<div style="font-size: 13px; font-weight: 700; color: #1E1B4B; margin-bottom: 10px;">🎯 Goal: "${plan.intention || appState.intention}" (${steps.length} ordered steps)</div>`;
+      if (steps.length === 0) {
+        html += `<div style="padding: 16px; text-align: center; color: var(--ios-text-secondary);">No steps required. Physical space is already optimal.</div>`;
+      } else {
+        steps.forEach(s => {
+          const isDone = s.status === 'completed';
+          const badgeClass = isDone ? 'badge-green' : (s.step_number === 1 ? 'badge-blue' : 'badge-orange');
+          html += `
+            <div class="ios-card" style="margin-bottom: 8px; border-left: 4px solid ${isDone ? 'var(--ios-green)' : 'var(--ios-blue)'}; padding: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <b style="font-size: 13px; color: #111;">Step ${s.step_number}: ${s.title}</b>
+                <span class="ios-badge ${badgeClass}">${s.status.toUpperCase()}</span>
+              </div>
+              <div style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 4px;">
+                ${s.description}
+              </div>
+              <div style="font-size: 11px; color: #4B5563; font-weight: 600;">
+                Evidence: ${s.evidence || s.expected_result || "Sensor verified"}
+              </div>
+            </div>
+          `;
+        });
+      }
+      bodyEl.innerHTML = html;
+    }
+
+    function closeMissionPlanModal() {
+      document.getElementById("mission-backdrop").classList.remove("active");
+      document.getElementById("mission-sheet").classList.remove("open");
+    }
+
+    // Epistemic World Partitioning (Features 11, 53, 54)
+    async function openEpistemicModal() {
+      playAppleChime('tap');
+      updateIsland("🧠 Partitioning Epistemic Knowledge...", true);
+      document.getElementById("epistemic-backdrop").classList.add("active");
+      document.getElementById("epistemic-sheet").classList.add("open");
+      const bodyEl = document.getElementById("epistemic-sheet-body");
+      bodyEl.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--ios-text-secondary);">Analyzing sensor certainty...</div>';
+
+      const entities = (appState.currentWorld && appState.currentWorld.entities)
+        ? appState.currentWorld.entities
+        : (SCENE_PRESETS[appState.sceneType] ? SCENE_PRESETS[appState.sceneType].entities : []);
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/consequence/epistemic`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ entities: entities })
+        });
+
+        if (res.ok) {
+          const part = await res.json();
+          renderEpistemicPartition(part);
+          speakCuteVoice(`World partitioned: ${part.known ? part.known.length : 0} known, ${part.probable ? part.probable.length : 0} probable, ${part.unknown ? part.unknown.length : 0} unknown.`);
+          logAudit("epistemic_partition_evaluated", part);
+          return;
+        }
+      } catch (e) {
+        console.warn("Epistemic fetch fallback:", e);
+      }
+
+      const known = entities.filter(e => e.confidence >= 0.85);
+      const probable = entities.filter(e => e.confidence >= 0.50 && e.confidence < 0.85);
+      const unknown = entities.filter(e => e.confidence < 0.50);
+      renderEpistemicPartition({ known: known, probable: probable, unknown: unknown });
+    }
+
+    function renderEpistemicPartition(part) {
+      const bodyEl = document.getElementById("epistemic-sheet-body");
+      let html = "";
+
+      html += `
+        <div class="ios-card" style="margin-bottom: 8px; border-left: 4px solid var(--ios-green); padding: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <b style="font-size: 13px; color: #047857;">🟢 KNOWN (Confidence ≥ 85%)</b>
+            <span class="ios-badge badge-green">${part.known ? part.known.length : 0} items</span>
+          </div>
+          <div style="font-size: 12px; color: var(--ios-text-secondary); line-height: 1.5;">
+            ${(part.known || []).map(e => `• <b>${e.label}</b>: ${e.state} (${Math.round(e.confidence * 100)}%)`).join("<br>") || "None"}
+          </div>
+        </div>
+      `;
+
+      html += `
+        <div class="ios-card" style="margin-bottom: 8px; border-left: 4px solid #F59E0B; padding: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <b style="font-size: 13px; color: #B45309;">🟡 PROBABLE (50% - 84%)</b>
+            <span class="ios-badge" style="background: #F59E0B; color: #FFF;">${part.probable ? part.probable.length : 0} items</span>
+          </div>
+          <div style="font-size: 12px; color: var(--ios-text-secondary); line-height: 1.5;">
+            ${(part.probable || []).map(e => `• <b>${e.label}</b>: ${e.state} (${Math.round(e.confidence * 100)}%)`).join("<br>") || "None"}
+          </div>
+        </div>
+      `;
+
+      html += `
+        <div class="ios-card" style="margin-bottom: 8px; border-left: 4px solid var(--ios-red); padding: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <b style="font-size: 13px; color: #B91C1C;">❓ UNKNOWN (&lt; 50% - Prompts Active Perception)</b>
+            <span class="ios-badge badge-red">${part.unknown ? part.unknown.length : 0} items</span>
+          </div>
+          <div style="font-size: 12px; color: var(--ios-text-secondary); line-height: 1.5;">
+            ${(part.unknown || []).map(e => `• <b>${e.label}</b>: ${e.state} (${Math.round(e.confidence * 100)}%)`).join("<br>") || "None"}
+          </div>
+        </div>
+      `;
+
+      bodyEl.innerHTML = html;
+    }
+
+    function closeEpistemicModal() {
+      document.getElementById("epistemic-backdrop").classList.remove("active");
+      document.getElementById("epistemic-sheet").classList.remove("open");
+    }
+
+    // Temporal Snapshot Save & Compare (Features 10, 83)
+    async function saveSnapshot(snapshotName = "morning_baseline") {
+      playAppleChime('tap');
+      updateIsland(`📸 Saving Physical Snapshot: ${snapshotName}...`, true);
+      const entities = (appState.currentWorld && appState.currentWorld.entities)
+        ? appState.currentWorld.entities
+        : (SCENE_PRESETS[appState.sceneType] ? SCENE_PRESETS[appState.sceneType].entities : []);
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/snapshots/save`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: snapshotName,
+            room_type: appState.currentWorld ? appState.currentWorld.room_type : "room",
+            entities: entities
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          updateIsland(`📸 Snapshot "${snapshotName}" Saved`, true);
+          speakCuteVoice(`Saved physical snapshot for ${snapshotName.replace('_', ' ')}.`);
+          logAudit("snapshot_saved", data);
+          return;
+        }
+      } catch (e) {
+        console.warn("Snapshot save error:", e);
+      }
+      updateIsland(`📸 Snapshot "${snapshotName}" Saved (Local)`, true);
+    }
+
+    async function compareSnapshot(baseName = "morning_baseline") {
+      playAppleChime('tap');
+      updateIsland(`⏱️ Comparing with ${baseName.replace('_', ' ')}...`, true);
+      const currentEntities = (appState.currentWorld && appState.currentWorld.entities)
+        ? appState.currentWorld.entities
+        : (SCENE_PRESETS[appState.sceneType] ? SCENE_PRESETS[appState.sceneType].entities : []);
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/snapshots/compare`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            base_name: baseName,
+            current_entities: currentEntities
+          })
+        });
+
+        if (res.ok) {
+          const diffData = await res.json();
+          renderSnapshotDiff(diffData);
+          logAudit("snapshot_compared", diffData);
+          return;
+        }
+      } catch (e) {
+        console.warn("Snapshot compare error:", e);
+      }
+    }
+
+    function renderSnapshotDiff(diffData) {
+      const container = document.getElementById("diff-items-container");
+      const title = document.getElementById("diff-summary-title");
+      if (!container || !title) return;
+
+      const transitions = diffData.state_changes || diffData.transitions || [];
+      title.innerText = `${transitions.length} Physical State Changes Detected`;
+      title.style.color = transitions.length > 0 ? "var(--ios-red)" : "var(--ios-green)";
+      container.innerHTML = "";
+
+      if (transitions.length === 0) {
+        container.innerHTML = `
+          <div class="consequence-card match">
+            <b style="font-size: 14px;">No Physical Changes</b>
+            <div style="font-size: 12px; color: var(--ios-text-secondary); margin-top: 4px;">
+              Current environment exactly matches baseline snapshot (${diffData.base_name || "baseline"}).
+            </div>
+          </div>
+        `;
+        speakCuteVoice("No state transitions detected. Physical reality is identical to baseline.");
+        return;
+      }
+
+      transitions.forEach(t => {
+        const card = document.createElement("div");
+        card.className = "consequence-card conflict";
+        const label = t.entity_label || t.label || "DEVICE";
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <b style="font-size: 14px;">${label.toUpperCase()}</b>
+            <span class="ios-badge badge-red">${t.old_state} → ${t.new_state}</span>
+          </div>
+          <div style="font-size: 12px; color: var(--ios-text-secondary); margin-top: 4px;">
+            ${t.consequence_impact || t.note || "State transition detected between snapshots."}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      speakCuteVoice(`Identified ${transitions.length} physical changes compared to ${diffData.base_name || "baseline"}.`);
+    }
+
+    // Multilingual Translation Hook (Telugu, Hindi, Hinglish)
+    async function checkMultilingualInput(text) {
+      try {
+        const res = await fetch(`${API_BASE}/v1/translate/intent`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: text })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.detected_language && data.detected_language !== "en" && data.detected_language !== "unknown") {
+            updateIsland(`🌐 Language: ${data.detected_language.toUpperCase()} (${data.intention_type})`, true);
+            speakCuteVoice(`Interpreted ${data.detected_language}: Intent is ${data.intention_type}.`);
+          }
+        }
+      } catch (e) {}
+    }
+
   </script>
 </body>
 </html>

@@ -128,7 +128,7 @@ class AnthropicModelClient:
 
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-DEFAULT_GEMINI_MODEL = "gemini-flash-latest"
+DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite"
 _MODEL_NAME_OK = re.compile(r"[A-Za-z0-9._-]{1,80}")
 
 
@@ -228,29 +228,41 @@ class GeminiModelClient:
             return PhysicalWorldModel(session_id=frames[0].id if frames else "session")
         prompt_text = (
             f"You are MIRROR: Physical Consequence Intelligence for everyday life. "
-            f"Analyze the image of this physical space with respect to user intention: '{intention or 'general check'}'. "
-            f"Identify all physical objects, devices, fixtures (windows, doors, AC, stove, screens, lamps, cables), and surfaces. "
-            f"For each, determine: label (lowercase noun), state ('OPEN', 'CLOSED', 'ON', 'OFF', 'CHARGING', 'CLEAR', 'CLUTTERED'), "
-            f"location, confidence (0-1), box_2d [ymin, xmin, ymax, xmax] (0-1000), is_device (bool), is_hazard (bool), properties (dict). "
-            f'Reply with JSON only:\n{{"room_type": "room", "entities": [{{"label": "window", "state": "OPEN", "location": "wall", "confidence": 0.95, "box_2d": [100, 200, 400, 600], "is_device": false, "is_hazard": false}}]}}'
+            f"Analyze the image of this physical environment carefully with respect to user intention: '{intention or 'general check'}'.\n"
+            f"Identify ALL visible physical objects, furniture (desk, table, chair, bed), appliances & devices (air conditioner, monitor, tv, laptop, lamp, fan, projector, heater, switches), fixtures (doors, windows), cables, and surfaces.\n"
+            f"For each, determine:\n"
+            f"- label: lowercase noun (e.g. 'desk', 'air conditioner', 'window', 'laptop', 'lamp')\n"
+            f"- state: physical state string ('OPEN', 'CLOSED', 'ON', 'OFF', 'CLEAR', 'CLUTTERED', 'HOT', 'ACTIVE', 'NORMAL')\n"
+            f"- location: where it is located in the space\n"
+            f"- confidence: 0.0 to 1.0\n"
+            f"- box_2d: normalized bounding box [ymin, xmin, ymax, xmax] scaled 0 to 1000\n"
+            f"- is_device: boolean (true if electronic or mechanical device)\n"
+            f"- is_hazard: boolean (true if safety hazard or risky state)\n"
+            f"- properties: optional key-value dictionary (e.g. ocr text, temperature, status labels)\n"
+            f'Reply with JSON only:\n{{"room_type": "room", "entities": [{{"label": "desk", "state": "CLEAR", "location": "center", "confidence": 0.95, "box_2d": [100, 200, 400, 600], "is_device": false, "is_hazard": false}}]}}'
         )
         parts.append({"text": prompt_text})
+        for cand_model in [self.model, "gemini-3.1-flash-lite", "gemini-flash-latest"]:
+            try:
+                r = self._http.post(
+                    GEMINI_URL.format(model=cand_model),
+                    headers={"x-goog-api-key": self._key, "content-type": "application/json"},
+                    json={"contents": [{"role": "user", "parts": parts}],
+                          "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}},
+                    timeout=15.0,
+                )
+                r.raise_for_status()
+                data = r.json()
+                candidates = data.get("candidates") or []
+                if not candidates:
+                    continue
+                text = "".join(p.get("text", "") for p in (candidates[0].get("content") or {}).get("parts", []))
+                parsed = parse_physical_world(text, sent[0].id)
+                if parsed.entities:
+                    return parsed
+            except Exception:
+                continue
         try:
-            r = self._http.post(
-                GEMINI_URL.format(model=self.model),
-                headers={"x-goog-api-key": self._key, "content-type": "application/json"},
-                json={"contents": [{"role": "user", "parts": parts}],
-                      "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}},
-                timeout=15.0,
-            )
-            r.raise_for_status()
-            data = r.json()
-            candidates = data.get("candidates") or []
-            if not candidates:
-                raise ModelError("Gemini returned no answer")
-            text = "".join(p.get("text", "") for p in (candidates[0].get("content") or {}).get("parts", []))
-            return parse_physical_world(text, sent[0].id)
-        except Exception:
             # Fallback to standard observe and convert
             obs = self.observe(frames)
             entities = []
@@ -271,6 +283,8 @@ class GeminiModelClient:
                     is_device=any(k in lbl for k in ("ac", "air conditioner", "tv", "light", "lamp", "stove")),
                 ))
             return PhysicalWorldModel(session_id=sent[0].id, entities=entities)
+        except Exception:
+            return PhysicalWorldModel(session_id=sent[0].id)
 
 
 def parse_physical_world(text: str, session_id: str) -> PhysicalWorldModel:
