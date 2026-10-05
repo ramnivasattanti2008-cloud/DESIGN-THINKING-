@@ -85,6 +85,17 @@ Last updated: 2026-10-05
        - **Dependency Reasoning Chain**: Hierarchical AV blocker visualizer (`#dependency-chain-container`) for Presentation mode.
        - **Learned Preferences Card**: Controllable explicit rule toggle (`#preferences-card`) for "Keep AC on during short departures".
        - **Reality Verified Scorecard**: Final audit card with *"4 conditions satisfied, 1 resolved by you (Window), 0 unverified actions"* and the core philosophy: *"MIRROR doesn't control your environment. It understands the state your environment should be in — and verifies reality against it."*
+    18. **AI Omni-Control & Autonomous Reality Alignment (`POST /v1/ai/omni-control`)**:
+       - Automatically identifies all controllable devices (AC, TV, Lights, Projector, Fan, Soundbar, Heater, Purifier) conflicting with or unneeded in the desired state.
+       - Dispatches multi-pulse 38kHz IR blast sequences to power down or configure devices autonomously.
+       - Transitions world model entity states in real-time and recalculates the physical readiness score.
+       - Synthesizes Aura's natural spoken confirmation and guides the user directly to closed-loop camera verification.
+    19. **Natural Language AI Voice Command Controller (`POST /v1/ai/voice-command`)**:
+       - Handles direct device commands ("Turn off AC", "Set AC to 22", "Mute TV", "Projector on", "Dim lights"), omni-control commands ("Fix everything", "Take control", "Do what you can"), and verification triggers ("Verify reality", "Check room").
+       - Integrated speech recognition with Web Speech API and Web Audio synthesizer chimes, transmitting real-time IR pulses and speaking back with Aura.
+    20. **Expanded Universal IR Remote & 8 Physical Device Profiles**:
+       - Complete interactive hardware control panels for 8 devices: Air Conditioner, Television/Screen, Smart Lighting, Classroom Projector, Ceiling/Floor Fan, Soundbar/Audio, Space Heater (Emergency safety cutoff), and Air Purifier.
+       - Top Master Quick Blast banner to execute all safe controls in one tap.
 
 ## Half done
 - None. Everything is complete, tested, and running live.

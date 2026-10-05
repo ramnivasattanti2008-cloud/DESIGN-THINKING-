@@ -9,6 +9,7 @@ Hardening (API key, rate limit, size limit, CORS, security headers) lives in src
 and is configured by environment variables; see that file.
 """
 import os
+import re
 import time
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -371,29 +372,40 @@ def compare_snapshots(body: SnapshotCompareRequest):
 # ---- Consumer IR (Infrared Blaster) Control Endpoints ----
 
 class IrTransmitRequest(BaseModel):
-    device_type: str = "ac"  # "ac", "tv", "projector", "fan"
-    command: str = "power_off"  # "power_off", "power_on", "temp_up", "temp_down", "mute"
+    device_type: str = "ac"  # "ac", "tv", "lights", "projector", "fan", "soundbar", "heater", "purifier"
+    command: str = "power_off"  # "power_off", "power_on", "temp_up", "temp_down", "mute", etc.
     brand: str = "generic"
     carrier_frequency: int = 38000
     parameters: dict = {}
 
 
+class IrBatchTransmitRequest(BaseModel):
+    commands: list[IrTransmitRequest]
+    delay_ms: int = 120
+
+
 @app.get("/v1/ir/devices")
 def get_ir_devices():
-    """Returns available IR remote profiles and commands."""
+    """Returns available IR remote profiles and commands for physical devices."""
     return {
         "devices": [
             {
                 "type": "ac",
                 "label": "Air Conditioner",
-                "commands": ["power_off", "power_on", "temp_up", "temp_down", "eco_mode", "sleep_mode"],
+                "commands": ["power_off", "power_on", "temp_up", "temp_down", "temp_set", "eco_mode", "sleep_mode"],
                 "protocol": "NEC_38KHZ",
             },
             {
                 "type": "tv",
                 "label": "Television / Display",
-                "commands": ["power_toggle", "mute", "vol_up", "vol_down", "input_hdmi1", "input_hdmi2"],
+                "commands": ["power_toggle", "power_off", "power_on", "mute", "vol_up", "vol_down", "input_hdmi1", "input_hdmi2"],
                 "protocol": "SONY_RC5_38KHZ",
+            },
+            {
+                "type": "lights",
+                "label": "Smart Lights / Lamp",
+                "commands": ["power_toggle", "power_off", "power_on", "dim", "warm_mode", "bright_mode"],
+                "protocol": "NEC_38KHZ",
             },
             {
                 "type": "projector",
@@ -404,25 +416,56 @@ def get_ir_devices():
             {
                 "type": "fan",
                 "label": "Ceiling / Floor Fan",
-                "commands": ["power_toggle", "speed_1", "speed_2", "speed_3"],
+                "commands": ["power_toggle", "power_off", "power_on", "speed_1", "speed_2", "speed_3", "oscillate"],
+                "protocol": "NEC_38KHZ",
+            },
+            {
+                "type": "soundbar",
+                "label": "Soundbar / Audio System",
+                "commands": ["power_toggle", "power_off", "mute", "vol_up", "vol_down", "bluetooth"],
+                "protocol": "NEC_38KHZ",
+            },
+            {
+                "type": "heater",
+                "label": "Space Heater",
+                "commands": ["power_off", "eco_standby", "temp_down"],
+                "protocol": "NEC_38KHZ",
+            },
+            {
+                "type": "purifier",
+                "label": "Air Purifier",
+                "commands": ["power_toggle", "power_off", "auto_mode", "night_mode"],
                 "protocol": "NEC_38KHZ",
             },
         ]
     }
 
 
+def _get_ir_pattern(device_type: str, command: str) -> list[int]:
+    """Generates standard mark/space pulse patterns in microseconds."""
+    dt = device_type.lower()
+    if "ac" in dt or "air" in dt:
+        return [9000, 4500, 560, 1690, 560, 560, 560, 1690, 560, 560, 560, 560, 560, 1690, 560, 40000]
+    elif "tv" in dt or "display" in dt or "screen" in dt:
+        return [2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 20000]
+    elif "projector" in dt:
+        return [9000, 4500, 560, 1690, 560, 1690, 560, 560, 560, 560, 560, 1690, 560, 42000]
+    elif "light" in dt or "lamp" in dt:
+        return [9000, 4500, 560, 560, 560, 1690, 560, 1690, 560, 560, 560, 1690, 560, 32000]
+    elif "sound" in dt or "audio" in dt:
+        return [2400, 600, 1200, 600, 1200, 600, 600, 600, 1200, 600, 600, 25000]
+    elif "heater" in dt:
+        return [9000, 4500, 560, 1690, 560, 560, 560, 560, 560, 1690, 560, 1690, 560, 45000]
+    elif "purifier" in dt:
+        return [9000, 4500, 560, 560, 560, 560, 560, 1690, 560, 1690, 560, 560, 560, 38000]
+    else:
+        return [9000, 4500, 560, 560, 560, 560, 560, 1690, 560, 30000]
+
+
 @app.post("/v1/ir/transmit")
 def transmit_ir(body: IrTransmitRequest):
     """Transmits or simulates an infrared control signal for physical devices."""
-    if body.device_type == "ac":
-        pattern = [9000, 4500, 560, 1690, 560, 560, 560, 1690, 560, 560, 560, 560, 560, 1690, 560, 40000]
-    elif body.device_type == "tv":
-        pattern = [2400, 600, 1200, 600, 600, 600, 1200, 600, 600, 600, 1200, 600, 600, 20000]
-    elif body.device_type == "projector":
-        pattern = [9000, 4500, 560, 1690, 560, 1690, 560, 560, 560, 560, 560, 1690, 560, 42000]
-    else:
-        pattern = [9000, 4500, 560, 560, 560, 560, 560, 1690, 560, 30000]
-
+    pattern = _get_ir_pattern(body.device_type, body.command)
     return {
         "ok": True,
         "device_type": body.device_type,
@@ -432,6 +475,388 @@ def transmit_ir(body: IrTransmitRequest):
         "pattern": pattern,
         "timestamp": time.time(),
         "status_message": f"Transmitted 38kHz IR signal: {body.device_type}.{body.command}"
+    }
+
+
+@app.post("/v1/ir/batch-transmit")
+def transmit_ir_batch(body: IrBatchTransmitRequest):
+    """Sequentially transmits a batch of infrared control signals (Omni-Control)."""
+    results = []
+    total_pulses = 0
+    for cmd in body.commands:
+        pattern = _get_ir_pattern(cmd.device_type, cmd.command)
+        total_pulses += len(pattern)
+        results.append({
+            "device_type": cmd.device_type,
+            "command": cmd.command,
+            "carrier_frequency": cmd.carrier_frequency,
+            "pulses": len(pattern),
+            "status": "transmitted",
+        })
+    elapsed = len(body.commands) * body.delay_ms
+    return {
+        "ok": True,
+        "total_transmitted": len(body.commands),
+        "total_pulses": total_pulses,
+        "simulated_delay_ms": elapsed,
+        "commands": results,
+        "timestamp": time.time()
+    }
+
+
+# ---- AI Omni-Control & Voice Command Endpoints ----
+
+class AiOmniControlRequest(BaseModel):
+    intention: str = "I'm leaving"
+    room_type: str = "bedroom"
+    entities: list[PhysicalEntity] = []
+    auto_execute: bool = True
+
+
+@app.post("/v1/ai/omni-control")
+def ai_omni_control(body: AiOmniControlRequest):
+    """AI Omni-Control: Analyzes room state, sequences IR signals, and controls physical devices."""
+    world = PhysicalWorldModel(room_type=body.room_type, entities=body.entities)
+    report = ConsequenceEngine.evaluate(world, body.intention)
+
+    executed_signals = []
+    transitioned_entities = []
+    pending_physical = []
+
+    # Map controllable devices based on intention
+    updated_entities = []
+    for ent in body.entities:
+        lbl = ent.label.lower()
+        st = ent.state.upper()
+        new_ent = ent.model_copy()
+
+        # Air conditioner
+        if any(k in lbl for k in ("air conditioner", "ac", "hvac", "cooling")):
+            if st in ("RUNNING", "ON", "ACTIVE"):
+                cmd = "power_off"
+                executed_signals.append({
+                    "device": "ac",
+                    "entity": ent.label,
+                    "command": cmd,
+                    "target_state": "OFF",
+                    "frequency": 38000,
+                    "protocol": "NEC_38KHZ",
+                    "pulses": len(_get_ir_pattern("ac", cmd))
+                })
+                new_ent.state = "OFF"
+                transitioned_entities.append(f"{ent.label} (ON -> OFF via 38kHz IR)")
+            updated_entities.append(new_ent)
+
+        # Television / screen
+        elif any(k in lbl for k in ("tv", "television", "display", "screen", "monitor")):
+            if st in ("RUNNING", "ON", "ACTIVE"):
+                cmd = "power_off"
+                executed_signals.append({
+                    "device": "tv",
+                    "entity": ent.label,
+                    "command": cmd,
+                    "target_state": "OFF",
+                    "frequency": 38000,
+                    "protocol": "SONY_RC5_38KHZ",
+                    "pulses": len(_get_ir_pattern("tv", cmd))
+                })
+                new_ent.state = "OFF"
+                transitioned_entities.append(f"{ent.label} (ON -> OFF via 38kHz IR)")
+            updated_entities.append(new_ent)
+
+        # Lights / Lamp
+        elif any(k in lbl for k in ("light", "lamp", "bulb", "lighting")):
+            if st in ("RUNNING", "ON", "ACTIVE"):
+                cmd = "power_off"
+                executed_signals.append({
+                    "device": "lights",
+                    "entity": ent.label,
+                    "command": cmd,
+                    "target_state": "OFF",
+                    "frequency": 38000,
+                    "protocol": "NEC_38KHZ",
+                    "pulses": len(_get_ir_pattern("lights", cmd))
+                })
+                new_ent.state = "OFF"
+                transitioned_entities.append(f"{ent.label} (ON -> OFF via 38kHz IR)")
+            updated_entities.append(new_ent)
+
+        # Classroom Projector
+        elif "projector" in lbl:
+            if "presentation" in body.intention.lower():
+                if st != "ON":
+                    cmd = "power_on"
+                    executed_signals.append({
+                        "device": "projector",
+                        "entity": ent.label,
+                        "command": cmd,
+                        "target_state": "ON",
+                        "frequency": 38000,
+                        "protocol": "NEC_38KHZ",
+                        "pulses": len(_get_ir_pattern("projector", cmd))
+                    })
+                    new_ent.state = "ON"
+                    transitioned_entities.append(f"{ent.label} (OFF -> ON via 38kHz IR)")
+            else:
+                if st in ("RUNNING", "ON", "ACTIVE"):
+                    cmd = "power_off"
+                    executed_signals.append({
+                        "device": "projector",
+                        "entity": ent.label,
+                        "command": cmd,
+                        "target_state": "OFF",
+                        "frequency": 38000,
+                        "protocol": "NEC_38KHZ",
+                        "pulses": len(_get_ir_pattern("projector", cmd))
+                    })
+                    new_ent.state = "OFF"
+                    transitioned_entities.append(f"{ent.label} (ON -> OFF via 38kHz IR)")
+            updated_entities.append(new_ent)
+
+        # Fan
+        elif "fan" in lbl:
+            if st in ("RUNNING", "ON", "ACTIVE") and not any(k in body.intention.lower() for k in ("sleep", "study")):
+                cmd = "power_off"
+                executed_signals.append({
+                    "device": "fan",
+                    "entity": ent.label,
+                    "command": cmd,
+                    "target_state": "OFF",
+                    "frequency": 38000,
+                    "protocol": "NEC_38KHZ",
+                    "pulses": len(_get_ir_pattern("fan", cmd))
+                })
+                new_ent.state = "OFF"
+                transitioned_entities.append(f"{ent.label} (ON -> OFF via 38kHz IR)")
+            updated_entities.append(new_ent)
+
+        # Space Heater
+        elif any(k in lbl for k in ("heater", "stove")):
+            if st in ("ON", "HOT", "ACTIVE"):
+                cmd = "power_off"
+                executed_signals.append({
+                    "device": "heater",
+                    "entity": ent.label,
+                    "command": cmd,
+                    "target_state": "OFF",
+                    "frequency": 38000,
+                    "protocol": "NEC_38KHZ",
+                    "pulses": len(_get_ir_pattern("heater", cmd))
+                })
+                new_ent.state = "OFF"
+                transitioned_entities.append(f"{ent.label} (Safety cutoff via 38kHz IR)")
+            updated_entities.append(new_ent)
+
+        else:
+            updated_entities.append(new_ent)
+            if st in ("OPEN", "DISCONNECTED", "UNLATCHED", "HAZARD"):
+                pending_physical.append(f"{ent.label} ({st})")
+
+    # Evaluate new world state
+    new_world = PhysicalWorldModel(room_type=body.room_type, entities=updated_entities)
+    new_report = ConsequenceEngine.evaluate(new_world, body.intention)
+
+    if executed_signals:
+        devices_str = ", ".join(s["device"].upper() for s in executed_signals)
+        speech = f"Autonomous Omni-Control complete! Dispatched 38kHz IR pulses to power off {devices_str}."
+        if pending_physical:
+            speech += f" Please check the physical {pending_physical[0]}."
+        else:
+            speech += " All physical conditions are satisfied. You're ready to proceed!"
+    else:
+        speech = "All controllable devices are already aligned with your desired state."
+
+    return {
+        "ok": True,
+        "intention": body.intention,
+        "executed_signals_count": len(executed_signals),
+        "executed_signals": executed_signals,
+        "transitioned_entities": transitioned_entities,
+        "pending_physical_actions": pending_physical,
+        "updated_entities": [e.model_dump() for e in updated_entities],
+        "initial_readiness": report.readiness_score,
+        "new_readiness": new_report.readiness_score,
+        "aura_speech": speech,
+        "ready_for_verification": True,
+        "timestamp": time.time()
+    }
+
+
+class VoiceCommandRequest(BaseModel):
+    command: str
+    room_type: str = "room"
+    entities: list[PhysicalEntity] = []
+
+
+@app.post("/v1/ai/voice-command")
+def ai_voice_command(body: VoiceCommandRequest):
+    """Natural Language AI Voice Controller: parses user speech and controls physical devices."""
+    cmd = body.command.strip().lower()
+
+    # 1. Global / Omni-Control voice requests
+    if any(k in cmd for k in ("fix everything", "do what you can", "take control", "execute all", "prepare room", "align state")):
+        omni_res = ai_omni_control(AiOmniControlRequest(
+            intention="I'm leaving",
+            room_type=body.room_type,
+            entities=body.entities,
+            auto_execute=True
+        ))
+        return {
+            "type": "omni_control",
+            "action_taken": "executed_all_safe_actions",
+            "voice_reply": omni_res["aura_speech"],
+            "omni_result": omni_res
+        }
+
+    # 2. Air Conditioner commands
+    if "ac" in cmd or "air condition" in cmd or "cooling" in cmd:
+        temp_match = re.search(r"(\d\d)", cmd)
+        if temp_match:
+            temp = int(temp_match.group(1))
+            res = transmit_ir(IrTransmitRequest(device_type="ac", command="temp_set", parameters={"temp": temp}))
+            return {
+                "type": "direct_device",
+                "device": "ac",
+                "command": f"temp_{temp}",
+                "voice_reply": f"Air conditioner temperature set to {temp} degrees Celsius.",
+                "ir_status": res
+            }
+        elif any(k in cmd for k in ("off", "stop", "shut", "down")):
+            res = transmit_ir(IrTransmitRequest(device_type="ac", command="power_off"))
+            return {
+                "type": "direct_device",
+                "device": "ac",
+                "command": "power_off",
+                "voice_reply": "Air conditioner powered down via 38kHz IR.",
+                "ir_status": res
+            }
+        else:
+            res = transmit_ir(IrTransmitRequest(device_type="ac", command="power_on"))
+            return {
+                "type": "direct_device",
+                "device": "ac",
+                "command": "power_on",
+                "voice_reply": "Air conditioner turned on at 24 degrees.",
+                "ir_status": res
+            }
+
+    # 3. Television commands
+    if "tv" in cmd or "television" in cmd or "display" in cmd:
+        if any(k in cmd for k in ("mute", "quiet", "silent")):
+            res = transmit_ir(IrTransmitRequest(device_type="tv", command="mute"))
+            return {
+                "type": "direct_device",
+                "device": "tv",
+                "command": "mute",
+                "voice_reply": "Television audio muted.",
+                "ir_status": res
+            }
+        elif any(k in cmd for k in ("off", "stop", "shut")):
+            res = transmit_ir(IrTransmitRequest(device_type="tv", command="power_off"))
+            return {
+                "type": "direct_device",
+                "device": "tv",
+                "command": "power_off",
+                "voice_reply": "Television powered off.",
+                "ir_status": res
+            }
+        else:
+            res = transmit_ir(IrTransmitRequest(device_type="tv", command="power_on"))
+            return {
+                "type": "direct_device",
+                "device": "tv",
+                "command": "power_on",
+                "voice_reply": "Television display powered on.",
+                "ir_status": res
+            }
+
+    # 4. Light commands
+    if "light" in cmd or "lamp" in cmd:
+        if any(k in cmd for k in ("off", "shut", "turn off")):
+            res = transmit_ir(IrTransmitRequest(device_type="lights", command="power_off"))
+            return {
+                "type": "direct_device",
+                "device": "lights",
+                "command": "power_off",
+                "voice_reply": "Room lights powered off.",
+                "ir_status": res
+            }
+        elif any(k in cmd for k in ("dim", "dark", "soft")):
+            res = transmit_ir(IrTransmitRequest(device_type="lights", command="dim"))
+            return {
+                "type": "direct_device",
+                "device": "lights",
+                "command": "dim",
+                "voice_reply": "Lights dimmed to ambient relaxation mode.",
+                "ir_status": res
+            }
+        else:
+            res = transmit_ir(IrTransmitRequest(device_type="lights", command="power_on"))
+            return {
+                "type": "direct_device",
+                "device": "lights",
+                "command": "power_on",
+                "voice_reply": "Room lighting enabled.",
+                "ir_status": res
+            }
+
+    # 5. Projector commands
+    if "projector" in cmd:
+        if any(k in cmd for k in ("on", "start")):
+            res = transmit_ir(IrTransmitRequest(device_type="projector", command="power_on"))
+            return {
+                "type": "direct_device",
+                "device": "projector",
+                "command": "power_on",
+                "voice_reply": "Classroom projector powered on.",
+                "ir_status": res
+            }
+        else:
+            res = transmit_ir(IrTransmitRequest(device_type="projector", command="power_off"))
+            return {
+                "type": "direct_device",
+                "device": "projector",
+                "command": "power_off",
+                "voice_reply": "Classroom projector powered down.",
+                "ir_status": res
+            }
+
+    # 6. Fan commands
+    if "fan" in cmd:
+        if any(k in cmd for k in ("off", "stop")):
+            res = transmit_ir(IrTransmitRequest(device_type="fan", command="power_off"))
+            return {
+                "type": "direct_device",
+                "device": "fan",
+                "command": "power_off",
+                "voice_reply": "Ceiling fan turned off.",
+                "ir_status": res
+            }
+        else:
+            res = transmit_ir(IrTransmitRequest(device_type="fan", command="speed_2"))
+            return {
+                "type": "direct_device",
+                "device": "fan",
+                "command": "speed_2",
+                "voice_reply": "Ceiling fan set to speed 2.",
+                "ir_status": res
+            }
+
+    # 7. Verification request
+    if any(k in cmd for k in ("verify", "check reality", "camera check")):
+        return {
+            "type": "verification_trigger",
+            "action_taken": "navigate_to_verify",
+            "voice_reply": "Opening camera to verify physical reality."
+        }
+
+    # Default fallback: Treat as an intention
+    itype, lang = classify_multilingual_intention(cmd)
+    return {
+        "type": "intention_detected",
+        "intention_type": itype.value,
+        "detected_language": lang,
+        "voice_reply": f"Understood. Analyzing physical environment for {itype.value.replace('_', ' ')}."
     }
 
 

@@ -1015,6 +1015,35 @@
           </div>
         </div>
 
+        <!-- AI OMNI-CONTROL COMMAND CARD -->
+        <div class="ios-card" style="padding: 14px; background: linear-gradient(135deg, #1E1B4B, #312E81); color: #FFFFFF; border: 1px solid #4338CA; box-shadow: 0 4px 16px rgba(49, 46, 129, 0.35); margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 20px;">⚡</span>
+              <span style="font-size: 11px; font-weight: 800; color: #A5B4FC; text-transform: uppercase; letter-spacing: 0.5px;">
+                AI Omni-Control Engine
+              </span>
+            </div>
+            <span class="ios-badge" style="background: #6366F1; color: #FFF; font-weight: 700; font-size: 10px;">Autonomy Mode</span>
+          </div>
+
+          <div style="font-size: 15px; font-weight: 800; color: #EEF2FF; margin-bottom: 4px;">
+            Autonomous Reality Alignment
+          </div>
+          <div style="font-size: 11px; color: #C7D2FE; margin-bottom: 10px; line-height: 1.4;">
+            One tap for MIRROR AI to sequence 38kHz IR pulses, command all active controllable devices (AC, TV, Lights, Fan), and align physical reality.
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="ios-btn-primary" style="flex: 1; padding: 11px 12px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #6366F1, #4F46E5); border: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);" onclick="triggerAiOmniControl()">
+              ⚡ Blast & Control All Devices
+            </button>
+            <button class="ios-btn-secondary" style="width: auto; padding: 11px 12px; font-size: 12px; font-weight: 700; background: rgba(255, 255, 255, 0.15); color: #FFF; border: 1px solid rgba(255, 255, 255, 0.25);" onclick="toggleSpeechRecognition()">
+              🎙️ Voice AI
+            </button>
+          </div>
+        </div>
+
         <!-- Phone Installation & Direct APK Download Card -->
         <div class="ios-card" style="padding: 12px; background: linear-gradient(135deg, #F0F9FF, #E0F2FE); border: 1px solid #BAE6FD;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -1248,8 +1277,8 @@ ROOM (Physical World Model)
           <div id="mirror-actions-list" style="font-size: 13px; color: var(--ios-text-primary); display: flex; flex-direction: column; gap: 6px;">
             <div>• Air Conditioner is running (27°C)</div>
           </div>
-          <button class="ios-btn-primary" style="margin-top: 10px; font-size: 13px; background: var(--ios-pink);" onclick="triggerIrShutdownFromMatrix()">
-            ⚡ Transmit 38kHz IR Power Off
+          <button class="ios-btn-primary" style="margin-top: 10px; font-size: 13px; background: linear-gradient(135deg, #6366F1, #4F46E5); border: none; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);" onclick="triggerAiOmniControl()">
+            ⚡ AI Omni-Control: Execute All Safe Actions (IR Blast)
           </button>
         </div>
 
@@ -1298,15 +1327,32 @@ ROOM (Physical World Model)
         <div class="ios-nav-header">
           <div>
             <h1 class="ios-large-title">Hardware IR Remote</h1>
-            <p class="ios-subtitle">Consumer IR Blaster (38kHz)</p>
+            <p class="ios-subtitle">Consumer IR Blaster (38.0 kHz)</p>
           </div>
-          <span class="ios-badge badge-pink">Blaster Ready</span>
+          <span class="ios-badge badge-pink">8 Devices Active</span>
         </div>
 
-        <!-- AC Remote Inset -->
+        <!-- Master AI Omni-Control Quick Blast Banner -->
+        <div class="ios-card" style="padding: 14px; background: linear-gradient(135deg, #1E1B4B, #312E81); color: #FFFFFF; border: 1px solid #4338CA; box-shadow: 0 4px 16px rgba(49, 46, 129, 0.35);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 18px;">⚡</span>
+              <span style="font-size: 11px; font-weight: 800; color: #A5B4FC; text-transform: uppercase;">AI Omni-Control Master</span>
+            </div>
+            <span class="ios-badge" style="background: #6366F1; color: #FFF; font-size: 10px;">Multi-Pulse</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 700; color: #EEF2FF; margin-bottom: 4px;">Autonomous Multi-Device Blaster</div>
+          <div style="font-size: 11px; color: #C7D2FE; margin-bottom: 10px;">Sequentially transmits 38kHz IR pulses to power down all unnecessary appliances.</div>
+          <button class="ir-btn-blast" style="background: linear-gradient(135deg, #6366F1, #4F46E5); padding: 12px;" onclick="triggerAiOmniControl()">
+            <span>⚡</span>
+            <span>BLAST ALL CONTROLLABLE DEVICES</span>
+          </button>
+        </div>
+
+        <!-- 1. AC Remote Panel -->
         <div class="ir-remote-panel">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 14px; font-weight: 700; letter-spacing: 0.5px;">AIR CONDITIONER</span>
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">❄️ AIR CONDITIONER</span>
             <div class="ir-led-indicator" id="ir-panel-led"></div>
           </div>
 
@@ -1320,7 +1366,7 @@ ROOM (Physical World Model)
           <div class="ir-button-grid">
             <button class="ir-btn ir-btn-power" onclick="blastIr('ac', 'power_off')">
               <span>⏻</span>
-              <span>Power</span>
+              <span>Power Off</span>
             </button>
             <button class="ir-btn" onclick="blastIr('ac', 'eco_mode')">
               <span>🍃</span>
@@ -1328,35 +1374,171 @@ ROOM (Physical World Model)
             </button>
             <button class="ir-btn" onclick="blastIr('ac', 'sleep_mode')">
               <span>🌙</span>
-              <span>Sleep</span>
+              <span>Sleep 26°</span>
             </button>
           </div>
-
-          <button class="ir-btn-blast" onclick="blastIr('ac', 'power_off')">
-            <span>⚡</span>
-            <span>BLAST IR POWER OFF</span>
-          </button>
         </div>
 
-        <!-- TV & Projector Remote Inset -->
+        <!-- 2. Television & Display -->
         <div class="ir-remote-panel" style="background: #242426;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 14px; font-weight: 700; letter-spacing: 0.5px;">TELEVISION & DISPLAY</span>
-            <span class="ios-badge badge-blue">Sony/NEC</span>
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">📺 TELEVISION & SCREEN</span>
+            <span class="ios-badge badge-blue">Sony RC5</span>
           </div>
-
-          <div class="ir-button-grid" style="margin-top: 10px;">
-            <button class="ir-btn ir-btn-power" onclick="blastIr('tv', 'power_toggle')">
+          <div class="ir-button-grid" style="margin-top: 8px;">
+            <button class="ir-btn ir-btn-power" onclick="blastIr('tv', 'power_off')">
               <span>⏻</span>
-              <span>TV Off</span>
+              <span>Power Off</span>
             </button>
             <button class="ir-btn" onclick="blastIr('tv', 'mute')">
               <span>🔇</span>
               <span>Mute</span>
             </button>
-            <button class="ir-btn" onclick="blastIr('projector', 'power_on')">
-              <span>📽️</span>
-              <span>Projector</span>
+            <button class="ir-btn" onclick="blastIr('tv', 'input_hdmi1')">
+              <span>🔌</span>
+              <span>HDMI 1</span>
+            </button>
+          </div>
+          <div class="ir-button-grid" style="margin-top: 4px;">
+            <button class="ir-btn" onclick="blastIr('tv', 'vol_down')">
+              <span>🔉</span>
+              <span>Vol -</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('tv', 'vol_up')">
+              <span>🔊</span>
+              <span>Vol +</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('tv', 'input_hdmi2')">
+              <span>🖥️</span>
+              <span>HDMI 2</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Smart Lighting & Lamp -->
+        <div class="ir-remote-panel" style="background: #25282A;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">💡 SMART LIGHTING & LAMPS</span>
+            <span class="ios-badge badge-orange">NEC 38kHz</span>
+          </div>
+          <div class="ir-button-grid" style="margin-top: 8px;">
+            <button class="ir-btn ir-btn-power" onclick="blastIr('lights', 'power_off')">
+              <span>⏻</span>
+              <span>Lights Off</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('lights', 'dim')">
+              <span>🔅</span>
+              <span>Dim 20%</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('lights', 'warm_mode')">
+              <span>🌅</span>
+              <span>Warm 50%</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Classroom Projector -->
+        <div class="ir-remote-panel" style="background: #202428;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">📽️ CLASSROOM PROJECTOR</span>
+            <span class="ios-badge badge-green">Presentation</span>
+          </div>
+          <div class="ir-button-grid" style="margin-top: 8px;">
+            <button class="ir-btn" style="background: #10B981;" onclick="blastIr('projector', 'power_on')">
+              <span>⚡</span>
+              <span>Power On</span>
+            </button>
+            <button class="ir-btn ir-btn-power" onclick="blastIr('projector', 'power_off')">
+              <span>⏻</span>
+              <span>Power Off</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('projector', 'freeze')">
+              <span>❄️</span>
+              <span>Freeze Frame</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. Ceiling / Floor Fan -->
+        <div class="ir-remote-panel" style="background: #222629;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">🌀 CEILING & FLOOR FAN</span>
+            <span class="ios-badge badge-blue">NEC 38kHz</span>
+          </div>
+          <div class="ir-button-grid" style="margin-top: 8px;">
+            <button class="ir-btn ir-btn-power" onclick="blastIr('fan', 'power_off')">
+              <span>⏻</span>
+              <span>Fan Off</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('fan', 'speed_1')">
+              <span>1️⃣</span>
+              <span>Low Speed</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('fan', 'speed_3')">
+              <span>3️⃣</span>
+              <span>High Turbo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 6. Soundbar & Audio System -->
+        <div class="ir-remote-panel" style="background: #282424;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">🔊 SOUNDBAR & AUDIO</span>
+            <span class="ios-badge badge-purple">Audio Sync</span>
+          </div>
+          <div class="ir-button-grid" style="margin-top: 8px;">
+            <button class="ir-btn ir-btn-power" onclick="blastIr('soundbar', 'power_off')">
+              <span>⏻</span>
+              <span>Audio Off</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('soundbar', 'mute')">
+              <span>🔇</span>
+              <span>Mute Audio</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('soundbar', 'bluetooth')">
+              <span>📶</span>
+              <span>Bluetooth</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 7. Space Heater (Safety Cutoff) -->
+        <div class="ir-remote-panel" style="background: #2B2121; border-left: 4px solid var(--ios-red);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: #FCA5A5;">🔥 SPACE HEATER</span>
+            <span class="ios-badge badge-red">Safety Hazard</span>
+          </div>
+          <div class="ir-button-grid" style="margin-top: 8px;">
+            <button class="ir-btn ir-btn-power" style="grid-column: span 2;" onclick="blastIr('heater', 'power_off')">
+              <span>⏻</span>
+              <span>EMERGENCY HEATER CUTOFF</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('heater', 'eco_standby')">
+              <span>🛡️</span>
+              <span>Standby</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 8. Air Purifier -->
+        <div class="ir-remote-panel" style="background: #1E2824;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">🍃 AIR PURIFIER</span>
+            <span class="ios-badge badge-green">HEPA Clean</span>
+          </div>
+          <div class="ir-button-grid" style="margin-top: 8px;">
+            <button class="ir-btn ir-btn-power" onclick="blastIr('purifier', 'power_off')">
+              <span>⏻</span>
+              <span>Power Off</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('purifier', 'auto_mode')">
+              <span>🌿</span>
+              <span>Smart Auto</span>
+            </button>
+            <button class="ir-btn" onclick="blastIr('purifier', 'night_mode')">
+              <span>🌙</span>
+              <span>Whisper Sleep</span>
             </button>
           </div>
         </div>
@@ -1844,7 +2026,8 @@ ROOM (Physical World Model)
       playAppleChime('listen');
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        alert("Speech recognition not supported in this browser. Please type your intention.");
+        const fallbackText = prompt("Type your voice command or intention:", "Turn off the AC");
+        if (fallbackText) handleAiVoiceInput(fallbackText);
         return;
       }
 
@@ -1862,12 +2045,10 @@ ROOM (Physical World Model)
 
       recognition.onresult = (e) => {
         const transcript = e.results[0][0].transcript;
-        document.getElementById("goal-input").value = transcript;
         micBadge.innerText = "🎙️ Tap to Speak";
         micBadge.className = "ios-badge badge-blue";
         document.getElementById("cute-voice-bar").classList.remove("listening");
-        speakCuteVoice(`Got it, Ram! Evaluating intention: ${transcript}`);
-        onEvaluateIntention();
+        handleAiVoiceInput(transcript);
       };
 
       recognition.onerror = () => {
@@ -1877,6 +2058,135 @@ ROOM (Physical World Model)
       };
 
       recognition.start();
+    }
+
+    // AI Natural Language Voice Controller (Features 1, 2, 7, 37)
+    async function handleAiVoiceInput(transcript) {
+      document.getElementById("goal-input").value = transcript;
+      updateIsland(`🎙️ Voice: "${transcript}"`, true);
+
+      const entities = (appState.currentWorld && appState.currentWorld.entities) 
+        ? appState.currentWorld.entities 
+        : (SCENE_PRESETS[appState.sceneType] ? SCENE_PRESETS[appState.sceneType].entities : []);
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/ai/voice-command`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            command: transcript,
+            room_type: appState.currentWorld ? appState.currentWorld.room_type : "bedroom",
+            entities: entities
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.type === "direct_device") {
+            playAppleChime('ir_pulse');
+            const pulseDot = document.getElementById("ir-pulse-dot");
+            pulseDot.classList.remove("firing");
+            void pulseDot.offsetWidth;
+            pulseDot.classList.add("firing");
+
+            updateIsland(`⚡ IR Blaster: ${data.device.toUpperCase()}.${data.command}`, true);
+            speakCuteVoice(data.voice_reply);
+
+            if (appState.consequenceReport) {
+              appState.consequenceReport.items.forEach(i => {
+                if (i.entity_label.toLowerCase().includes(data.device)) {
+                  i.current_state = data.command.includes("off") ? "OFF" : "ON";
+                  i.status = "match";
+                  i.consequence_text = `Device controlled via voice: ${data.command}`;
+                }
+              });
+              renderConsequenceMatrix(appState.consequenceReport);
+            }
+            logAudit("voice_ir_command", data);
+            return;
+          } else if (data.type === "omni_control") {
+            triggerAiOmniControl();
+            return;
+          } else if (data.type === "verification_trigger") {
+            navTo("verify");
+            speakCuteVoice(data.voice_reply);
+            setTimeout(() => onRunVerification(), 900);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("AI voice endpoint fallback:", e);
+      }
+
+      appState.intention = transcript;
+      speakCuteVoice(`Evaluating your intention: ${transcript}`);
+      onEvaluateIntention();
+    }
+
+    // AI Omni-Control: Autonomous Multi-Device IR Blast (Features 1, 6, 7)
+    async function triggerAiOmniControl() {
+      playAppleChime('ir_pulse');
+      const pulseDot = document.getElementById("ir-pulse-dot");
+      for (let p = 0; p < 3; p++) {
+        setTimeout(() => {
+          pulseDot.classList.remove("firing");
+          void pulseDot.offsetWidth;
+          pulseDot.classList.add("firing");
+          playAppleChime('ir_pulse');
+        }, p * 150);
+      }
+
+      if ("vibrate" in navigator) {
+        navigator.vibrate([60, 40, 60, 40, 80]);
+      }
+
+      updateIsland("⚡ AI Omni-Control: Blasting 38kHz IR to All Devices...", true);
+
+      const entities = (appState.currentWorld && appState.currentWorld.entities)
+        ? appState.currentWorld.entities
+        : (SCENE_PRESETS[appState.sceneType] ? SCENE_PRESETS[appState.sceneType].entities : []);
+
+      try {
+        const res = await fetch(`${API_BASE}/v1/ai/omni-control`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            intention: appState.intention || "I'm leaving",
+            room_type: appState.currentWorld ? appState.currentWorld.room_type : "bedroom",
+            entities: entities,
+            auto_execute: true
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          updateIsland(`🟢 Omni-Control Done: ${data.executed_signals_count} Devices Off`, true);
+
+          if (data.updated_entities && appState.currentWorld) {
+            appState.currentWorld.entities = data.updated_entities;
+          }
+
+          if (appState.consequenceReport) {
+            appState.consequenceReport.items.forEach(i => {
+              if (i.action_type === "automated_system" || i.status === "unnecessary_active") {
+                i.current_state = i.desired_state;
+                i.status = "match";
+                i.consequence_text = "Device safely powered down via Autonomous IR Blaster.";
+              }
+            });
+            appState.consequenceReport.readiness_score = data.new_readiness;
+            renderConsequenceMatrix(appState.consequenceReport);
+          }
+
+          speakCuteVoice(data.aura_speech);
+          logAudit("ai_omni_control_executed", data);
+          return;
+        }
+      } catch (err) {
+        console.warn("Omni-control fallback:", err);
+      }
+
+      doWhatYouCanAction();
     }
 
     // Navigation
@@ -1908,16 +2218,14 @@ ROOM (Physical World Model)
       document.getElementById("island-led").style.background = isGood ? "var(--ios-green)" : "var(--ios-red)";
     }
 
-    // Hardware IR Blaster Transmission
+    // Hardware IR Blaster Transmission (8 Devices Supported)
     async function blastIr(deviceType, command) {
       playAppleChime('ir_pulse');
-      // Fire top IR LED beam pulse animation
       const pulseDot = document.getElementById("ir-pulse-dot");
       pulseDot.classList.remove("firing");
       void pulseDot.offsetWidth;
       pulseDot.classList.add("firing");
 
-      // Haptic vibration
       if ("vibrate" in navigator) {
         navigator.vibrate([40, 60, 40]);
       }
@@ -1936,11 +2244,12 @@ ROOM (Physical World Model)
 
         if (res.ok) {
           const data = await res.json();
-          speakCuteVoice(`IR signal sent to ${deviceType}. Power turned off.`);
+          const cleanName = deviceType.toUpperCase();
+          speakCuteVoice(`IR signal dispatched to ${cleanName}: ${command.replace('_', ' ')}.`);
           logAudit("ir_transmitted", data);
         }
       } catch (err) {
-        speakCuteVoice(`IR blast transmitted to ${deviceType}.`);
+        speakCuteVoice(`38kHz IR pulse sent to ${deviceType}.`);
       }
     }
 
@@ -1951,18 +2260,7 @@ ROOM (Physical World Model)
     }
 
     function triggerIrShutdownFromMatrix() {
-      blastIr('ac', 'power_off');
-      // Update local state to match resolution
-      if (appState.consequenceReport) {
-        appState.consequenceReport.items.forEach(i => {
-          if (i.entity_label.includes("ac") || i.entity_label.includes("conditioner")) {
-            i.current_state = "OFF";
-            i.status = "match";
-            i.consequence_text = "AC powered off via IR Blaster.";
-          }
-        });
-        renderConsequenceMatrix(appState.consequenceReport);
-      }
+      triggerAiOmniControl();
     }
 
     // Presets

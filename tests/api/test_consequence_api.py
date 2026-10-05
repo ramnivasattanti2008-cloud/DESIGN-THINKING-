@@ -260,3 +260,85 @@ def test_failure_recovery_endpoint():
     assert "window" in data["failed_entity"].lower()
     assert len(data["possible_causes"]) > 0
 
+
+def test_ir_devices_expanded_catalog():
+    res = client.get("/v1/ir/devices")
+    assert res.status_code == 200
+    devices = res.json()["devices"]
+    types = [d["type"] for d in devices]
+    assert "ac" in types
+    assert "tv" in types
+    assert "lights" in types
+    assert "projector" in types
+    assert "fan" in types
+    assert "soundbar" in types
+    assert "heater" in types
+    assert "purifier" in types
+    assert len(devices) == 8
+
+
+def test_ir_batch_transmit():
+    payload = {
+        "commands": [
+            {"device_type": "ac", "command": "power_off"},
+            {"device_type": "tv", "command": "power_off"},
+            {"device_type": "lights", "command": "power_off"}
+        ],
+        "delay_ms": 100
+    }
+    res = client.post("/v1/ir/batch-transmit", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["ok"] is True
+    assert data["total_transmitted"] == 3
+    assert len(data["commands"]) == 3
+    assert data["total_pulses"] > 0
+
+
+def test_ai_omni_control_execution():
+    payload = {
+        "intention": "I'm leaving",
+        "room_type": "bedroom",
+        "entities": [
+            {"label": "air conditioner", "state": "RUNNING", "confidence": 0.95, "is_device": True},
+            {"label": "television", "state": "ON", "confidence": 0.92, "is_device": True},
+            {"label": "window", "state": "OPEN", "confidence": 0.98, "is_device": False}
+        ],
+        "auto_execute": True
+    }
+    res = client.post("/v1/ai/omni-control", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["ok"] is True
+    assert data["executed_signals_count"] == 2
+    assert len(data["transitioned_entities"]) == 2
+    assert any("window" in p.lower() for p in data["pending_physical_actions"])
+    assert data["ready_for_verification"] is True
+    assert "aura_speech" in data
+    assert "power off" in data["aura_speech"].lower()
+
+
+def test_ai_voice_command_controls():
+    # AC temp set
+    res_ac = client.post("/v1/ai/voice-command", json={"command": "Set AC to 22 degrees"})
+    assert res_ac.status_code == 200
+    assert res_ac.json()["device"] == "ac"
+    assert "22" in res_ac.json()["voice_reply"]
+
+    # TV mute
+    res_tv = client.post("/v1/ai/voice-command", json={"command": "Mute the TV please"})
+    assert res_tv.status_code == 200
+    assert res_tv.json()["device"] == "tv"
+    assert "muted" in res_tv.json()["voice_reply"]
+
+    # Omni-control trigger
+    res_omni = client.post("/v1/ai/voice-command", json={
+        "command": "Fix everything and take control",
+        "entities": [
+            {"label": "air conditioner", "state": "RUNNING", "confidence": 0.95, "is_device": True}
+        ]
+    })
+    assert res_omni.status_code == 200
+    assert res_omni.json()["type"] == "omni_control"
+
+
