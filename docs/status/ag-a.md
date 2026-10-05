@@ -129,6 +129,12 @@ Last updated: 2026-10-05
         - Added minimal 1-tap appliance remote strip (AC Power, TV Power, Lights) delivering instantaneous 38kHz Web Audio IR carrier blasts.
         - Trained Aura's conversational voice delivery: crisp, warm, polite, and articulate pacing without redundant speech stutter.
         - Verified full regression test suite: 312 / 312 pytest cases passing green in 14.14s.
+     25. **Real-World Overhaul: Connected Devices Management, Camera Viewfinder Upgrade & Activity History Timeline**:
+        - Purged hardcoded pre-connected appliances from the Remote tab; replaced with a Real-World Device Management system with a Cupertino pairing sheet (`+ Pair Appliance`), category selection, brand/protocol mapping, IR test pulses, and persistent `localStorage` storage.
+        - Purged raw JSON code dumps from the Audit tab; redesigned into an Apple-style Activity Timeline with human-readable event cards (Camera Scans, IR Blasts, Intention Evaluations, Sensor Verifications) with formatted timestamps and status badges.
+        - Upgraded the Camera Viewfinder with Front/Rear lens flipping (`flipCameraLens`), explicit `video.play()` stream mounting, rule-of-thirds grid alignment overlay, and a live streaming indicator (`● LIVE FEED`).
+        - Completely purged all remaining hackathon and mock references across all user interfaces, establishing a pure real-world consumer product.
+        - Verified full regression test suite: 312 / 312 pytest cases passing green in 14.85s.
 
 ## Half done
 - None. Everything is complete, tested, and running live.

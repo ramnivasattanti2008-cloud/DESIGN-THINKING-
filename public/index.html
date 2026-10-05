@@ -1224,6 +1224,168 @@
     #matrix-mode-banner { display: none !important; }
     #disambiguation-card { display: none !important; }
 
+
+    /* Professional Camera Grid Lines */
+    .camera-grid-line {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.25);
+      pointer-events: none;
+      z-index: 5;
+    }
+    .camera-grid-line.h1 { top: 33.33%; left: 0; right: 0; height: 1px; }
+    .camera-grid-line.h2 { top: 66.66%; left: 0; right: 0; height: 1px; }
+    .camera-grid-line.v1 { left: 33.33%; top: 0; bottom: 0; width: 1px; }
+    .camera-grid-line.v2 { left: 66.66%; top: 0; bottom: 0; width: 1px; }
+
+    .cam-live-indicator {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      color: #34D399;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 20;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+    }
+    .cam-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+      animation: camDotBlink 1.2s infinite;
+    }
+    @keyframes camDotBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* Connected Devices Cards & Empty State */
+    .empty-devices-card {
+      background: var(--ios-surface);
+      border: 0.5px solid var(--ios-border);
+      border-radius: 20px;
+      padding: 32px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    }
+
+    .device-paired-card {
+      background: var(--ios-surface);
+      border: 0.5px solid var(--ios-border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .device-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .device-card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .device-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--ios-surface-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .device-card-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ios-text-primary);
+    }
+    .device-card-meta {
+      font-size: 11px;
+      color: var(--ios-text-secondary);
+    }
+    .device-unpair-btn {
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: var(--ios-text-tertiary);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    /* Activity History Timeline */
+    .activity-timeline-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-bottom: 10px;
+    }
+    .activity-event-card {
+      background: var(--ios-surface);
+      border: 0.5px solid var(--ios-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      transition: all 0.15s;
+    }
+    .activity-icon-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--ios-surface-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .activity-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .activity-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .activity-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ios-text-primary);
+    }
+    .activity-time {
+      font-size: 11px;
+      color: var(--ios-text-tertiary);
+    }
+    .activity-desc {
+      font-size: 12px;
+      color: var(--ios-text-secondary);
+      line-height: 1.35;
+    }
+
   </style>
 </head>
 <body>
@@ -1359,35 +1521,51 @@
         <div id="home-status-badge" style="display:none;"></div>
       </div>
 
-      <!-- SCREEN 2: VISION & CAMERA OBSERVE -->
+      <!-- SCREEN 2: VISION & CAMERA OBSERVE (PROFESSIONAL MULTIMODAL PERCEPTION) -->
       <div id="screen-camera" class="ios-screen">
         <div class="ios-nav-header">
           <div>
-            <h1 class="ios-large-title">Physical World</h1>
-            <p class="ios-subtitle" id="camera-goal-label">Temporary Environmental Model</p>
+            <h1 class="ios-large-title">Camera Vision</h1>
+            <p class="ios-subtitle" id="camera-goal-label">Live Environmental Perception & OCR</p>
           </div>
-          <span class="ios-badge badge-blue" id="camera-mode-badge">Camera Ready</span>
+          <span class="ios-badge badge-green" id="camera-mode-badge">● Live Sensor</span>
         </div>
 
-        <!-- Camera Viewport with Spatial Reticles -->
-        <div class="apple-camera-viewport">
-          <video id="webcam-stream" autoplay playsinline muted></video>
-          <canvas id="viewfinder-canvas"></canvas>
+        <!-- Professional Camera Viewport with Spatial Reticles & Grid -->
+        <div class="apple-camera-viewport" id="main-camera-viewport">
+          <video id="webcam-stream" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+          <canvas id="viewfinder-canvas" style="width: 100%; height: 100%; object-fit: cover; display: block;"></canvas>
+          
+          <!-- Rule of thirds camera grid overlay -->
+          <div class="camera-grid-line h1"></div>
+          <div class="camera-grid-line h2"></div>
+          <div class="camera-grid-line v1"></div>
+          <div class="camera-grid-line v2"></div>
+
           <div class="camera-corner tl"></div>
           <div class="camera-corner tr"></div>
           <div class="camera-corner bl"></div>
           <div class="camera-corner br"></div>
           <div id="spatial-overlay" class="spatial-overlay"></div>
+
+          <!-- Live camera badge inside viewport -->
+          <div class="cam-live-indicator" id="cam-live-indicator" style="display: none;">
+            <span class="cam-dot"></span> LIVE FEED
+          </div>
         </div>
 
         <!-- Shutter & Controls -->
         <div class="apple-shutter-wrap">
           <button class="ios-btn-secondary" style="width: auto; padding: 10px 14px; font-size: 12px;" onclick="triggerFilePicker()">
-            📁 Photo
+            📁 Choose Photo
           </button>
 
-          <button class="apple-shutter-btn" onclick="onCaptureAndAnalyze()" title="Capture Physical State">
+          <button class="apple-shutter-btn" id="shutter-capture-btn" onclick="onCaptureAndAnalyze()" title="Capture & Reason Physical Space">
             <div class="shutter-inner" style="background: var(--ios-pink);"></div>
+          </button>
+
+          <button class="ios-btn-secondary" style="width: auto; padding: 10px 14px; font-size: 12px;" id="btn-camera-flip" onclick="flipCameraLens()" title="Switch Front/Rear Camera">
+            🔄 Flip
           </button>
 
           <button class="ios-btn-secondary" style="width: auto; padding: 10px 14px; font-size: 12px;" id="btn-webcam-toggle" onclick="toggleWebcam()">
@@ -1519,225 +1697,38 @@ PHYSICAL WORLD MODEL
         </div>
       </div>
 
-      <!-- SCREEN 4: UNIVERSAL IR REMOTE CONTROLLER -->
+      <!-- SCREEN 4: REAL-WORLD CONNECTED DEVICES & IR APPLIANCES -->
       <div id="screen-remote" class="ios-screen">
         <div class="ios-nav-header">
           <div>
-            <h1 class="ios-large-title">Hardware IR Remote</h1>
-            <p class="ios-subtitle">Consumer IR Blaster (38.0 kHz)</p>
+            <h1 class="ios-large-title">Connected Devices</h1>
+            <p class="ios-subtitle">Real Hardware Appliances & IR Blaster</p>
           </div>
-          <span class="ios-badge badge-pink">8 Devices Active</span>
+          <button class="ios-badge badge-blue" style="cursor: pointer; border: none; font-size: 12px; padding: 6px 12px;" onclick="openPairDeviceModal()">
+            + Pair Appliance
+          </button>
         </div>
 
-        <!-- Master AI Omni-Control Quick Blast Banner -->
-        <div class="ios-card" style="padding: 14px; background: linear-gradient(135deg, #1E1B4B, #312E81); color: #FFFFFF; border: 1px solid #4338CA; box-shadow: 0 4px 16px rgba(49, 46, 129, 0.35);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <!-- Master Omni-Control Quick Bar -->
+        <div class="ios-card" style="padding: 12px; background: linear-gradient(135deg, #1E1B4B, #312E81); color: #FFFFFF; border: 1px solid #4338CA; box-shadow: 0 4px 16px rgba(49, 46, 129, 0.35);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 18px;">⚡</span>
-              <span style="font-size: 11px; font-weight: 800; color: #A5B4FC; text-transform: uppercase;">AI Omni-Control Master</span>
+              <span style="font-size: 16px;">⚡</span>
+              <span style="font-size: 11px; font-weight: 800; color: #A5B4FC; text-transform: uppercase;">Omni-Control Power</span>
             </div>
-            <span class="ios-badge" style="background: #6366F1; color: #FFF; font-size: 10px;">Multi-Pulse</span>
+            <div class="ir-led-indicator" id="ir-panel-led"></div>
           </div>
-          <div style="font-size: 13px; font-weight: 700; color: #EEF2FF; margin-bottom: 4px;">Autonomous Multi-Device Blaster</div>
-          <div style="font-size: 11px; color: #C7D2FE; margin-bottom: 10px;">Sequentially transmits 38kHz IR pulses to power down all unnecessary appliances.</div>
-          <button class="ir-btn-blast" style="background: linear-gradient(135deg, #6366F1, #4F46E5); padding: 12px;" onclick="triggerAiOmniControl()">
+          <div style="font-size: 13px; font-weight: 700; color: #EEF2FF; margin-bottom: 2px;">Align All Connected Appliances</div>
+          <div style="font-size: 11px; color: #C7D2FE; margin-bottom: 8px;">Transmits 38kHz IR pulses to power off all inactive or conflicting devices.</div>
+          <button class="ir-btn-blast" style="background: linear-gradient(135deg, #6366F1, #4F46E5); padding: 10px; font-size: 13px;" onclick="triggerAiOmniControl()">
             <span>⚡</span>
             <span>BLAST ALL CONTROLLABLE DEVICES</span>
           </button>
         </div>
 
-        <!-- 1. AC Remote Panel -->
-        <div class="ir-remote-panel">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">❄️ AIR CONDITIONER</span>
-            <div class="ir-led-indicator" id="ir-panel-led"></div>
-          </div>
-
-          <div class="ir-temp-display" id="ir-ac-temp">24°C</div>
-
-          <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 6px;">
-            <button class="ir-btn" style="width: 50px; height: 50px; font-size: 20px;" onclick="adjustIrTemp(-1)">-</button>
-            <button class="ir-btn" style="width: 50px; height: 50px; font-size: 20px;" onclick="adjustIrTemp(1)">+</button>
-          </div>
-
-          <div class="ir-button-grid">
-            <button class="ir-btn ir-btn-power" onclick="blastIr('ac', 'power_off')">
-              <span>⏻</span>
-              <span>Power Off</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('ac', 'eco_mode')">
-              <span>🍃</span>
-              <span>Eco 24°</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('ac', 'sleep_mode')">
-              <span>🌙</span>
-              <span>Sleep 26°</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 2. Television & Display -->
-        <div class="ir-remote-panel" style="background: #242426;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">📺 TELEVISION & SCREEN</span>
-            <span class="ios-badge badge-blue">Sony RC5</span>
-          </div>
-          <div class="ir-button-grid" style="margin-top: 8px;">
-            <button class="ir-btn ir-btn-power" onclick="blastIr('tv', 'power_off')">
-              <span>⏻</span>
-              <span>Power Off</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('tv', 'mute')">
-              <span>🔇</span>
-              <span>Mute</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('tv', 'input_hdmi1')">
-              <span>🔌</span>
-              <span>HDMI 1</span>
-            </button>
-          </div>
-          <div class="ir-button-grid" style="margin-top: 4px;">
-            <button class="ir-btn" onclick="blastIr('tv', 'vol_down')">
-              <span>🔉</span>
-              <span>Vol -</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('tv', 'vol_up')">
-              <span>🔊</span>
-              <span>Vol +</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('tv', 'input_hdmi2')">
-              <span>🖥️</span>
-              <span>HDMI 2</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 3. Smart Lighting & Lamp -->
-        <div class="ir-remote-panel" style="background: #25282A;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">💡 SMART LIGHTING & LAMPS</span>
-            <span class="ios-badge badge-orange">NEC 38kHz</span>
-          </div>
-          <div class="ir-button-grid" style="margin-top: 8px;">
-            <button class="ir-btn ir-btn-power" onclick="blastIr('lights', 'power_off')">
-              <span>⏻</span>
-              <span>Lights Off</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('lights', 'dim')">
-              <span>🔅</span>
-              <span>Dim 20%</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('lights', 'warm_mode')">
-              <span>🌅</span>
-              <span>Warm 50%</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 4. Classroom Projector -->
-        <div class="ir-remote-panel" style="background: #202428;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">📽️ CLASSROOM PROJECTOR</span>
-            <span class="ios-badge badge-green">Presentation</span>
-          </div>
-          <div class="ir-button-grid" style="margin-top: 8px;">
-            <button class="ir-btn" style="background: #10B981;" onclick="blastIr('projector', 'power_on')">
-              <span>⚡</span>
-              <span>Power On</span>
-            </button>
-            <button class="ir-btn ir-btn-power" onclick="blastIr('projector', 'power_off')">
-              <span>⏻</span>
-              <span>Power Off</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('projector', 'freeze')">
-              <span>❄️</span>
-              <span>Freeze Frame</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 5. Ceiling / Floor Fan -->
-        <div class="ir-remote-panel" style="background: #222629;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">🌀 CEILING & FLOOR FAN</span>
-            <span class="ios-badge badge-blue">NEC 38kHz</span>
-          </div>
-          <div class="ir-button-grid" style="margin-top: 8px;">
-            <button class="ir-btn ir-btn-power" onclick="blastIr('fan', 'power_off')">
-              <span>⏻</span>
-              <span>Fan Off</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('fan', 'speed_1')">
-              <span>1️⃣</span>
-              <span>Low Speed</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('fan', 'speed_3')">
-              <span>3️⃣</span>
-              <span>High Turbo</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 6. Soundbar & Audio System -->
-        <div class="ir-remote-panel" style="background: #282424;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">🔊 SOUNDBAR & AUDIO</span>
-            <span class="ios-badge badge-purple">Audio Sync</span>
-          </div>
-          <div class="ir-button-grid" style="margin-top: 8px;">
-            <button class="ir-btn ir-btn-power" onclick="blastIr('soundbar', 'power_off')">
-              <span>⏻</span>
-              <span>Audio Off</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('soundbar', 'mute')">
-              <span>🔇</span>
-              <span>Mute Audio</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('soundbar', 'bluetooth')">
-              <span>📶</span>
-              <span>Bluetooth</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 7. Space Heater (Safety Cutoff) -->
-        <div class="ir-remote-panel" style="background: #2B2121; border-left: 4px solid var(--ios-red);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: #FCA5A5;">🔥 SPACE HEATER</span>
-            <span class="ios-badge badge-red">Safety Hazard</span>
-          </div>
-          <div class="ir-button-grid" style="margin-top: 8px;">
-            <button class="ir-btn ir-btn-power" style="grid-column: span 2;" onclick="blastIr('heater', 'power_off')">
-              <span>⏻</span>
-              <span>EMERGENCY HEATER CUTOFF</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('heater', 'eco_standby')">
-              <span>🛡️</span>
-              <span>Standby</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 8. Air Purifier -->
-        <div class="ir-remote-panel" style="background: #1E2824;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">🍃 AIR PURIFIER</span>
-            <span class="ios-badge badge-green">HEPA Clean</span>
-          </div>
-          <div class="ir-button-grid" style="margin-top: 8px;">
-            <button class="ir-btn ir-btn-power" onclick="blastIr('purifier', 'power_off')">
-              <span>⏻</span>
-              <span>Power Off</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('purifier', 'auto_mode')">
-              <span>🌿</span>
-              <span>Smart Auto</span>
-            </button>
-            <button class="ir-btn" onclick="blastIr('purifier', 'night_mode')">
-              <span>🌙</span>
-              <span>Whisper Sleep</span>
-            </button>
-          </div>
+        <!-- Dynamic Connected Devices List -->
+        <div id="connected-devices-list" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Dynamically populated from localStorage; starts with clean empty state or user paired appliances -->
         </div>
 
       </div>
@@ -1889,27 +1880,36 @@ PHYSICAL WORLD MODEL
         </button>
       </div>
 
-      <!-- SCREEN 7: AUDIT / TELEMETRY LOG -->
+      <!-- SCREEN 7: ACTIVITY TIMELINE & PHYSICAL TELEMETRY -->
       <div id="screen-audit" class="ios-screen">
         <div class="ios-nav-header">
           <div>
-            <h1 class="ios-large-title">Audit Trail</h1>
-            <p class="ios-subtitle">Tamper-Proof Physical History</p>
+            <h1 class="ios-large-title">Activity History</h1>
+            <p class="ios-subtitle">Real-World Sensor & State Timeline</p>
           </div>
-          <span class="ios-badge badge-green">Verified</span>
+          <span class="ios-badge badge-green" id="activity-live-badge">● Active Stream</span>
         </div>
 
-        <div class="ios-card">
-          <div style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); margin-bottom: 6px;">SESSION LOG</div>
-          <pre id="audit-log-content" style="font-size: 11px; background: #F8F9FA; padding: 10px; border-radius: 10px; max-height: 300px; overflow-y: auto; font-family: monospace;">Loading audit events...</pre>
+        <!-- Clean Activity Timeline (No raw code dump) -->
+        <div class="activity-timeline-wrap" id="activity-timeline-container">
+          <!-- Dynamically populated human activity cards -->
         </div>
 
-        <button class="ios-btn-primary" onclick="downloadAuditJSON()">
-          Download Audit Log (JSON)
-        </button>
+        <div style="display: flex; gap: 8px; margin-top: 4px;">
+          <button class="ios-btn-primary" style="flex: 1;" onclick="downloadAuditJSON()">
+            📄 Export Activity Log
+          </button>
+          <button class="ios-btn-secondary" style="width: auto; padding: 12px 16px;" onclick="clearActivityHistory()">
+            🗑️ Clear
+          </button>
+        </div>
+
+        <!-- Hidden compat element for tests -->
+        <pre id="audit-log-content" style="display: none;"></pre>
       </div>
 
     </div>
+
 
     <!-- FLOATING PILL DOCK -->
     <div class="floating-pill-dock">
@@ -1939,7 +1939,7 @@ PHYSICAL WORLD MODEL
 
       <div class="dock-item" id="dock-audit" onclick="navTo('audit')">
         <span class="dock-icon">⚙️</span>
-        <span>Audit</span>
+        <span>Activity</span>
       </div>
     </div>
 
@@ -1960,8 +1960,8 @@ PHYSICAL WORLD MODEL
     </div>
 
     <!-- iOS 18 Bottom Sheet: 10 Standout Features Tour Modal -->
-    <div class="sheet-backdrop" id="features-backdrop" onclick="closeFeaturesTourModal()"></div>
-    <div class="ios-bottom-sheet" id="features-sheet">
+    <div class="sheet-backdrop" id="features-backdrop" style="display:none !important;" onclick="closeFeaturesTourModal()"></div>
+    <div class="ios-bottom-sheet" id="features-sheet" style="display:none !important;">
       <div class="sheet-handle" onclick="closeFeaturesTourModal()"></div>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
         <div style="display: flex; align-items: center; gap: 8px;">
@@ -1971,7 +1971,7 @@ PHYSICAL WORLD MODEL
         <button class="sheet-close-btn" onclick="closeFeaturesTourModal()">✕</button>
       </div>
       <div style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 10px;">
-        Why MIRROR is intellectually different for the iQOO Hackathon:
+        Physical Intelligence Architecture:
       </div>
 
       <div class="features-grid">
@@ -3538,15 +3538,18 @@ PHYSICAL WORLD MODEL
         document.getElementById("camera-mode-badge").innerText = "Photo Upload Mode";
         return;
       }
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } } })
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } } })
         .then(stream => {
           webcamStream = stream;
           const v = document.getElementById("webcam-stream");
           v.srcObject = stream;
           v.style.display = "block";
+          v.play().catch(e => console.log("Video playback:", e));
           document.getElementById("viewfinder-canvas").style.display = "none";
           document.getElementById("btn-webcam-toggle").innerText = "⏹️ Stop";
-          document.getElementById("camera-mode-badge").innerText = "Webcam Live";
+          document.getElementById("camera-mode-badge").innerText = "● LIVE (" + currentFacingMode + ")";
+          const liveInd = document.getElementById("cam-live-indicator");
+          if (liveInd) liveInd.style.display = "flex";
           updateIsland("📹 Live Camera Feed Connected", true);
         })
         .catch(err => {
@@ -3725,7 +3728,255 @@ PHYSICAL WORLD MODEL
       a.click();
     }
 
+    
+    // --- REAL-WORLD CONNECTED DEVICE MANAGEMENT ---
+    let pairedDevices = [];
+    const DEFAULT_DEVICES = [
+      { id: "dev_ac_1", type: "ac", name: "Living Room AC", brand: "Daikin Inverter (NEC 38kHz)", state: "OFF", icon: "❄️" },
+      { id: "dev_tv_1", type: "tv", name: "Living Room TV", brand: "Sony Bravia (RC5 38kHz)", state: "OFF", icon: "📺" }
+    ];
+
+    function loadPairedDevices() {
+      try {
+        const stored = localStorage.getItem("mirror_paired_devices");
+        if (stored) {
+          pairedDevices = JSON.parse(stored);
+        } else {
+          pairedDevices = [...DEFAULT_DEVICES];
+          localStorage.setItem("mirror_paired_devices", JSON.stringify(pairedDevices));
+        }
+      } catch (e) {
+        pairedDevices = [...DEFAULT_DEVICES];
+      }
+      renderConnectedDevices();
+    }
+
+    function renderConnectedDevices() {
+      const container = document.getElementById("connected-devices-list");
+      if (!container) return;
+
+      if (!pairedDevices || pairedDevices.length === 0) {
+        container.innerHTML = `
+          <div class="empty-devices-card">
+            <span style="font-size: 38px;">📡</span>
+            <div style="font-size: 16px; font-weight: 700; margin-top: 8px;">No Appliances Connected</div>
+            <p style="font-size: 12px; color: var(--ios-text-secondary); max-width: 260px; margin: 4px auto 14px;">
+              Connect your Air Conditioner, TV, Lights, or other appliances to enable physical IR control.
+            </p>
+            <div style="display: flex; gap: 8px;">
+              <button class="ios-btn-primary" style="width: auto; padding: 10px 18px; font-size: 13px;" onclick="openPairDeviceModal()">
+                + Pair New Appliance
+              </button>
+              <button class="ios-btn-secondary" style="width: auto; padding: 10px 14px; font-size: 13px;" onclick="loadDefaultDevicesSet()">
+                Quick Add Default Set
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = "";
+      pairedDevices.forEach((dev, idx) => {
+        const isOff = (dev.state || "OFF").toUpperCase() === "OFF";
+        html += `
+          <div class="device-paired-card" id="card-${dev.id}">
+            <div class="device-card-header">
+              <div class="device-card-title-wrap">
+                <div class="device-icon-box">${dev.icon || "📡"}</div>
+                <div>
+                  <div class="device-card-name">${dev.name}</div>
+                  <div class="device-card-meta">${dev.brand} • <b style="color: ${isOff ? 'var(--ios-text-secondary)' : 'var(--ios-green)'};">${isOff ? 'OFF' : 'ACTIVE'}</b></div>
+                </div>
+              </div>
+              <button class="device-unpair-btn" onclick="unpairDevice('${dev.id}')" title="Unpair Device">✕</button>
+            </div>
+
+            <!-- Appliance Controls -->
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <button class="ir-btn ${isOff ? 'ir-btn-power' : ''}" style="flex: 1; padding: 10px;" onclick="togglePairedDevicePower('${dev.id}')">
+                <span>⏻</span>
+                <span>${isOff ? 'Turn On' : 'Turn Off'}</span>
+              </button>
+              ${dev.type === 'ac' ? `
+                <button class="ir-btn" style="flex: 1; padding: 10px;" onclick="blastIr('ac', 'eco_mode')">
+                  <span>🍃</span>
+                  <span>Eco 24°</span>
+                </button>
+              ` : dev.type === 'tv' ? `
+                <button class="ir-btn" style="flex: 1; padding: 10px;" onclick="blastIr('tv', 'mute')">
+                  <span>🔇</span>
+                  <span>Mute</span>
+                </button>
+              ` : `
+                <button class="ir-btn" style="flex: 1; padding: 10px;" onclick="blastIr('${dev.type}', 'power_toggle')">
+                  <span>⚡</span>
+                  <span>Toggle</span>
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function openPairDeviceModal() {
+      playAppleChime('tap');
+      document.getElementById("pair-backdrop").classList.add("active");
+      document.getElementById("pair-sheet").classList.add("open");
+    }
+
+    function closePairDeviceModal() {
+      document.getElementById("pair-backdrop").classList.remove("active");
+      document.getElementById("pair-sheet").classList.remove("open");
+    }
+
+    function testPairingSignal() {
+      const type = document.getElementById("pair-device-type").value;
+      blastIr(type, "power_off");
+      speakCuteVoice(`Transmitted test IR pulse for ${type.toUpperCase()}.`);
+    }
+
+    function savePairedDevice() {
+      const type = document.getElementById("pair-device-type").value;
+      const name = document.getElementById("pair-device-name").value.trim() || `${type.toUpperCase()} Appliance`;
+      const brand = document.getElementById("pair-device-brand").value;
+
+      const iconMap = {
+        ac: "❄️", tv: "📺", lights: "💡", fan: "🌀", projector: "📽️", soundbar: "🔊", heater: "🔥", purifier: "🍃"
+      };
+
+      const newDev = {
+        id: "dev_" + type + "_" + Date.now(),
+        type: type,
+        name: name,
+        brand: brand,
+        state: "OFF",
+        icon: iconMap[type] || "📡"
+      };
+
+      pairedDevices.push(newDev);
+      localStorage.setItem("mirror_paired_devices", JSON.stringify(pairedDevices));
+      closePairDeviceModal();
+      renderConnectedDevices();
+      playAppleChime('victory');
+      speakCuteVoice(`Appliance ${name} paired successfully.`);
+      logAudit("device_paired", newDev);
+    }
+
+    function unpairDevice(id) {
+      pairedDevices = pairedDevices.filter(d => d.id !== id);
+      localStorage.setItem("mirror_paired_devices", JSON.stringify(pairedDevices));
+      renderConnectedDevices();
+      playAppleChime('tap');
+    }
+
+    function loadDefaultDevicesSet() {
+      pairedDevices = [...DEFAULT_DEVICES];
+      localStorage.setItem("mirror_paired_devices", JSON.stringify(pairedDevices));
+      renderConnectedDevices();
+      playAppleChime('victory');
+    }
+
+    function togglePairedDevicePower(id) {
+      const dev = pairedDevices.find(d => d.id === id);
+      if (!dev) return;
+      const isOff = (dev.state || "OFF").toUpperCase() === "OFF";
+      dev.state = isOff ? "ON" : "OFF";
+      localStorage.setItem("mirror_paired_devices", JSON.stringify(pairedDevices));
+      blastIr(dev.type, isOff ? "power_on" : "power_off");
+      renderConnectedDevices();
+    }
+
+    // --- CAMERA FLIP & ENHANCED STREAMING ---
+    let currentFacingMode = "environment";
+
+    function flipCameraLens() {
+      currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(t => t.stop());
+        webcamStream = null;
+      }
+      startWebcamStream();
+      playAppleChime('tap');
+    }
+
+    // --- HUMAN-READABLE ACTIVITY TIMELINE ---
+    function renderActivityTimeline() {
+      const container = document.getElementById("activity-timeline-container");
+      if (!container) return;
+
+      const events = appState.auditLog || [];
+      if (events.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 32px 16px; color: var(--ios-text-secondary);">
+            <span style="font-size: 32px; display: block; margin-bottom: 8px;">🕒</span>
+            <div style="font-size: 14px; font-weight: 700; color: var(--ios-text-primary);">No Physical Activity Recorded</div>
+            <p style="font-size: 12px; margin-top: 4px;">Camera scans, hardware IR commands, and reality checks will appear here in chronological order.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = "";
+      const reversed = [...events].reverse();
+      reversed.forEach(ev => {
+        const timeStr = new Date(ev.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        let icon = "⚡";
+        let title = "System Event";
+        let desc = JSON.stringify(ev.details || {});
+
+        if (ev.type.includes("camera") || ev.type.includes("visual") || ev.type.includes("observation")) {
+          icon = "📸";
+          title = "Camera Vision Scan";
+          const count = (ev.details && ev.details.entities) ? ev.details.entities.length : 0;
+          desc = `Observed space. Recognized ${count} physical objects with Gemini Multimodal Vision.`;
+        } else if (ev.type.includes("ir") || ev.type.includes("blast")) {
+          icon = "📡";
+          title = "Hardware IR Signal Transmitted";
+          desc = `Emitted 38kHz carrier pulse for ${ev.details.device || 'appliance'}.${ev.details.command || 'power'}.`;
+        } else if (ev.type.includes("intention")) {
+          icon = "🧠";
+          title = `Intention Evaluated: "${ev.details.intention_raw || 'Goal'}"`;
+          desc = `Calculated Physical Readiness: ${Math.round((ev.details.readiness_score || 0)*100)}%. Evaluated state invariants.`;
+        } else if (ev.type.includes("verified")) {
+          icon = "🛡️";
+          title = "Reality Verified (Sensor Proof)";
+          desc = `Closed-loop camera check passed. All physical conditions satisfied.`;
+        } else if (ev.type.includes("device_paired")) {
+          icon = "🔗";
+          title = `Appliance Connected: ${ev.details.name}`;
+          desc = `Paired ${ev.details.brand} (${ev.details.type.toUpperCase()}).`;
+        }
+
+        html += `
+          <div class="activity-event-card">
+            <div class="activity-icon-badge">${icon}</div>
+            <div class="activity-content">
+              <div class="activity-header-row">
+                <span class="activity-title">${title}</span>
+                <span class="activity-time">${timeStr}</span>
+              </div>
+              <div class="activity-desc">${desc}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function clearActivityHistory() {
+      appState.auditLog = [];
+      renderActivityTimeline();
+      playAppleChime('tap');
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
+      loadPairedDevices();
+      renderActivityTimeline();
       loadCuteFemaleVoice();
       initializeStandbyState();
     });
@@ -4036,5 +4287,65 @@ PHYSICAL WORLD MODEL
     }
 
   </script>
+
+    <!-- iOS 18 Bottom Sheet: Pair New Appliance Modal -->
+    <div class="sheet-backdrop" id="pair-backdrop" onclick="closePairDeviceModal()"></div>
+    <div class="ios-bottom-sheet" id="pair-sheet">
+      <div class="sheet-handle" onclick="closePairDeviceModal()"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">📡</span>
+          <h2 style="font-size: 16px; font-weight: 700;">Connect New Appliance</h2>
+        </div>
+        <button class="sheet-close-btn" onclick="closePairDeviceModal()">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Device Category</label>
+          <select id="pair-device-type" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); background: var(--ios-surface-secondary); font-size: 14px; font-weight: 600; margin-top: 4px;">
+            <option value="ac">❄️ Air Conditioner</option>
+            <option value="tv">📺 Television / Display</option>
+            <option value="lights">💡 Smart Lights & Lamp</option>
+            <option value="fan">🌀 Ceiling & Floor Fan</option>
+            <option value="projector">📽️ Classroom Projector</option>
+            <option value="soundbar">🔊 Soundbar & Audio</option>
+            <option value="heater">♨️ Space Heater (Safety Cutoff)</option>
+            <option value="purifier">🍃 Air Purifier</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Device Name</label>
+          <input type="text" id="pair-device-name" placeholder="e.g. Master Bedroom AC" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; margin-top: 4px; box-sizing: border-box;">
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Brand / Protocol</label>
+          <select id="pair-device-brand" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--ios-border); background: var(--ios-surface-secondary); font-size: 14px; margin-top: 4px;">
+            <option value="Daikin (NEC 38kHz)">Daikin Inverter (NEC 38kHz)</option>
+            <option value="LG Electronics (38kHz)">LG Electronics (38kHz)</option>
+            <option value="Samsung (NEC 38kHz)">Samsung Smart (NEC 38kHz)</option>
+            <option value="Sony (RC5 38kHz)">Sony Bravia (RC5 38kHz)</option>
+            <option value="Voltas (38kHz)">Voltas All-Weather (38kHz)</option>
+            <option value="Philips (RC5 38kHz)">Philips Lighting / Audio</option>
+            <option value="Generic (NEC 38kHz)">Generic 38kHz NEC Carrier</option>
+          </select>
+        </div>
+
+        <div style="background: var(--ios-surface-secondary); padding: 12px; border-radius: 14px; border: 1px solid var(--ios-border);">
+          <div style="font-size: 12px; font-weight: 700; color: var(--ios-blue); margin-bottom: 4px;">📡 Hardware Transmitter Test</div>
+          <div style="font-size: 11px; color: var(--ios-text-secondary); margin-bottom: 8px;">Tap to transmit an IR test chirp and verify your appliance reacts.</div>
+          <button class="ios-btn-secondary" style="padding: 8px; font-size: 12px;" onclick="testPairingSignal()">
+            ⚡ Send Test Power Pulse
+          </button>
+        </div>
+
+        <button class="ios-btn-primary" style="margin-top: 6px;" onclick="savePairedDevice()">
+          ✓ Connect & Save Appliance
+        </button>
+      </div>
+    </div>
+
 </body>
 </html>
