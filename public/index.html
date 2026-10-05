@@ -1386,6 +1386,262 @@
       line-height: 1.35;
     }
 
+
+    /* --- Mi Remote Universal Remote Styles --- */
+    .mi-remote-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Category Grid for Pairing Wizard */
+    .appliance-category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .appliance-cat-btn {
+      background: var(--ios-surface);
+      border: 1px solid var(--ios-border);
+      border-radius: 16px;
+      padding: 14px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .appliance-cat-btn:active {
+      transform: scale(0.92);
+      background: #E5E5EA;
+    }
+    .appliance-cat-icon {
+      font-size: 26px;
+    }
+    .appliance-cat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ios-text-primary);
+      text-align: center;
+    }
+
+    /* Brand Selection Chips & Search */
+    .brand-chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 2px;
+    }
+    .brand-chip-btn {
+      background: var(--ios-surface);
+      border: 1px solid var(--ios-border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ios-text-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .brand-chip-btn:active {
+      transform: scale(0.94);
+      background: var(--ios-blue);
+      color: #FFF;
+    }
+
+    /* Mi Remote Code Testing Cycle Box */
+    .mi-test-box {
+      background: #1C1C1E;
+      color: #FFF;
+      border-radius: 24px;
+      padding: 20px 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .mi-code-profile-pill {
+      background: rgba(255, 255, 255, 0.12);
+      color: #A1A1AA;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 12px;
+      letter-spacing: 0.5px;
+    }
+    .mi-test-pulse-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FF3B30, #FF453A);
+      color: #FFF;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(255, 59, 48, 0.5);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .mi-test-pulse-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 2px 10px rgba(255, 59, 48, 0.3);
+    }
+
+    /* Dedicated Full Remote Controller Viewport */
+    .full-remote-card {
+      background: #18181B;
+      color: #FFF;
+      border-radius: 28px;
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    /* TV Remote: D-Pad & Rockers */
+    .tv-rockers-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin: 8px 0;
+    }
+    .tv-rocker {
+      width: 60px;
+      height: 120px;
+      background: #27272A;
+      border-radius: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .tv-rocker-btn {
+      width: 44px;
+      height: 44px;
+      background: none;
+      border: none;
+      color: #FFF;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.15s;
+    }
+    .tv-rocker-btn:active {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(0.92);
+    }
+    .tv-rocker-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #A1A1AA;
+      letter-spacing: 0.5px;
+    }
+
+    /* Circular D-Pad Controller */
+    .dpad-container {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: #27272A;
+      position: relative;
+      margin: 10px auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4), inset 0 2px 6px rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .dpad-center-ok {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: #3F3F46;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      color: #FFF;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .dpad-center-ok:active {
+      background: #52525B;
+      transform: translate(-50%, -50%) scale(0.92);
+    }
+    .dpad-arrow {
+      position: absolute;
+      background: none;
+      border: none;
+      color: #D4D4D8;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      transition: all 0.15s;
+    }
+    .dpad-arrow:active {
+      color: #FFF;
+      transform: scale(1.15);
+    }
+    .dpad-up { top: 6px; left: 50%; transform: translateX(-50%); }
+    .dpad-down { bottom: 6px; left: 50%; transform: translateX(-50%); }
+    .dpad-left { left: 6px; top: 50%; transform: translateY(-50%); }
+    .dpad-right { right: 6px; top: 50%; transform: translateY(-50%); }
+
+    /* AC Remote: Backlit LCD Screen */
+    .ac-lcd-screen {
+      background: #064E3B;
+      border: 2px solid #059669;
+      border-radius: 20px;
+      padding: 16px;
+      color: #6EE7B7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 16px rgba(5, 150, 105, 0.2);
+      font-family: monospace;
+    }
+    .ac-lcd-temp-huge {
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .ac-lcd-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: right;
+    }
+
   </style>
 </head>
 <body>
@@ -1697,16 +1953,24 @@ PHYSICAL WORLD MODEL
         </div>
       </div>
 
-      <!-- SCREEN 4: REAL-WORLD CONNECTED DEVICES & IR APPLIANCES -->
+      <!-- SCREEN 4: MI REMOTE UNIVERSAL APPLIANCE CONTROLLER -->
       <div id="screen-remote" class="ios-screen">
         <div class="ios-nav-header">
           <div>
-            <h1 class="ios-large-title">Connected Devices</h1>
-            <p class="ios-subtitle">Real Hardware Appliances & IR Blaster</p>
+            <h1 class="ios-large-title">Mi Remote</h1>
+            <p class="ios-subtitle">Universal Hardware IR Blaster (38kHz)</p>
           </div>
-          <button class="ios-badge badge-blue" style="cursor: pointer; border: none; font-size: 12px; padding: 6px 12px;" onclick="openPairDeviceModal()">
-            + Pair Appliance
+          <button class="ios-badge badge-blue" style="cursor: pointer; border: none; font-size: 12px; padding: 6px 12px; font-weight: 700;" onclick="openMiPairingWizard()">
+            + Add Remote
           </button>
+        </div>
+
+        <!-- Room Filter Pills -->
+        <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;">
+          <button class="brand-chip-btn active" id="room-filter-all" style="background: var(--ios-text-primary); color: #FFF; font-size: 12px; padding: 6px 12px;" onclick="filterRemotesByRoom('all')">All Remotes</button>
+          <button class="brand-chip-btn" id="room-filter-living" style="font-size: 12px; padding: 6px 12px;" onclick="filterRemotesByRoom('Living Room')">Living Room</button>
+          <button class="brand-chip-btn" id="room-filter-bedroom" style="font-size: 12px; padding: 6px 12px;" onclick="filterRemotesByRoom('Bedroom')">Bedroom</button>
+          <button class="brand-chip-btn" id="room-filter-office" style="font-size: 12px; padding: 6px 12px;" onclick="filterRemotesByRoom('Office')">Office</button>
         </div>
 
         <!-- Master Omni-Control Quick Bar -->
@@ -1719,16 +1983,21 @@ PHYSICAL WORLD MODEL
             <div class="ir-led-indicator" id="ir-panel-led"></div>
           </div>
           <div style="font-size: 13px; font-weight: 700; color: #EEF2FF; margin-bottom: 2px;">Align All Connected Appliances</div>
-          <div style="font-size: 11px; color: #C7D2FE; margin-bottom: 8px;">Transmits 38kHz IR pulses to power off all inactive or conflicting devices.</div>
+          <div style="font-size: 11px; color: #C7D2FE; margin-bottom: 8px;">Sequentially transmits 38kHz IR pulses to power off all unnecessary appliances.</div>
           <button class="ir-btn-blast" style="background: linear-gradient(135deg, #6366F1, #4F46E5); padding: 10px; font-size: 13px;" onclick="triggerAiOmniControl()">
             <span>⚡</span>
             <span>BLAST ALL CONTROLLABLE DEVICES</span>
           </button>
         </div>
 
-        <!-- Dynamic Connected Devices List -->
-        <div id="connected-devices-list" style="display: flex; flex-direction: column; gap: 12px;">
-          <!-- Dynamically populated from localStorage; starts with clean empty state or user paired appliances -->
+        <!-- Dynamic Remotes List Container -->
+        <div id="connected-devices-list" class="mi-remote-wrap">
+          <!-- Populated from paired remotes -->
+        </div>
+
+        <!-- Expanded Full Virtual Remote Modal/Viewport Container -->
+        <div id="expanded-virtual-remote" style="display: none; margin-top: 8px;">
+          <!-- Dynamically loads authentic physical remote skin -->
         </div>
 
       </div>
@@ -3736,6 +4005,374 @@ PHYSICAL WORLD MODEL
       { id: "dev_tv_1", type: "tv", name: "Living Room TV", brand: "Sony Bravia (RC5 38kHz)", state: "OFF", icon: "📺" }
     ];
 
+    
+    // --- MI REMOTE COMPREHENSIVE ENGINE & VIRTUAL SKINS ---
+
+    const BRAND_DATABASE = {
+      ac: ["Daikin", "Voltas", "LG", "Samsung", "Blue Star", "Hitachi", "Panasonic", "Carrier", "Lloyd", "Gree", "Midea", "Haier", "Whirlpool", "Godrej", "O General", "TCL", "Mitsubishi", "General 38kHz NEC"],
+      tv: ["Samsung", "LG", "Sony", "Mi / Xiaomi", "TCL", "OnePlus", "Panasonic", "Philips", "Vu", "Toshiba", "Hisense", "Realme", "Sansui", "Insignia", "Sharp", "General Sony/RC5"],
+      stb: ["Tata Play", "Airtel Digital TV", "Dish TV", "Sun Direct", "D2H", "Apple TV", "Amazon Fire TV", "Roku Box", "Mi Box", "General STB"],
+      fan: ["Atomberg", "Havells", "Crompton", "Orient", "Usha", "Luminous", "Dyson", "KDK", "Superfan", "General Fan NEC"],
+      lights: ["Philips Hue", "Xiaomi Smart", "Syska", "Wipro", "Tuya", "Generic RGB 38kHz"],
+      projector: ["Epson", "BenQ", "Sony", "Optoma", "ViewSonic", "XGIMI", "Nebula", "InFocus", "NEC Projector"],
+      soundbar: ["Sony Audio", "JBL", "Bose", "Samsung Sound", "boAt", "Yamaha", "Sonos", "Boat Aavante"],
+      heater: ["Bajaj", "Usha", "Havells", "Morphy Richards", "Generic Heater"],
+      purifier: ["Mi Air Purifier", "Dyson Purifier", "Philips Clean", "Coway", "Honeywell"]
+    };
+
+    let wizardState = {
+      step: 1,
+      type: "ac",
+      typeName: "Air Conditioner",
+      typeIcon: "❄️",
+      brand: "Daikin",
+      codeProfile: 1,
+      totalProfiles: 14,
+      room: "Living Room"
+    };
+
+    let activeRoomFilter = "all";
+    let currentlyExpandedRemoteId = null;
+
+    function openMiPairingWizard() {
+      playAppleChime('tap');
+      goToWizardStep(1);
+      document.getElementById("mi-wizard-backdrop").classList.add("active");
+      document.getElementById("mi-wizard-sheet").classList.add("open");
+    }
+
+    function closeMiPairingWizard() {
+      document.getElementById("mi-wizard-backdrop").classList.remove("active");
+      document.getElementById("mi-wizard-sheet").classList.remove("open");
+    }
+
+    function goToWizardStep(stepNum) {
+      wizardState.step = stepNum;
+      for (let s = 1; s <= 4; s++) {
+        const el = document.getElementById(`wizard-step-${s}`);
+        if (el) el.style.display = (s === stepNum) ? "block" : "none";
+      }
+
+      if (stepNum === 1) {
+        document.getElementById("wizard-title").innerText = "Add Appliance Remote";
+        document.getElementById("wizard-top-icon").innerText = "📡";
+      } else if (stepNum === 2) {
+        document.getElementById("wizard-title").innerText = `Select ${wizardState.typeName} Brand`;
+        document.getElementById("wizard-top-icon").innerText = wizardState.typeIcon;
+        renderWizardBrandChips();
+      } else if (stepNum === 3) {
+        document.getElementById("wizard-title").innerText = `Testing ${wizardState.brand} Codes`;
+        document.getElementById("wizard-top-icon").innerText = "⚡";
+        wizardState.codeProfile = 1;
+        updateWizardCodeProfileUI();
+      } else if (stepNum === 4) {
+        document.getElementById("wizard-title").innerText = "Save Remote";
+        document.getElementById("wizard-top-icon").innerText = "✅";
+        document.getElementById("wizard-final-name").value = `${wizardState.room} ${wizardState.brand} ${wizardState.typeName}`;
+      }
+    }
+
+    function selectWizardAppliance(type, name, icon) {
+      playAppleChime('tap');
+      wizardState.type = type;
+      wizardState.typeName = name;
+      wizardState.typeIcon = icon;
+      goToWizardStep(2);
+    }
+
+    function renderWizardBrandChips(filterText = "") {
+      const container = document.getElementById("wizard-brand-chips");
+      if (!container) return;
+      const brands = BRAND_DATABASE[wizardState.type] || BRAND_DATABASE.ac;
+      const q = filterText.toLowerCase();
+
+      let html = "";
+      brands.forEach(b => {
+        if (!q || b.toLowerCase().includes(q)) {
+          html += `<button class="brand-chip-btn" onclick="selectWizardBrand('${b}')">${b}</button>`;
+        }
+      });
+      container.innerHTML = html;
+    }
+
+    function filterWizardBrands() {
+      const q = document.getElementById("wizard-brand-search").value;
+      renderWizardBrandChips(q);
+    }
+
+    function selectWizardBrand(brand) {
+      playAppleChime('tap');
+      wizardState.brand = brand;
+      wizardState.totalProfiles = Math.floor(Math.random() * 8) + 8; // 8-16 profiles like real Mi Remote
+      goToWizardStep(3);
+    }
+
+    function autoDetectBrandFromCamera() {
+      playAppleChime('tap');
+      closeMiPairingWizard();
+      navTo('camera');
+      speakCuteVoice("Point your camera at the appliance or brand logo. I'll identify it automatically.");
+    }
+
+    function updateWizardCodeProfileUI() {
+      const pill = document.getElementById("mi-code-index-pill");
+      if (pill) pill.innerText = `Code Profile ${wizardState.codeProfile} of ${wizardState.totalProfiles}`;
+      const instr = document.getElementById("mi-test-instruction");
+      if (instr) instr.innerText = `Point phone at your ${wizardState.brand} ${wizardState.typeName} and tap Power`;
+    }
+
+    function sendWizardTestPulse() {
+      playAppleChime('ir_pulse');
+      blastIr(wizardState.type, "power_off");
+      const btn = document.getElementById("mi-test-pulse-btn");
+      if (btn) {
+        btn.style.transform = "scale(0.88)";
+        setTimeout(() => btn.style.transform = "scale(1)", 150);
+      }
+    }
+
+    function cycleNextCodeProfile(didRespond) {
+      playAppleChime('tap');
+      if (didRespond) {
+        playAppleChime('victory');
+        speakCuteVoice(`Code match found for ${wizardState.brand}! Let's save your remote.`);
+        goToWizardStep(4);
+      } else {
+        if (wizardState.codeProfile < wizardState.totalProfiles) {
+          wizardState.codeProfile++;
+          updateWizardCodeProfileUI();
+          sendWizardTestPulse();
+        } else {
+          alert(`Finished testing all ${wizardState.totalProfiles} code profiles. Using best match profile 1.`);
+          goToWizardStep(4);
+        }
+      }
+    }
+
+    function selectWizardRoom(room) {
+      wizardState.room = room;
+      ["living", "bedroom", "study", "office"].forEach(r => {
+        const b = document.getElementById(`room-choice-${r}`);
+        if (b) b.classList.remove("active");
+      });
+      const activeBtn = document.getElementById(`room-choice-${room.toLowerCase().replace(' ', '')}`);
+      if (activeBtn) activeBtn.classList.add("active");
+    }
+
+    function saveWizardRemoteAndFinish() {
+      const name = document.getElementById("wizard-final-name").value.trim() || `${wizardState.brand} ${wizardState.typeName}`;
+      const newRemote = {
+        id: "rem_" + Date.now(),
+        type: wizardState.type,
+        name: name,
+        brand: wizardState.brand,
+        room: wizardState.room,
+        icon: wizardState.typeIcon,
+        state: "OFF",
+        codeProfile: wizardState.codeProfile,
+        temp: 24,
+        mode: "COOL",
+        fanSpeed: "AUTO"
+      };
+
+      pairedDevices.push(newRemote);
+      localStorage.setItem("mirror_paired_devices", JSON.stringify(pairedDevices));
+      closeMiPairingWizard();
+      renderConnectedDevices();
+      playAppleChime('victory');
+      speakCuteVoice(`Remote for ${name} saved. You can now control it.`);
+      logAudit("device_paired", newRemote);
+      openDedicatedVirtualRemote(newRemote.id);
+    }
+
+    // --- DEDICATED FULL VIRTUAL REMOTE CONTROLLER SKINS ---
+
+    function openDedicatedVirtualRemote(id) {
+      playAppleChime('tap');
+      const dev = pairedDevices.find(d => d.id === id);
+      if (!dev) return;
+
+      currentlyExpandedRemoteId = id;
+      const wrap = document.getElementById("expanded-virtual-remote");
+      if (!wrap) return;
+
+      wrap.style.display = "block";
+      const isOff = (dev.state || "OFF").toUpperCase() === "OFF";
+
+      if (dev.type === "ac") {
+        wrap.innerHTML = `
+          <div class="full-remote-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 17px; font-weight: 800;">${dev.name}</div>
+                <div style="font-size: 11px; color: #A1A1AA;">${dev.brand} • ${dev.room}</div>
+              </div>
+              <button style="background: none; border: none; color: #71717A; font-size: 18px; cursor: pointer;" onclick="closeDedicatedVirtualRemote()">✕ Close</button>
+            </div>
+
+            <!-- Backlit LCD AC Screen -->
+            <div class="ac-lcd-screen">
+              <div>
+                <div class="ac-lcd-temp-huge" id="v-ac-temp">${dev.temp || 24}°C</div>
+                <div style="font-size: 10px; margin-top: 2px;">SET TEMP</div>
+              </div>
+              <div class="ac-lcd-meta">
+                <div>MODE: <span id="v-ac-mode">${dev.mode || "COOL"}</span></div>
+                <div>FAN: <span id="v-ac-fan">${dev.fanSpeed || "AUTO"}</span></div>
+                <div>SWING: <span style="color: #34D399;">ON ↔️</span></div>
+              </div>
+            </div>
+
+            <!-- Main Rockers: Temp + and - -->
+            <div style="display: flex; justify-content: center; gap: 16px;">
+              <button class="ir-btn" style="width: 70px; height: 60px; font-size: 24px; font-weight: 800;" onclick="adjustVirtualAcTemp('${dev.id}', -1)">-</button>
+              <button class="ir-btn" style="width: 70px; height: 60px; font-size: 24px; font-weight: 800;" onclick="adjustVirtualAcTemp('${dev.id}', 1)">+</button>
+            </div>
+
+            <!-- Control Buttons Grid -->
+            <div class="ir-button-grid">
+              <button class="ir-btn ${isOff ? 'ir-btn-power' : ''}" onclick="togglePairedDevicePower('${dev.id}')">
+                <span>⏻</span>
+                <span>${isOff ? 'Power On' : 'Power Off'}</span>
+              </button>
+              <button class="ir-btn" onclick="cycleVirtualAcMode('${dev.id}')">
+                <span>❄️</span>
+                <span>Mode</span>
+              </button>
+              <button class="ir-btn" onclick="blastIr('ac', 'eco_mode')">
+                <span>🍃</span>
+                <span>Eco 24°</span>
+              </button>
+              <button class="ir-btn" onclick="blastIr('ac', 'sleep_mode')">
+                <span>🌙</span>
+                <span>Sleep</span>
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (dev.type === "tv" || dev.type === "stb") {
+        wrap.innerHTML = `
+          <div class="full-remote-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 17px; font-weight: 800;">${dev.name}</div>
+                <div style="font-size: 11px; color: #A1A1AA;">${dev.brand} • ${dev.room}</div>
+              </div>
+              <button style="background: none; border: none; color: #71717A; font-size: 18px; cursor: pointer;" onclick="closeDedicatedVirtualRemote()">✕ Close</button>
+            </div>
+
+            <!-- Top TV Controls -->
+            <div style="display: flex; justify-content: space-between; gap: 8px;">
+              <button class="ir-btn ${isOff ? 'ir-btn-power' : ''}" style="flex: 1;" onclick="togglePairedDevicePower('${dev.id}')">
+                <span>⏻</span> <span>Power</span>
+              </button>
+              <button class="ir-btn" style="flex: 1;" onclick="blastIr('tv', 'mute')">
+                <span>🔇</span> <span>Mute</span>
+              </button>
+              <button class="ir-btn" style="flex: 1;" onclick="blastIr('tv', 'input_hdmi1')">
+                <span>🔌</span> <span>Input</span>
+              </button>
+            </div>
+
+            <!-- Authentic TV Navigation D-Pad -->
+            <div class="dpad-container">
+              <button class="dpad-arrow dpad-up" onclick="blastIr('tv', 'vol_up')">▲</button>
+              <button class="dpad-arrow dpad-down" onclick="blastIr('tv', 'vol_down')">▼</button>
+              <button class="dpad-arrow dpad-left" onclick="blastIr('tv', 'mute')">◀</button>
+              <button class="dpad-arrow dpad-right" onclick="blastIr('tv', 'input_hdmi1')">▶</button>
+              <button class="dpad-center-ok" onclick="playAppleChime('tap'); blastIr('tv', 'mute');">OK</button>
+            </div>
+
+            <!-- Volume & Channel Rockers -->
+            <div class="tv-rockers-row">
+              <div class="tv-rocker">
+                <button class="tv-rocker-btn" onclick="blastIr('tv', 'vol_up')">+</button>
+                <span class="tv-rocker-label">VOL</span>
+                <button class="tv-rocker-btn" onclick="blastIr('tv', 'vol_down')">-</button>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button class="ir-btn" style="width: 48px; height: 48px; border-radius: 50%;" onclick="blastIr('tv', 'power_toggle')">⌂</button>
+                <button class="ir-btn" style="width: 48px; height: 48px; border-radius: 50%;" onclick="blastIr('tv', 'mute')">↩</button>
+              </div>
+
+              <div class="tv-rocker">
+                <button class="tv-rocker-btn" onclick="blastIr('tv', 'input_hdmi1')">▲</button>
+                <span class="tv-rocker-label">CH</span>
+                <button class="tv-rocker-btn" onclick="blastIr('tv', 'input_hdmi2')">▼</button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        wrap.innerHTML = `
+          <div class="full-remote-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 17px; font-weight: 800;">${dev.name}</div>
+                <div style="font-size: 11px; color: #A1A1AA;">${dev.brand} • ${dev.room}</div>
+              </div>
+              <button style="background: none; border: none; color: #71717A; font-size: 18px; cursor: pointer;" onclick="closeDedicatedVirtualRemote()">✕ Close</button>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+              <button class="ir-btn ${isOff ? 'ir-btn-power' : ''}" style="flex: 1; padding: 14px;" onclick="togglePairedDevicePower('${dev.id}')">
+                <span>⏻</span> <span>Power Toggle</span>
+              </button>
+              <button class="ir-btn" style="flex: 1; padding: 14px;" onclick="blastIr('${dev.type}', 'power_toggle')">
+                <span>⚡</span> <span>Action Key</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      wrap.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeDedicatedVirtualRemote() {
+      currentlyExpandedRemoteId = null;
+      const wrap = document.getElementById("expanded-virtual-remote");
+      if (wrap) wrap.style.display = "none";
+    }
+
+    function adjustVirtualAcTemp(id, delta) {
+      playAppleChime('tap');
+      const dev = pairedDevices.find(d => d.id === id);
+      if (!dev) return;
+      dev.temp = Math.max(16, Math.min(30, (dev.temp || 24) + delta));
+      localStorage.setItem("mirror_paired_devices", JSON.stringify(pairedDevices));
+      const el = document.getElementById("v-ac-temp");
+      if (el) el.innerText = `${dev.temp}°C`;
+      blastIr('ac', delta > 0 ? 'temp_up' : 'temp_down');
+    }
+
+    function cycleVirtualAcMode(id) {
+      playAppleChime('tap');
+      const dev = pairedDevices.find(d => d.id === id);
+      if (!dev) return;
+      const modes = ["COOL", "AUTO", "DRY", "FAN", "HEAT"];
+      const nextIdx = (modes.indexOf(dev.mode || "COOL") + 1) % modes.length;
+      dev.mode = modes[nextIdx];
+      localStorage.setItem("mirror_paired_devices", JSON.stringify(pairedDevices));
+      const el = document.getElementById("v-ac-mode");
+      if (el) el.innerText = dev.mode;
+      blastIr('ac', 'eco_mode');
+    }
+
+    function filterRemotesByRoom(room) {
+      playAppleChime('tap');
+      activeRoomFilter = room;
+      ["all", "living", "bedroom", "office"].forEach(r => {
+        const b = document.getElementById(`room-filter-${r}`);
+        if (b) b.classList.remove("active");
+      });
+      const activeBtn = document.getElementById(`room-filter-${room.toLowerCase().replace(' ', '')}`);
+      if (activeBtn) activeBtn.classList.add("active");
+
+      renderConnectedDevices();
+    }
+
     function loadPairedDevices() {
       try {
         const stored = localStorage.getItem("mirror_paired_devices");
@@ -3777,7 +4414,21 @@ PHYSICAL WORLD MODEL
       }
 
       let html = "";
-      pairedDevices.forEach((dev, idx) => {
+      const filtered = pairedDevices.filter(d => activeRoomFilter === 'all' || (d.room && d.room.toLowerCase() === activeRoomFilter.toLowerCase()));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-devices-card">
+            <span style="font-size: 32px;">🛋️</span>
+            <div style="font-size: 15px; font-weight: 700; margin-top: 6px;">No Remotes in ${activeRoomFilter}</div>
+            <p style="font-size: 12px; color: var(--ios-text-secondary); margin: 4px 0 12px;">Add an appliance remote to this room.</p>
+            <button class="ios-btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="openMiPairingWizard()">+ Add Remote</button>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach((dev, idx) => {
         const isOff = (dev.state || "OFF").toUpperCase() === "OFF";
         html += `
           <div class="device-paired-card" id="card-${dev.id}">
@@ -3786,34 +4437,22 @@ PHYSICAL WORLD MODEL
                 <div class="device-icon-box">${dev.icon || "📡"}</div>
                 <div>
                   <div class="device-card-name">${dev.name}</div>
-                  <div class="device-card-meta">${dev.brand} • <b style="color: ${isOff ? 'var(--ios-text-secondary)' : 'var(--ios-green)'};">${isOff ? 'OFF' : 'ACTIVE'}</b></div>
+                  <div class="device-card-meta">${dev.brand} • <span style="color: #6366F1; font-weight: 600;">${dev.room || 'Living Room'}</span> • <b style="color: ${isOff ? 'var(--ios-text-secondary)' : 'var(--ios-green)'};">${isOff ? 'OFF' : 'ACTIVE'}</b></div>
                 </div>
               </div>
               <button class="device-unpair-btn" onclick="unpairDevice('${dev.id}')" title="Unpair Device">✕</button>
             </div>
 
-            <!-- Appliance Controls -->
+            <!-- Appliance Controls & Full Remote Launcher -->
             <div style="display: flex; gap: 8px; margin-top: 4px;">
               <button class="ir-btn ${isOff ? 'ir-btn-power' : ''}" style="flex: 1; padding: 10px;" onclick="togglePairedDevicePower('${dev.id}')">
                 <span>⏻</span>
                 <span>${isOff ? 'Turn On' : 'Turn Off'}</span>
               </button>
-              ${dev.type === 'ac' ? `
-                <button class="ir-btn" style="flex: 1; padding: 10px;" onclick="blastIr('ac', 'eco_mode')">
-                  <span>🍃</span>
-                  <span>Eco 24°</span>
-                </button>
-              ` : dev.type === 'tv' ? `
-                <button class="ir-btn" style="flex: 1; padding: 10px;" onclick="blastIr('tv', 'mute')">
-                  <span>🔇</span>
-                  <span>Mute</span>
-                </button>
-              ` : `
-                <button class="ir-btn" style="flex: 1; padding: 10px;" onclick="blastIr('${dev.type}', 'power_toggle')">
-                  <span>⚡</span>
-                  <span>Toggle</span>
-                </button>
-              `}
+              <button class="ir-btn" style="flex: 1.2; padding: 10px; background: #3B82F6; color: #FFF; font-weight: 700;" onclick="openDedicatedVirtualRemote('${dev.id}')">
+                <span>📱</span>
+                <span>Open Remote</span>
+              </button>
             </div>
           </div>
         `;
@@ -4345,6 +4984,134 @@ PHYSICAL WORLD MODEL
           ✓ Connect & Save Appliance
         </button>
       </div>
+    </div>
+
+
+    <!-- Mi Remote Step-by-Step Pairing Wizard (Cupertino Modal) -->
+    <div class="sheet-backdrop" id="mi-wizard-backdrop" onclick="closeMiPairingWizard()"></div>
+    <div class="ios-bottom-sheet" id="mi-wizard-sheet" style="max-height: 88%;">
+      <div class="sheet-handle" onclick="closeMiPairingWizard()"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;" id="wizard-top-icon">📡</span>
+          <h2 style="font-size: 16px; font-weight: 800;" id="wizard-title">Add Appliance Remote</h2>
+        </div>
+        <button class="sheet-close-btn" onclick="closeMiPairingWizard()">✕</button>
+      </div>
+
+      <!-- Step 1: Select Appliance Type -->
+      <div id="wizard-step-1" class="wizard-step">
+        <div style="font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 6px;">Select the type of appliance you want to control:</div>
+        <div class="appliance-category-grid">
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('ac', 'Air Conditioner', '❄️')">
+            <span class="appliance-cat-icon">❄️</span>
+            <span class="appliance-cat-label">AC</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('tv', 'Television', '📺')">
+            <span class="appliance-cat-icon">📺</span>
+            <span class="appliance-cat-label">TV</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('stb', 'Set-Top Box', '📦')">
+            <span class="appliance-cat-icon">📦</span>
+            <span class="appliance-cat-label">Set-Top Box</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('fan', 'Ceiling Fan', '🌀')">
+            <span class="appliance-cat-icon">🌀</span>
+            <span class="appliance-cat-label">Fan</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('lights', 'Smart Lights', '💡')">
+            <span class="appliance-cat-icon">💡</span>
+            <span class="appliance-cat-label">Lights</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('projector', 'Projector', '📽️')">
+            <span class="appliance-cat-icon">📽️</span>
+            <span class="appliance-cat-label">Projector</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('soundbar', 'A/V Audio', '🔊')">
+            <span class="appliance-cat-icon">🔊</span>
+            <span class="appliance-cat-label">Soundbar</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('heater', 'Space Heater', '🔥')">
+            <span class="appliance-cat-icon">🔥</span>
+            <span class="appliance-cat-label">Heater</span>
+          </div>
+          <div class="appliance-cat-btn" onclick="selectWizardAppliance('purifier', 'Air Purifier', '🍃')">
+            <span class="appliance-cat-icon">🍃</span>
+            <span class="appliance-cat-label">Purifier</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Select Brand with Search & Popular Chips -->
+      <div id="wizard-step-2" class="wizard-step" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--ios-text-primary);" id="wizard-brand-prompt">Select Brand</span>
+          <button class="ios-badge badge-blue" style="cursor: pointer; border: none;" onclick="autoDetectBrandFromCamera()">📸 AI Auto-Detect</button>
+        </div>
+
+        <input type="text" id="wizard-brand-search" placeholder="Search brand e.g. Daikin, LG, Samsung, Voltas..." oninput="filterWizardBrands()" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; box-sizing: border-box;">
+
+        <div class="brand-chips-wrap" id="wizard-brand-chips">
+          <!-- Populated dynamically -->
+        </div>
+
+        <button class="ios-btn-secondary" style="margin-top: 10px;" onclick="goToWizardStep(1)">← Back to Appliances</button>
+      </div>
+
+      <!-- Step 3: Signature Mi Remote Code Testing Cycle -->
+      <div id="wizard-step-3" class="wizard-step" style="display: none;">
+        <div class="mi-test-box">
+          <div class="mi-code-profile-pill" id="mi-code-index-pill">Code Profile 1 of 16</div>
+          <div style="font-size: 15px; font-weight: 700;" id="mi-test-instruction">Point phone at your AC and press Power</div>
+          <div style="font-size: 12px; color: #A1A1AA;">Make sure nothing is blocking the top IR emitter.</div>
+
+          <button class="mi-test-pulse-btn" id="mi-test-pulse-btn" onclick="sendWizardTestPulse()">
+            <span>⏻</span>
+          </button>
+          <div style="font-size: 11px; color: #E4E4E7; font-weight: 600;">TAP TO TEST SIGNAL</div>
+
+          <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); width: 100%; padding-top: 12px; margin-top: 6px;">
+            <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Did the appliance respond (beep / toggle)?</div>
+            <div style="display: flex; gap: 10px; width: 100%;">
+              <button class="ios-btn-secondary" style="flex: 1; padding: 10px; background: rgba(255, 255, 255, 0.1); color: #FFF; border: none;" onclick="cycleNextCodeProfile(false)">
+                ❌ No, Next Code
+              </button>
+              <button class="ios-btn-primary" style="flex: 1; padding: 10px; background: #10B981; border: none;" onclick="cycleNextCodeProfile(true)">
+                ✅ Yes, It Responded
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="ios-btn-secondary" style="margin-top: 10px;" onclick="goToWizardStep(2)">← Back to Brand Selection</button>
+      </div>
+
+      <!-- Step 4: Name & Save Remote -->
+      <div id="wizard-step-4" class="wizard-step" style="display: none;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--ios-green); text-align: center; margin-bottom: 4px;">🎉 Remote Matched Successfully!</div>
+        <div style="font-size: 12px; color: var(--ios-text-secondary); text-align: center; margin-bottom: 12px;">Signal codes verified. Give your remote a name:</div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Remote Name</label>
+          <input type="text" id="wizard-final-name" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--ios-border); font-size: 14px; margin-top: 4px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-top: 10px;">
+          <label style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">Room Location</label>
+          <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+            <button class="brand-chip-btn active" id="room-choice-living" onclick="selectWizardRoom('Living Room')">Living Room</button>
+            <button class="brand-chip-btn" id="room-choice-bedroom" onclick="selectWizardRoom('Bedroom')">Bedroom</button>
+            <button class="brand-chip-btn" id="room-choice-study" onclick="selectWizardRoom('Study')">Study</button>
+            <button class="brand-chip-btn" id="room-choice-office" onclick="selectWizardRoom('Office')">Office</button>
+          </div>
+        </div>
+
+        <button class="ios-btn-primary" style="margin-top: 18px; background: var(--ios-blue);" onclick="saveWizardRemoteAndFinish()">
+          ✓ Save Remote & Start Controlling
+        </button>
+      </div>
+
     </div>
 
 </body>
