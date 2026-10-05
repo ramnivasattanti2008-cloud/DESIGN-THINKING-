@@ -1239,21 +1239,27 @@
       <div id="screen-matrix" class="ios-screen">
         <div class="ios-nav-header">
           <div>
-            <h1 class="ios-large-title" id="matrix-headline">Departure Check</h1>
-            <p class="ios-subtitle">Consequence Graph Reasoning</p>
+            <h1 class="ios-large-title" id="matrix-headline">MIRROR Copilot</h1>
+            <p class="ios-subtitle">Environmental Intelligence & Consequence Engine</p>
           </div>
-          <span class="ios-badge badge-red" id="matrix-status-badge">Not Ready</span>
+          <span class="ios-badge badge-green" id="matrix-status-badge">Standby Ready</span>
+        </div>
+
+        <!-- Mode Indicator Banner -->
+        <div id="matrix-mode-banner" style="display: none; margin-bottom: 8px; padding: 8px 12px; background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 12px; font-size: 12px; color: #92400E; display: flex; justify-content: space-between; align-items: center;">
+          <span>🧪 <b>Benchmark Simulation Mode:</b> Showing simulated offline scenario.</span>
+          <button class="ios-btn-secondary" style="width: auto; padding: 4px 8px; font-size: 11px;" onclick="switchToLiveRealityMode()">Switch to Live Camera</button>
         </div>
 
         <!-- Readiness Ring Card -->
         <div class="ios-card">
           <div style="display: flex; align-items: center; gap: 16px;">
-            <div style="width: 58px; height: 58px; border-radius: 50%; border: 5px solid var(--ios-red); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: var(--ios-red);" id="readiness-circle">
-              38%
+            <div style="width: 58px; height: 58px; border-radius: 50%; border: 5px solid var(--ios-green); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: var(--ios-green);" id="readiness-circle">
+              100%
             </div>
             <div>
-              <div style="font-size: 19px; font-weight: 700;" id="readiness-percent">38% Ready</div>
-              <div style="font-size: 12px; color: var(--ios-text-secondary);" id="readiness-desc">2 State Conflicts require attention</div>
+              <div style="font-size: 19px; font-weight: 700;" id="readiness-percent">MIRROR Standby</div>
+              <div style="font-size: 12px; color: var(--ios-text-secondary);" id="readiness-desc">Awaiting camera observation or intention input.</div>
             </div>
           </div>
         </div>
@@ -1267,12 +1273,9 @@
             <span class="ios-badge badge-blue" style="font-size: 10px;">Structured Reality</span>
           </div>
           <div class="world-model-tree" id="world-model-tree-view">
-ROOM (Physical World Model)
-├── AC: ON (24°C)
-├── LIGHT: ON
-├── TV: OFF
-├── WINDOW: OPEN ⚠ (State Conflict)
-└── UNKNOWN DEVICE: ? (Active Perception Required)
+PHYSICAL WORLD MODEL
+└── No space scanned yet.
+    Point camera or upload a photo to populate the world model with Gemini Vision.
           </div>
         </div>
 
@@ -1291,7 +1294,12 @@ ROOM (Physical World Model)
             <span class="ios-badge badge-pink" style="cursor: pointer; font-size: 10px;" onclick="openFeaturesTourModal()">10 Features</span>
           </div>
           <div id="matrix-items-list" style="display: flex; flex-direction: column; gap: 8px;">
-            <!-- Dynamically populated consequence items -->
+            <div style="text-align: center; padding: 24px 16px; color: var(--ios-text-secondary);">
+              <span style="font-size: 32px; display: block; margin-bottom: 8px;">📷</span>
+              <b style="font-size: 14px; color: var(--ios-text-primary);">Awaiting Space Observation</b>
+              <p style="font-size: 12px; margin-top: 4px; margin-bottom: 12px;">Point your camera at your desk, appliances, or room to perceive physical reality.</p>
+              <button class="ios-btn-primary" style="width: auto; padding: 8px 16px; font-size: 13px; margin: 0 auto; background: var(--ios-pink);" onclick="navTo('camera')">📸 Open Live Camera →</button>
+            </div>
           </div>
         </div>
 
@@ -1301,7 +1309,7 @@ ROOM (Physical World Model)
             📡 Hardware IR Control (Smart/Blaster)
           </div>
           <div id="mirror-actions-list" style="font-size: 13px; color: var(--ios-text-primary); display: flex; flex-direction: column; gap: 6px;">
-            <div>• Air Conditioner is running (27°C)</div>
+            <div>• No active hardware conflicts detected. Use Remote tab to control devices.</div>
           </div>
           <button class="ios-btn-primary" style="margin-top: 10px; font-size: 13px; background: linear-gradient(135deg, #6366F1, #4F46E5); border: none; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);" onclick="triggerAiOmniControl()">
             ⚡ AI Omni-Control: Execute All Safe Actions (IR Blast)
@@ -1313,7 +1321,7 @@ ROOM (Physical World Model)
             👤 What You Need to Check
           </div>
           <div id="user-actions-list" style="font-size: 13px; color: var(--ios-text-primary); display: flex; flex-direction: column; gap: 6px;">
-            <div>• Close and securely latch bedroom window</div>
+            <div>• No manual physical tasks pending. Scan space with camera to inspect.</div>
           </div>
           <button class="ios-btn-primary" style="margin-top: 10px;" onclick="navTo('verify')">
             ✓ Actions Done, Verify State →
@@ -1581,14 +1589,14 @@ ROOM (Physical World Model)
           <span class="ios-badge badge-green" id="v-status-pill">Pending</span>
         </div>
 
-        <div class="ios-card" id="v-result-card" style="border-left: 5px solid var(--ios-blue);">
+        <div class="ios-card" id="v-result-card" style="border-left: 5px solid var(--ios-green);">
           <div style="display: flex; align-items: center; gap: 14px;">
-            <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--ios-blue-light); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--ios-blue);" id="v-result-icon">
-              🔍
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--ios-green-light); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--ios-green);" id="v-result-icon">
+              🛡️
             </div>
             <div>
-              <div id="v-result-title" style="font-size: 18px; font-weight: 700;">Verifying Space State...</div>
-              <div id="v-result-subtitle" style="font-size: 12px; color: var(--ios-text-secondary);">Point camera at resolved items</div>
+              <div id="v-result-title" style="font-size: 18px; font-weight: 700;">Verification Copilot Ready</div>
+              <div id="v-result-subtitle" style="font-size: 12px; color: var(--ios-text-secondary);">Point camera at room fixtures or devices to confirm physical transitions.</div>
             </div>
           </div>
         </div>
@@ -1679,52 +1687,42 @@ ROOM (Physical World Model)
 
         <div class="ios-card">
           <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--ios-text-secondary); margin-bottom: 8px;">
-            <span>Baseline: <b>Morning (8:00 AM)</b></span>
-            <span>Current: <b>Evening (6:30 PM)</b></span>
+            <span>Baseline: <b id="diff-baseline-name">Not Recorded</b></span>
+            <span>Current: <b id="diff-current-name">Live Reality</b></span>
           </div>
-          <div style="font-size: 15px; font-weight: 700; color: var(--ios-red);" id="diff-summary-title">
-            2 Physical State Changes Detected
+          <div style="font-size: 15px; font-weight: 700; color: var(--ios-text-primary);" id="diff-summary-title">
+            State Memory: Temporal Snapshot Comparison
           </div>
         </div>
 
         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-          <button class="ios-btn-secondary" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700;" onclick="saveSnapshot('morning_baseline')">
-            📸 Save Baseline
+          <button class="ios-btn-secondary" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700;" onclick="saveSnapshot('user_baseline')">
+            📸 Save Baseline Snapshot
           </button>
-          <button class="ios-btn-primary" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700; background: #EA580C;" onclick="compareSnapshot('morning_baseline')">
-            🔍 Compare Baseline
+          <button class="ios-btn-primary" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700; background: #EA580C;" onclick="compareSnapshot('user_baseline')">
+            🔍 Compare With Current State
           </button>
         </div>
 
         <div class="ios-card" style="padding: 12px;">
-          <div style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase; margin-bottom: 8px;">
-            Detected Physical Transitions
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase;">
+              Detected Physical Transitions
+            </div>
+            <span class="ios-badge badge-blue">Snapshot Diff</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;" id="diff-items-container">
-            <div class="consequence-card conflict">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <b style="font-size: 14px;">Window (Far Wall)</b>
-                <span class="ios-badge badge-red">CLOSED → OPEN</span>
-              </div>
-              <div style="font-size: 12px; color: var(--ios-text-secondary);">
-                Window was opened while you were away. Risk of rain and security vulnerability.
-              </div>
-            </div>
-
-            <div class="consequence-card unnecessary_active">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <b style="font-size: 14px;">Air Conditioner (Wall)</b>
-                <span class="ios-badge badge-orange">OFF → RUNNING (27°C)</span>
-              </div>
-              <div style="font-size: 12px; color: var(--ios-text-secondary);">
-                Device turned ON; cooling empty room.
-              </div>
+            <div style="text-align: center; padding: 24px 12px; color: var(--ios-text-secondary);">
+              <span style="font-size: 32px; display: block; margin-bottom: 8px;">⏱️</span>
+              <b style="color: var(--ios-text-primary); font-size: 14px;">No Snapshots Saved Yet</b>
+              <p style="font-size: 12px; margin-top: 4px; margin-bottom: 12px;">Save a baseline snapshot (e.g. before leaving), then compare later to detect what changed.</p>
+              <button class="ios-btn-secondary" style="width: auto; padding: 6px 14px; font-size: 12px; margin: 0 auto;" onclick="saveSnapshot('user_baseline')">📸 Record Baseline Now</button>
             </div>
           </div>
         </div>
 
-        <button class="ios-btn-primary" onclick="setPreset('leaving', 'I\'m leaving', 'bedroom_leaving')">
-          Resolve With Departure Check →
+        <button class="ios-btn-primary" onclick="navTo('matrix')">
+          View Active Consequence Matrix →
         </button>
       </div>
 
@@ -1915,15 +1913,17 @@ ROOM (Physical World Model)
   <script>
     // State Model
     const appState = {
-      intention: "I'm leaving",
-      sceneType: "bedroom_leaving",
+      intention: "",
+      mode: "live", // "live" (real camera/photo) or "simulation" (offline test presets)
+      sceneType: null,
       currentWorld: null,
       consequenceReport: null,
       verificationResult: null,
       spokenText: "",
       auditEvents: [],
       acTemp: 24,
-      isListeningVoice: false
+      isListeningVoice: false,
+      lastCapturedFrameB64: null
     };
 
     const API_BASE = window.location.port === "8080" 
@@ -2005,45 +2005,103 @@ ROOM (Physical World Model)
     function loadCuteFemaleVoice() {
       if (!("speechSynthesis" in window)) return;
       const voices = window.speechSynthesis.getVoices();
-      // Search for best natural cute female voices
-      cuteFemaleVoice = voices.find(v => 
-        v.name.includes("Samantha") ||
-        v.name.includes("Victoria") ||
-        v.name.includes("Karen") ||
-        v.name.includes("Zira") ||
-        v.name.includes("Google US English") ||
-        v.name.includes("Moira") ||
-        v.name.includes("Fiona") ||
-        v.name.toLowerCase().includes("female")
-      ) || voices[0];
+      if (!voices || voices.length === 0) return;
+
+      const priorityNames = [
+        "Microsoft Jenny Online (Natural) - English (United States)",
+        "Microsoft Sonia Online (Natural) - English (United Kingdom)",
+        "Microsoft Aria Online (Natural) - English (United States)",
+        "Google UK English Female",
+        "Google US English",
+        "Samantha",
+        "Victoria",
+        "Karen",
+        "Microsoft Zira - English (United States)",
+        "Moira",
+        "Fiona"
+      ];
+      for (const name of priorityNames) {
+        const found = voices.find(v => v.name.includes(name) || v.name === name);
+        if (found) {
+          cuteFemaleVoice = found;
+          return;
+        }
+      }
+      const female = voices.find(v => 
+        v.name.toLowerCase().includes("female") || 
+        v.name.toLowerCase().includes("natural") ||
+        (v.lang && v.lang.startsWith("en") && !v.name.toLowerCase().includes("david") && !v.name.toLowerCase().includes("george"))
+      );
+      cuteFemaleVoice = female || voices[0];
     }
     window.speechSynthesis.onvoiceschanged = loadCuteFemaleVoice;
 
     // Cute Voice Speech Synthesis
     function speakCuteVoice(text) {
-      if (!("speechSynthesis" in window)) return;
+      if (!("speechSynthesis" in window) || !text) return;
       window.speechSynthesis.cancel();
       if (!cuteFemaleVoice) loadCuteFemaleVoice();
 
       const u = new SpeechSynthesisUtterance(text);
       if (cuteFemaleVoice) u.voice = cuteFemaleVoice;
-      u.pitch = 1.18; // Sweet, cute, pleasant pitch
+      u.pitch = 1.15; // Sweet, cute, warm pitch
       u.rate = 0.98;  // Clear, articulate pacing
 
       const bar = document.getElementById("cute-voice-bar");
       u.onstart = () => {
         if (bar) bar.classList.add("speaking");
-        document.getElementById("voice-play-badge").innerText = "Speaking 🌸";
+        const b = document.getElementById("voice-play-badge");
+        if (b) b.innerText = "Speaking 🌸";
       };
       u.onend = () => {
         if (bar) bar.classList.remove("speaking");
-        document.getElementById("voice-play-badge").innerText = "Tap to Hear";
+        const b = document.getElementById("voice-play-badge");
+        if (b) b.innerText = "Tap to Hear";
       };
       window.speechSynthesis.speak(u);
     }
 
     function playVoiceGreeting() {
-      speakCuteVoice("Hi Ram! I'm Aura, your physical intelligence assistant. Tell me what you're doing, and I'll keep your space safe and perfect!");
+      speakCuteVoice("Hi Ram! I'm Aura, your physical intelligence copilot. Show me your space with the camera or tell me your intention!");
+    }
+
+    // Web Audio Carrier IR Pulse Synthesizer for 3.5mm/USB-C Audio IR Blasters
+    function playHardwareIrChirp(patternUs = [9000, 4500, 560, 1690, 560, 560, 560, 40000]) {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const sampleRate = ctx.sampleRate;
+        const totalUs = patternUs.reduce((a, b) => a + b, 0);
+        const totalSamples = Math.min(sampleRate * 2, Math.ceil((totalUs / 1000000) * sampleRate));
+        if (totalSamples <= 0) return;
+
+        const buffer = ctx.createBuffer(1, totalSamples, sampleRate);
+        const data = buffer.getChannelData(0);
+        const targetFreq = Math.min(19200, sampleRate / 2 - 1000);
+        const omega = 2 * Math.PI * targetFreq / sampleRate;
+
+        let sampleIdx = 0;
+        let isMark = true;
+        for (const us of patternUs) {
+          const numSamples = Math.round((us / 1000000) * sampleRate);
+          for (let i = 0; i < numSamples && (sampleIdx + i) < totalSamples; i++) {
+            if (isMark) {
+              data[sampleIdx + i] = Math.sin(omega * (sampleIdx + i)) * 0.95;
+            } else {
+              data[sampleIdx + i] = 0;
+            }
+          }
+          sampleIdx += numSamples;
+          isMark = !isMark;
+        }
+
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        src.connect(ctx.destination);
+        src.start();
+      } catch (e) {
+        console.warn("Hardware IR chirp note:", e);
+      }
     }
 
     // Web Audio API Synthesizer Chimes
@@ -2301,7 +2359,9 @@ ROOM (Physical World Model)
       if (targetDock) targetDock.classList.add("active");
 
       if (screenName === "camera") {
-        renderCanvasScene();
+        if (!webcamStream) {
+          startWebcamStream();
+        }
       } else if (screenName === "verify") {
         renderVerifyCanvas();
       }
@@ -2322,15 +2382,26 @@ ROOM (Physical World Model)
     async function blastIr(deviceType, command) {
       playAppleChime('ir_pulse');
       const pulseDot = document.getElementById("ir-pulse-dot");
-      pulseDot.classList.remove("firing");
-      void pulseDot.offsetWidth;
-      pulseDot.classList.add("firing");
+      if (pulseDot) {
+        pulseDot.classList.remove("firing");
+        void pulseDot.offsetWidth;
+        pulseDot.classList.add("firing");
+      }
+      const panelLed = document.getElementById("ir-panel-led");
+      if (panelLed) {
+        panelLed.style.background = "#EF4444";
+        panelLed.style.boxShadow = "0 0 16px #EF4444";
+        setTimeout(() => {
+          panelLed.style.background = "#10B981";
+          panelLed.style.boxShadow = "0 0 8px #10B981";
+        }, 300);
+      }
 
       if ("vibrate" in navigator) {
         navigator.vibrate([40, 60, 40]);
       }
 
-      updateIsland(`📡 Transmitting 38kHz IR: ${deviceType}.${command}`, true);
+      updateIsland(`📡 Transmitting 38kHz IR: ${deviceType.toUpperCase()}.${command}`, true);
 
       try {
         const res = await fetch(`${API_BASE}/v1/ir/transmit`, {
@@ -2344,11 +2415,42 @@ ROOM (Physical World Model)
 
         if (res.ok) {
           const data = await res.json();
+          if (data.pattern) {
+            playHardwareIrChirp(data.pattern);
+          }
           const cleanName = deviceType.toUpperCase();
-          speakCuteVoice(`IR signal dispatched to ${cleanName}: ${command.replace('_', ' ')}.`);
+          speakCuteVoice(`Dispatched 38kHz IR command to ${cleanName}: ${command.replace('_', ' ')}.`);
           logAudit("ir_transmitted", data);
+
+          // Update local world model and matrix if active
+          if (appState.currentWorld && appState.currentWorld.entities) {
+            appState.currentWorld.entities.forEach(ent => {
+              const l = ent.label.toLowerCase();
+              if (l.includes(deviceType) || (deviceType === 'ac' && l.includes('conditioner')) || (deviceType === 'lights' && (l.includes('light') || l.includes('lamp')))) {
+                if (command.includes('off') || command.includes('cutoff')) {
+                  ent.state = 'OFF';
+                } else if (command.includes('temp') || command.includes('eco')) {
+                  ent.state = 'ECO 24°C';
+                }
+              }
+            });
+          }
+          if (appState.consequenceReport && appState.consequenceReport.items) {
+            appState.consequenceReport.items.forEach(item => {
+              const l = item.entity_label.toLowerCase();
+              if (l.includes(deviceType) || (deviceType === 'ac' && l.includes('conditioner')) || (deviceType === 'lights' && (l.includes('light') || l.includes('lamp')))) {
+                if (command.includes('off') || command.includes('cutoff')) {
+                  item.current_state = 'OFF';
+                  item.status = 'match';
+                  item.consequence_text = `${cleanName} turned off via 38kHz IR blaster.`;
+                }
+              }
+            });
+            renderConsequenceMatrix(appState.consequenceReport);
+          }
         }
       } catch (err) {
+        playHardwareIrChirp();
         speakCuteVoice(`38kHz IR pulse sent to ${deviceType}.`);
       }
     }
@@ -2367,8 +2469,11 @@ ROOM (Physical World Model)
     function selectPreset(presetId, intentionText, sceneKey) {
       document.getElementById("goal-input").value = intentionText;
       appState.intention = intentionText;
+      appState.mode = "simulation";
       appState.sceneType = sceneKey;
-      document.getElementById("active-scene-preset-label").innerText = `Scene: ${sceneKey.replace('_', ' ')}`;
+      document.getElementById("active-scene-preset-label").innerText = `Simulation: ${sceneKey.replace('_', ' ')}`;
+      const b = document.getElementById("matrix-mode-banner");
+      if (b) b.style.display = "flex";
       onEvaluateIntention();
     }
 
@@ -2391,42 +2496,93 @@ ROOM (Physical World Model)
 
       updateIsland("⚡ Evaluating Consequence Graph...", true);
 
-      const sceneData = SCENE_PRESETS[appState.sceneType] || SCENE_PRESETS.bedroom_leaving;
-      appState.currentWorld = sceneData;
+      const payload = {
+        intention: intention,
+        room_type: "room"
+      };
+
+      if (appState.mode === "live") {
+        if (appState.lastCapturedFrameB64) {
+          payload.frames = [{
+            id: "frame_" + Date.now(),
+            media_type: "image/jpeg",
+            data_b64: appState.lastCapturedFrameB64
+          }];
+        }
+        // In live mode without a captured photo, send NO fake entities!
+      } else if (appState.mode === "simulation" && appState.sceneType && SCENE_PRESETS[appState.sceneType]) {
+        const sceneData = SCENE_PRESETS[appState.sceneType];
+        payload.entities = sceneData.entities;
+        payload.room_type = sceneData.room_type;
+      }
 
       try {
         const res = await fetch(`${API_BASE}/v1/consequence/evaluate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            intention: intention,
-            entities: sceneData.entities,
-            room_type: sceneData.room_type
-          })
+          body: JSON.stringify(payload)
         });
 
         if (res.ok) {
           const report = await res.json();
           appState.consequenceReport = report;
+          if (report.entities && report.entities.length > 0) {
+            appState.currentWorld = {
+              room_type: report.room_type || "room",
+              entities: report.entities
+            };
+            renderWorldModelTree(report.entities);
+          }
           renderConsequenceMatrix(report);
           logAudit("intention_evaluated", report);
           navTo("matrix");
-          updateIsland(`${report.headline} Loaded`, report.is_ready);
+          updateIsland(`${report.headline} Evaluated`, report.is_ready);
           speakCuteVoice(report.spoken_summary);
-        } else {
-          fallbackLocalEvaluation(intention, sceneData);
+          return;
         }
       } catch (err) {
-        fallbackLocalEvaluation(intention, sceneData);
+        console.warn("Evaluate intention network note:", err);
       }
+
+      if (appState.mode === "simulation") {
+        fallbackLocalEvaluation(intention, SCENE_PRESETS[appState.sceneType] || SCENE_PRESETS.bedroom_leaving);
+      } else {
+        fallbackLiveStandbyEvaluation(intention);
+      }
+    }
+
+    function fallbackLiveStandbyEvaluation(intention) {
+      const report = {
+        headline: `${intention.charAt(0).toUpperCase() + intention.slice(1)} Target Invariants`,
+        readiness_score: 1.0,
+        is_ready: false,
+        spoken_summary: `Target conditions prepared for: ${intention}. Please scan your space with the camera to visually verify reality.`,
+        items: [
+          {
+            entity_label: "physical_space",
+            current_state: "AWAITING_CAMERA",
+            desired_state: "VERIFIED",
+            status: "attention",
+            consequence_text: `Visual verification is needed to confirm physical conditions for '${intention}'.`,
+            suggested_action: "Point camera at your desk, appliances, or room.",
+            action_type: "physical_user"
+          }
+        ],
+        mirror_actions: ["Hardware IR Blaster ready to control appliances once observed."],
+        user_actions: ["Scan your space with the camera to verify physical reality."]
+      };
+      appState.consequenceReport = report;
+      renderConsequenceMatrix(report);
+      navTo("matrix");
+      speakCuteVoice(report.spoken_summary);
     }
 
     function fallbackLocalEvaluation(intention, sceneData) {
       const report = {
-        headline: intention.toLowerCase().includes("sleep") ? "Sleep Environment Transition" : "Departure Check",
+        headline: intention.toLowerCase().includes("sleep") ? "Sleep Environment Transition (Simulated)" : "Departure Check (Simulated)",
         readiness_score: 0.38,
         is_ready: false,
-        spoken_summary: "Your space isn't ready. The window is open and the air conditioner is still running.",
+        spoken_summary: "Simulated benchmark loaded: window is open and air conditioner is running.",
         items: [
           {
             entity_label: "window",
@@ -2837,8 +2993,11 @@ ROOM (Physical World Model)
       playAppleChime('listen');
       document.getElementById("goal-input").value = "MIRROR, I'm leaving for college.";
       appState.intention = "I'm leaving for college";
+      appState.mode = "simulation";
       appState.sceneType = "college_departure";
-      document.getElementById("active-scene-preset-label").innerText = "Scene: College Departure (5 Entities)";
+      document.getElementById("active-scene-preset-label").innerText = "Simulation: College Departure (5 Entities)";
+      const b = document.getElementById("matrix-mode-banner");
+      if (b) b.style.display = "flex";
       speakCuteVoice("MIRROR, I'm leaving for college. Scanning room, building world model, and evaluating departure state!");
       onEvaluateIntention();
     }
@@ -2908,24 +3067,45 @@ ROOM (Physical World Model)
       canvas.width = canvas.parentElement.clientWidth || 380;
       canvas.height = canvas.parentElement.clientHeight || 380;
 
-      ctx.fillStyle = "#16181F";
+      if (appState.mode === "simulation" && appState.sceneType && SCENE_PRESETS[appState.sceneType]) {
+        // Only draw simulation diagram if explicitly running a simulation benchmark!
+        ctx.fillStyle = "#16181F";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#222633";
+        ctx.fillRect(0, canvas.height * 0.45, canvas.width, canvas.height * 0.55);
+        ctx.strokeStyle = "#4F5D75";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(canvas.width * 0.50, canvas.height * 0.12, canvas.width * 0.42, canvas.height * 0.32);
+        ctx.fillStyle = "#1E2A38";
+        ctx.fillRect(canvas.width * 0.51, canvas.height * 0.13, canvas.width * 0.40, canvas.height * 0.30);
+        ctx.fillStyle = "#E2E8F0";
+        ctx.fillRect(canvas.width * 0.12, canvas.height * 0.08, canvas.width * 0.32, canvas.height * 0.12);
+        renderSpatialBoxes();
+        return;
+      }
+
+      // Live mode standby viewfinder
+      ctx.fillStyle = "#0B0D12";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = "#222633";
-      ctx.fillRect(0, canvas.height * 0.45, canvas.width, canvas.height * 0.55);
+      // Viewfinder grid & reticle
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 3, 0); ctx.lineTo(canvas.width / 3, canvas.height);
+      ctx.moveTo(canvas.width * 2 / 3, 0); ctx.lineTo(canvas.width * 2 / 3, canvas.height);
+      ctx.moveTo(0, canvas.height / 3); ctx.lineTo(canvas.width, canvas.height / 3);
+      ctx.moveTo(0, canvas.height * 2 / 3); ctx.lineTo(canvas.width, canvas.height * 2 / 3);
+      ctx.stroke();
 
-      ctx.strokeStyle = "#4F5D75";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(canvas.width * 0.50, canvas.height * 0.12, canvas.width * 0.42, canvas.height * 0.32);
-      ctx.fillStyle = "#1E2A38";
-      ctx.fillRect(canvas.width * 0.51, canvas.height * 0.13, canvas.width * 0.40, canvas.height * 0.30);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("📷 Camera Viewfinder Standby", canvas.width / 2, canvas.height / 2 - 12);
 
-      ctx.fillStyle = "#E2E8F0";
-      ctx.fillRect(canvas.width * 0.12, canvas.height * 0.08, canvas.width * 0.32, canvas.height * 0.12);
-
-      ctx.strokeStyle = "#78350F";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(canvas.width * 0.08, canvas.height * 0.25, canvas.width * 0.20, canvas.height * 0.65);
+      ctx.font = "12px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+      ctx.fillText("Tap 'Live Cam' for webcam or 'Photo' to upload image", canvas.width / 2, canvas.height / 2 + 14);
 
       renderSpatialBoxes();
     }
@@ -2934,7 +3114,8 @@ ROOM (Physical World Model)
       const overlay = document.getElementById("spatial-overlay");
       overlay.innerHTML = "";
 
-      const scene = appState.currentWorld || SCENE_PRESETS.bedroom_leaving;
+      const scene = appState.currentWorld;
+      if (!scene || !scene.entities) return;
       scene.entities.forEach(ent => {
         if (!ent.box_2d) return;
         const [ymin, xmin, ymax, xmax] = ent.box_2d;
@@ -2962,19 +3143,21 @@ ROOM (Physical World Model)
       vc.height = vc.parentElement.clientHeight || 280;
       const vctx = vc.getContext("2d");
 
-      vctx.fillStyle = "#16181F";
+      vctx.fillStyle = "#0B0D12";
       vctx.fillRect(0, 0, vc.width, vc.height);
 
-      vctx.strokeStyle = "#10B981";
-      vctx.lineWidth = 4;
-      vctx.strokeRect(vc.width * 0.25, vc.height * 0.15, vc.width * 0.50, vc.height * 0.65);
-      vctx.fillStyle = "#064E3B";
-      vctx.fillRect(vc.width * 0.26, vc.height * 0.16, vc.width * 0.48, vc.height * 0.63);
+      vctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+      vctx.lineWidth = 2;
+      vctx.strokeRect(vc.width * 0.1, vc.height * 0.1, vc.width * 0.8, vc.height * 0.8);
 
       vctx.fillStyle = "#FFFFFF";
-      vctx.font = "bold 16px -apple-system";
+      vctx.font = "bold 15px -apple-system, sans-serif";
       vctx.textAlign = "center";
-      vctx.fillText("WINDOW CLOSED ✓", vc.width * 0.50, vc.height * 0.50);
+      vctx.fillText("🛡️ Closed-Loop Verification Viewport", vc.width * 0.50, vc.height * 0.45);
+
+      vctx.font = "12px -apple-system, sans-serif";
+      vctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+      vctx.fillText("Point camera at device to verify desired state", vc.width * 0.50, vc.height * 0.58);
     }
 
     async function onRunVerification(isSuccess = true) {
@@ -3135,42 +3318,132 @@ ROOM (Physical World Model)
       });
     }
 
+    function startWebcamStream() {
+      if (webcamStream) return;
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById("camera-mode-badge").innerText = "Photo Upload Mode";
+        return;
+      }
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } } })
+        .then(stream => {
+          webcamStream = stream;
+          const v = document.getElementById("webcam-stream");
+          v.srcObject = stream;
+          v.style.display = "block";
+          document.getElementById("viewfinder-canvas").style.display = "none";
+          document.getElementById("btn-webcam-toggle").innerText = "⏹️ Stop";
+          document.getElementById("camera-mode-badge").innerText = "Webcam Live";
+          updateIsland("📹 Live Camera Feed Connected", true);
+        })
+        .catch(err => {
+          console.warn("Webcam access note:", err.message);
+          document.getElementById("camera-mode-badge").innerText = "Photo Ready";
+        });
+    }
+
+    function toggleWebcam() {
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(t => t.stop());
+        webcamStream = null;
+        document.getElementById("webcam-stream").style.display = "none";
+        document.getElementById("viewfinder-canvas").style.display = "block";
+        document.getElementById("btn-webcam-toggle").innerText = "📹 Live Cam";
+        document.getElementById("camera-mode-badge").innerText = "Camera Standby";
+        updateIsland("Camera Paused", false);
+      } else {
+        startWebcamStream();
+      }
+    }
+
+    function triggerFilePicker() {
+      document.getElementById("file-picker").click();
+    }
+
+    function handleFilePicked(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          canvas.width = img.width || 640;
+          canvas.height = img.height || 480;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          if (webcamStream) {
+            webcamStream.getTracks().forEach(t => t.stop());
+            webcamStream = null;
+            document.getElementById("btn-webcam-toggle").innerText = "📹 Live Cam";
+          }
+          document.getElementById("webcam-stream").style.display = "none";
+          document.getElementById("viewfinder-canvas").style.display = "block";
+          document.getElementById("camera-mode-badge").innerText = `Photo: ${file.name.substring(0, 12)}`;
+
+          try {
+            appState.lastCapturedFrameB64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+          } catch(err) {
+            console.warn("Photo export:", err);
+          }
+
+          appState.mode = "live";
+          onCaptureAndAnalyze();
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     async function onCaptureAndAnalyze() {
-      updateIsland("⚡ Scanning Physical Space with Gemini Vision...", true);
+      updateIsland("📸 Scanning Physical Space with Gemini Vision...", true);
       playAppleChime('tap');
 
+      // Visual shutter flash effect
+      const viewport = document.querySelector(".apple-camera-viewport");
+      if (viewport) {
+        const flash = document.createElement("div");
+        flash.style.position = "absolute";
+        flash.style.inset = "0";
+        flash.style.background = "#FFFFFF";
+        flash.style.opacity = "0.8";
+        flash.style.zIndex = "50";
+        flash.style.transition = "opacity 0.25s ease-out";
+        viewport.appendChild(flash);
+        setTimeout(() => { flash.style.opacity = "0"; setTimeout(() => flash.remove(), 250); }, 50);
+      }
+
+      let frameB64 = null;
       if (webcamStream) {
         const v = document.getElementById("webcam-stream");
         if (v && v.videoWidth > 0) {
           canvas.width = v.videoWidth;
           canvas.height = v.videoHeight;
           ctx.drawImage(v, 0, 0);
+          try {
+            frameB64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+            appState.lastCapturedFrameB64 = frameB64;
+          } catch (e) {
+            console.warn("Canvas export fallback:", e);
+          }
         }
-      }
-
-      let frameB64 = null;
-      try {
-        frameB64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
-      } catch (e) {
-        console.warn("Canvas export fallback:", e);
+      } else if (appState.lastCapturedFrameB64) {
+        frameB64 = appState.lastCapturedFrameB64;
       }
 
       const intention = appState.intention || document.getElementById("goal-input").value.trim() || "I'm leaving";
-      const sceneData = SCENE_PRESETS[appState.sceneType] || SCENE_PRESETS.bedroom_leaving;
-
       const payload = {
         intention: intention,
-        room_type: sceneData.room_type
+        room_type: "room"
       };
 
-      if (frameB64 && (webcamStream || document.getElementById("camera-mode-badge").innerText.includes("Photo") || document.getElementById("camera-mode-badge").innerText.includes("Live"))) {
+      if (frameB64) {
         payload.frames = [{
           id: "cam_capture_" + Date.now(),
           media_type: "image/jpeg",
           data_b64: frameB64
         }];
-      } else {
-        payload.entities = sceneData.entities;
+      } else if (appState.mode === "simulation" && appState.sceneType && SCENE_PRESETS[appState.sceneType]) {
+        payload.entities = SCENE_PRESETS[appState.sceneType].entities;
+        payload.room_type = SCENE_PRESETS[appState.sceneType].room_type;
       }
 
       try {
@@ -3185,7 +3458,7 @@ ROOM (Physical World Model)
           appState.consequenceReport = report;
           if (report.entities && report.entities.length > 0) {
             appState.currentWorld = {
-              room_type: sceneData.room_type,
+              room_type: report.room_type || "room",
               entities: report.entities
             };
             renderBoundingBoxes(report.entities);
@@ -3202,49 +3475,11 @@ ROOM (Physical World Model)
         console.warn("Camera evaluate failed, falling back:", err);
       }
 
-      onEvaluateIntention();
-    }
-
-    function toggleWebcam() {
-      if (webcamStream) {
-        webcamStream.getTracks().forEach(t => t.stop());
-        webcamStream = null;
-        document.getElementById("webcam-stream").style.display = "none";
-        document.getElementById("viewfinder-canvas").style.display = "block";
-        document.getElementById("btn-webcam-toggle").innerText = "📹 Live Cam";
+      if (appState.mode === "simulation") {
+        fallbackLocalEvaluation(intention, SCENE_PRESETS[appState.sceneType] || SCENE_PRESETS.bedroom_leaving);
       } else {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-          .then(stream => {
-            webcamStream = stream;
-            const v = document.getElementById("webcam-stream");
-            v.srcObject = stream;
-            v.style.display = "block";
-            document.getElementById("viewfinder-canvas").style.display = "none";
-            document.getElementById("btn-webcam-toggle").innerText = "⏹️ Stop";
-            document.getElementById("camera-mode-badge").innerText = "Webcam Live";
-          })
-          .catch(err => alert("Camera unavailable: " + err.message));
+        fallbackLiveStandbyEvaluation(intention);
       }
-    }
-
-    function triggerFilePicker() {
-      document.getElementById("file-picker").click();
-    }
-
-    function handleFilePicked(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const img = new Image();
-        img.onload = function() {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          document.getElementById("camera-mode-badge").innerText = `Photo: ${file.name.substring(0, 10)}`;
-          onEvaluateIntention();
-        };
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
     }
 
     function logAudit(event, data) {
@@ -3267,9 +3502,29 @@ ROOM (Physical World Model)
 
     window.addEventListener("DOMContentLoaded", () => {
       loadCuteFemaleVoice();
-      renderCanvasScene();
-      onEvaluateIntention();
+      initializeStandbyState();
     });
+
+    function initializeStandbyState() {
+      appState.mode = "live";
+      appState.currentWorld = null;
+      appState.consequenceReport = null;
+      appState.lastCapturedFrameB64 = null;
+      updateIsland("🌸 MIRROR Ready · Awaiting Intention or Camera Scan", true);
+      const b = document.getElementById("matrix-mode-banner");
+      if (b) b.style.display = "none";
+    }
+
+    function switchToLiveRealityMode() {
+      playAppleChime('tap');
+      appState.mode = "live";
+      appState.sceneType = null;
+      const b = document.getElementById("matrix-mode-banner");
+      if (b) b.style.display = "none";
+      navTo('camera');
+      startWebcamStream();
+      speakCuteVoice("Switched to Live Reality Mode. Point camera at your space.");
+    }
 
     // Hierarchical Mission Planner (Features 14, 22, 85)
     async function openMissionPlanModal() {

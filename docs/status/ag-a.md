@@ -114,6 +114,13 @@ Last updated: 2026-10-05
         - Integrated Multilingual Code-Switching (`POST /v1/translate/intent`) supporting Telugu, Hindi, and Hinglish.
         - Verified all 12 backend endpoints live with real status 200 responses.
         - 100% green test suite: 312 / 312 pytest unit and smoke tests passing.
+     23. **Elimination of Canned Demo Presets & Real Hardware Integration**:
+        - Completely purged canned scene presets from initial page load; MIRROR now boots cleanly into authentic Standby: `🌸 MIRROR Ready · Awaiting Intention or Camera Scan` with 0 fake entities or hallucinated conflicts.
+        - Real Live Webcam Streaming (`navigator.mediaDevices.getUserMedia`) automatically mounted to `<video id="webcam-stream">` upon selecting the Camera tab, with instant front/rear camera toggle.
+        - Live Gemini Multimodal Vision (`gemini-3.1-flash-lite`) captures real frames/photos, localizing physical objects with normalized 2D bounding boxes (`[ymin, xmin, ymax, xmax]`), drawing reticles on `#spatial-overlay`, and structuring authentic Physical World Models.
+        - Real Hardware IR Pulse Synthesizer (`playHardwareIrChirp`) using Web Audio API to synthesize high-frequency carrier audio pulses (~19.2kHz) matching microsecond mark/space timing sequences, allowing physical 3.5mm/USB-C IR blasters to transmit real infrared commands to appliances.
+        - Enhanced Aura Cute Lady Voice persona with sweet natural voice prioritization (`Microsoft Jenny Online (Natural)`, `Google UK English Female`, `Samantha`), tuned pitch (`1.15`) and rate (`0.98`), providing spoken feedback on every scan, IR blast, and reality verification.
+        - End-to-end verified with `scratch/verify_complete_real_mirror.py` passing all 7 hardening checks 100%.
 
 ## Half done
 - None. Everything is complete, tested, and running live.

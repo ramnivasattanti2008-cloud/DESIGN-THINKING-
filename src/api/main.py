@@ -306,7 +306,8 @@ def evaluate_consequence(body: ConsequenceRequest):
                 from src.core.model_client import GeminiModelClient
                 client = GeminiModelClient(gemini_key, model=os.environ.get("MIRROR_MODEL_NAME", "gemini-3.1-flash-lite"))
                 world = client.observe_physical_world(body.frames, body.intention)
-            except Exception:
+            except Exception as e:
+                print(f"[MIRROR] Gemini observation fallback: {e}")
                 world = PhysicalWorldModel(room_type=body.room_type)
         elif hasattr(_model, "observe_physical_world"):
             world = _model.observe_physical_world(body.frames, body.intention)

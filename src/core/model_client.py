@@ -241,8 +241,12 @@ class GeminiModelClient:
             f"- properties: optional key-value dictionary (e.g. ocr text, temperature, status labels)\n"
             f'Reply with JSON only:\n{{"room_type": "room", "entities": [{{"label": "desk", "state": "CLEAR", "location": "center", "confidence": 0.95, "box_2d": [100, 200, 400, 600], "is_device": false, "is_hazard": false}}]}}'
         )
-        parts.append({"text": prompt_text})
-        for cand_model in [self.model, "gemini-3.1-flash-lite", "gemini-flash-latest"]:
+        cand_models = ["gemini-3.1-flash-lite", self.model, "gemini-flash-latest"]
+        seen_models = set()
+        for cand_model in cand_models:
+            if not cand_model or cand_model in seen_models:
+                continue
+            seen_models.add(cand_model)
             try:
                 r = self._http.post(
                     GEMINI_URL.format(model=cand_model),
