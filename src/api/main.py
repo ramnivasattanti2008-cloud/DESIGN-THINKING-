@@ -683,13 +683,13 @@ def ai_omni_control(body: AiOmniControlRequest):
 
     if executed_signals:
         devices_str = ", ".join(s["device"].upper() for s in executed_signals)
-        speech = f"Autonomous Omni-Control complete! Dispatched 38kHz IR pulses to power off {devices_str}."
+        speech = f"All set! Sent IR signal to power off {devices_str}."
         if pending_physical:
-            speech += f" Please check the physical {pending_physical[0]}."
+            speech += f" Please check the physical {pending_physical[0]} before leaving."
         else:
-            speech += " All physical conditions are satisfied. You're ready to proceed!"
+            speech += " Your room is aligned and ready to go!"
     else:
-        speech = "All controllable devices are already aligned with your desired state."
+        speech = "Your space is already in the desired state. Everything looks great!"
 
     return {
         "ok": True,

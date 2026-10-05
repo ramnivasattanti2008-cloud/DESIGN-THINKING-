@@ -121,6 +121,14 @@ Last updated: 2026-10-05
         - Real Hardware IR Pulse Synthesizer (`playHardwareIrChirp`) using Web Audio API to synthesize high-frequency carrier audio pulses (~19.2kHz) matching microsecond mark/space timing sequences, allowing physical 3.5mm/USB-C IR blasters to transmit real infrared commands to appliances.
         - Enhanced Aura Cute Lady Voice persona with sweet natural voice prioritization (`Microsoft Jenny Online (Natural)`, `Google UK English Female`, `Samantha`), tuned pitch (`1.15`) and rate (`0.98`), providing spoken feedback on every scan, IR blast, and reality verification.
         - End-to-end verified with `scratch/verify_complete_real_mirror.py` passing all 7 hardening checks 100%.
+     24. **Minimalist Apple Home UI Transformation & Living Aura Intelligence Orb**:
+        - Completely purged hackathon demo cards, simulation banners, phone install ads, and cluttered preset lists from the home screen.
+        - Implemented the Living Ambient Aura Intelligence Orb with fluid multi-hue radial mesh, breathing pulse on standby, active listening ripple in speech recognition, and speaking animation during voice replies.
+        - Created minimalist intention search pill with voice mic trigger and 4 primary quick-intention pills: 🚪 Leaving, 🌙 Sleep, 📖 Study, 🍳 Cooking.
+        - Added Live Space Status card with mini readiness ring and direct 1-tap room scanning and device alignment.
+        - Added minimal 1-tap appliance remote strip (AC Power, TV Power, Lights) delivering instantaneous 38kHz Web Audio IR carrier blasts.
+        - Trained Aura's conversational voice delivery: crisp, warm, polite, and articulate pacing without redundant speech stutter.
+        - Verified full regression test suite: 312 / 312 pytest cases passing green in 14.14s.
 
 ## Half done
 - None. Everything is complete, tested, and running live.

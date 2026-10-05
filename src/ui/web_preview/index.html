@@ -897,6 +897,333 @@
       color: var(--ios-text-secondary);
       line-height: 1.35;
     }
+
+    /* --- Minimalist Apple Home & Living Aura Intelligence Orb --- */
+    .home-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0 10px;
+    }
+    .home-header-left {
+      display: flex;
+      flex-direction: column;
+    }
+    .home-app-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: var(--ios-text-primary);
+    }
+    .home-space-subtitle {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ios-text-secondary);
+      margin-top: 1px;
+    }
+    .home-header-cam-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--ios-surface);
+      border: 0.5px solid var(--ios-border);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .home-header-cam-btn:active {
+      transform: scale(0.9);
+      background: #E5E5EA;
+    }
+
+    /* The Living Ambient Aura Intelligence Orb */
+    .aura-orb-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 0 12px;
+      cursor: pointer;
+    }
+    .aura-orb {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #FF758C 0%, #FF7EB3 45%, #7F00FF 80%, #E100FF 100%);
+      box-shadow: 0 10px 35px rgba(255, 117, 140, 0.45), 0 0 20px rgba(127, 0, 255, 0.3);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: auraFloat 4s ease-in-out infinite alternate;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .aura-orb::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: inherit;
+      filter: blur(12px);
+      opacity: 0.6;
+      z-index: -1;
+      animation: auraPulse 3s ease-in-out infinite alternate;
+    }
+    .aura-orb:active {
+      transform: scale(0.92);
+    }
+    .aura-orb.speaking {
+      animation: auraSpeaking 1.1s ease-in-out infinite alternate;
+      box-shadow: 0 14px 50px rgba(255, 45, 85, 0.65), 0 0 35px rgba(255, 149, 0, 0.5);
+    }
+    .aura-orb.listening {
+      animation: auraListening 0.8s ease-in-out infinite alternate;
+      background: radial-gradient(circle at 35% 35%, #60A5FA 0%, #3B82F6 45%, #6366F1 80%, #8B5CF6 100%);
+      box-shadow: 0 14px 50px rgba(59, 130, 246, 0.65), 0 0 35px rgba(99, 102, 241, 0.5);
+    }
+    @keyframes auraFloat {
+      0% { transform: translateY(0px) scale(1); filter: hue-rotate(0deg); }
+      100% { transform: translateY(-4px) scale(1.05); filter: hue-rotate(20deg); }
+    }
+    @keyframes auraPulse {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.15); opacity: 0.75; }
+    }
+    @keyframes auraSpeaking {
+      0% { transform: scale(0.98); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1.02); }
+    }
+    @keyframes auraListening {
+      0% { transform: scale(1); filter: brightness(1); }
+      100% { transform: scale(1.14); filter: brightness(1.25); }
+    }
+    .aura-speech-bubble {
+      margin-top: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ios-text-primary);
+      text-align: center;
+      max-width: 300px;
+      line-height: 1.35;
+      letter-spacing: -0.2px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Minimalist Intention Search Pill */
+    .minimal-search-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--ios-surface);
+      border: 1px solid var(--ios-border);
+      border-radius: 28px;
+      padding: 6px 8px 6px 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+      gap: 8px;
+    }
+    .minimal-mic-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s;
+    }
+    .minimal-mic-btn:active {
+      transform: scale(0.88);
+    }
+    .minimal-goal-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ios-text-primary);
+      outline: none;
+      font-family: inherit;
+    }
+    .minimal-goal-input::placeholder {
+      color: var(--ios-text-tertiary);
+    }
+    .minimal-send-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--ios-text-primary);
+      color: #FFF;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s;
+    }
+    .minimal-send-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* Quick Intention Pills Grid */
+    .quick-intentions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .quick-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--ios-surface);
+      border: 0.5px solid var(--ios-border);
+      border-radius: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .quick-pill:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+    .quick-pill:active {
+      transform: scale(0.96);
+    }
+    .quick-pill-icon {
+      font-size: 20px;
+    }
+    .quick-pill-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ios-text-primary);
+      letter-spacing: -0.2px;
+    }
+
+    /* Live Room Status Card */
+    .space-status-card {
+      background: var(--ios-surface);
+      border: 0.5px solid var(--ios-border);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .space-status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .space-status-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .space-status-headline {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ios-text-primary);
+      letter-spacing: -0.3px;
+    }
+    .space-status-sub {
+      font-size: 12px;
+      color: var(--ios-text-secondary);
+      margin-top: 2px;
+    }
+    .space-ring-mini {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 4px solid #E5E5EA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ios-text-secondary);
+      transition: all 0.3s;
+    }
+    .space-action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .minimal-action-btn {
+      flex: 1;
+      padding: 11px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .minimal-action-btn.primary {
+      background: var(--ios-blue);
+      color: #FFF;
+      box-shadow: 0 3px 10px rgba(0, 122, 255, 0.3);
+    }
+    .minimal-action-btn.secondary {
+      background: rgba(118, 118, 128, 0.1);
+      color: var(--ios-text-primary);
+    }
+    .minimal-action-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Minimal Appliance Strip */
+    .appliance-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .appliance-tile {
+      background: var(--ios-surface);
+      border: 0.5px solid var(--ios-border);
+      border-radius: 16px;
+      padding: 12px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      transition: all 0.15s;
+    }
+    .appliance-tile:active {
+      transform: scale(0.94);
+      background: #E5E5EA;
+    }
+    .appliance-icon {
+      font-size: 20px;
+    }
+    .appliance-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ios-text-secondary);
+    }
+
+    /* Suppress unnecessary demo clutter */
+    .showcase-master-card { display: none !important; }
+    #matrix-mode-banner { display: none !important; }
+    #disambiguation-card { display: none !important; }
+
   </style>
 </head>
 <body>
@@ -935,265 +1262,101 @@
     <div class="screen-viewport">
 
       <!-- SCREEN 1: HOME / INTENTION INPUT -->
+            <!-- SCREEN 1: HOME / MINIMALIST AURA INTELLIGENCE -->
       <div id="screen-home" class="ios-screen active">
-        <div class="ios-nav-header">
-          <div>
-            <h1 class="ios-large-title">Physical Intention</h1>
-            <p class="ios-subtitle">Give MIRROR an intention, not a command</p>
+        <!-- Minimal Top Status -->
+        <div class="home-header">
+          <div class="home-header-left">
+            <span class="home-app-title">MIRROR</span>
+            <span class="home-space-subtitle" id="active-space-name">Living Room · Standby</span>
+            <span id="active-scene-preset-label" style="display:none;">Scene: Living Room</span>
           </div>
-          <span class="ios-badge badge-pink" id="home-status-badge">Aura Voice AI</span>
+          <button class="home-header-cam-btn" onclick="navTo('camera')" title="Open Live Camera">
+            <span>📸</span>
+          </button>
         </div>
 
-        <!-- Inset Text Input Card -->
-        <div class="ios-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <div style="font-size: 11px; font-weight: 700; color: var(--ios-pink); text-transform: uppercase;">
-              User Intention
-            </div>
-            <span class="ios-badge badge-blue" style="cursor: pointer;" onclick="toggleSpeechRecognition()" id="mic-badge">
-              🎙️ Tap to Speak
-            </span>
+        <!-- The Glowing Aura Living Intelligence Orb -->
+        <div class="aura-orb-container" onclick="handleAuraOrbTap()" title="Tap to speak with Aura">
+          <div class="aura-orb" id="aura-orb"></div>
+          <div class="aura-speech-bubble" id="aura-status-speech">
+            "Hi Ram, how should this space be?"
           </div>
-          <textarea id="goal-input" style="width: 100%; height: 50px; background: transparent; border: none; color: #000; font-size: 17px; font-weight: 600; letter-spacing: -0.3px; outline: none; resize: none;" placeholder="What are you trying to accomplish?">I'm leaving</textarea>
-          
-          <!-- Multilingual Quick Suggestion Chips (Features 37, 38) -->
-          <div class="lang-chips-row">
-            <span class="lang-chip" onclick="applyIntentionText('I\'m leaving', 'bedroom_leaving')">🇺🇸 "I'm leaving"</span>
-            <span class="lang-chip" onclick="applyIntentionText('Nenu bayataki velthunna', 'bedroom_leaving')">🇮🇳 "Nenu bayataki velthunna"</span>
-            <span class="lang-chip" onclick="applyIntentionText('Padukodaniki velthunna', 'bedroom_sleep')">🇮🇳 "Padukodaniki velthunna"</span>
-            <span class="lang-chip" onclick="applyIntentionText('Main sone ja raha hu', 'bedroom_sleep')">🇮🇳 "Main sone ja raha hu"</span>
-            <span class="lang-chip" onclick="applyIntentionText('Khana banane ja raha hu', 'kitchen_cooking')">🍳 "Khana banane ja raha hu"</span>
-            <span class="lang-chip" onclick="applyIntentionText('Prepare this room for presentation', 'classroom_av')">📽️ "Presentation Setup"</span>
+        </div>
+
+        <!-- Minimalist Intention Search Pill -->
+        <div class="minimal-search-wrap">
+          <button class="minimal-mic-btn" id="minimal-mic-btn" onclick="toggleSpeechRecognition()" title="Voice Intention">
+            <span id="mic-badge" style="display:none;">🎙️ Tap to Speak</span>
+            <span id="minimal-mic-icon">🎙️</span>
+          </button>
+          <input type="text" id="goal-input" class="minimal-goal-input" placeholder="Say or type your intention..." onkeydown="if(event.key==='Enter') onEvaluateIntention()">
+          <button class="minimal-send-btn" onclick="onEvaluateIntention()" title="Evaluate Intention">
+            <span>➔</span>
+          </button>
+        </div>
+
+        <!-- Essential Quick Intention Pills -->
+        <div class="quick-intentions-grid">
+          <button class="quick-pill" onclick="applyIntentionText('I\'m leaving', 'bedroom_leaving')">
+            <span class="quick-pill-icon">🚪</span>
+            <span class="quick-pill-label">Leaving</span>
+          </button>
+          <button class="quick-pill" onclick="applyIntentionText('I\'m going to sleep', 'bedroom_sleep')">
+            <span class="quick-pill-icon">🌙</span>
+            <span class="quick-pill-label">Sleep</span>
+          </button>
+          <button class="quick-pill" onclick="applyIntentionText('I\'m going to study', 'study_desk')">
+            <span class="quick-pill-icon">📖</span>
+            <span class="quick-pill-label">Study</span>
+          </button>
+          <button class="quick-pill" onclick="applyIntentionText('I\'m going to cook', 'kitchen_cooking')">
+            <span class="quick-pill-icon">🍳</span>
+            <span class="quick-pill-label">Cooking</span>
+          </button>
+        </div>
+
+        <!-- Live Room Status Card (Minimalist Glassmorphic) -->
+        <div class="space-status-card" id="space-status-card">
+          <div class="space-status-top">
+            <div class="space-status-info">
+              <span class="space-status-headline" id="space-status-headline">Physical Space Standby</span>
+              <span class="space-status-sub" id="space-status-sub">Point camera to perceive physical objects</span>
+            </div>
+            <div class="space-ring-mini" id="space-ring-mini">
+              <span id="space-score-mini">--</span>
+            </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; border-top: 0.5px solid var(--ios-border); padding-top: 8px;">
-            <span style="font-size: 12px; color: var(--ios-text-secondary);" id="active-scene-preset-label">Scene: Living Room</span>
-            <button class="ios-btn-primary" style="width: auto; padding: 10px 18px; font-size: 14px; background: var(--ios-pink);" onclick="onEvaluateIntention()">
-              Evaluate State →
+          <div class="space-action-buttons">
+            <button class="minimal-action-btn primary" onclick="navTo('camera')">
+              <span>📷</span> Scan Room
+            </button>
+            <button class="minimal-action-btn secondary" id="home-align-btn" onclick="triggerAiOmniControl()">
+              <span>⚡</span> Align Devices
             </button>
           </div>
         </div>
 
-        <!-- Cute Lady Voice Persona Bar -->
-        <div class="cute-voice-bar" id="cute-voice-bar" onclick="playVoiceGreeting()">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-size: 26px;">🌸</span>
-            <div>
-              <div style="font-size: 14px; font-weight: 700;" id="voice-name-title">Aura (Cute Lady Voice)</div>
-              <div style="font-size: 11px; color: var(--ios-text-secondary);" id="voice-status-sub">"Hi Ram! I'll protect your home & guide you!"</div>
-            </div>
-          </div>
-          <span class="ios-badge badge-pink" id="voice-play-badge">Tap to Hear</span>
+        <!-- Minimal 1-Tap Appliance Strip -->
+        <div class="appliance-strip">
+          <button class="appliance-tile" onclick="blastIr('ac', 'power_off')">
+            <span class="appliance-icon">❄️</span>
+            <span class="appliance-name">AC Power</span>
+          </button>
+          <button class="appliance-tile" onclick="blastIr('tv', 'power_off')">
+            <span class="appliance-icon">📺</span>
+            <span class="appliance-name">TV Power</span>
+          </button>
+          <button class="appliance-tile" onclick="blastIr('lights', 'power_off')">
+            <span class="appliance-icon">💡</span>
+            <span class="appliance-name">Lights</span>
+          </button>
         </div>
 
-        <!-- Ambiguous Intention Disambiguation Card (User Spec Section 1) -->
-        <div class="ios-card" id="disambiguation-card" style="display: none; padding: 12px; background: #FFFBEB; border: 1px solid #FCD34D;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <span style="font-size: 18px;">🤔</span>
-            <div style="font-size: 13px; font-weight: 700; color: #92400E;">How should I prepare this room?</div>
-          </div>
-          <div style="font-size: 11px; color: #B45309; margin-bottom: 8px;">
-            “Prepare the room” depends on your activity. Select what you are planning:
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-            <button class="ios-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="applyIntentionText('Prepare room for studying', 'study_desk')">📖 Studying</button>
-            <button class="ios-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="applyIntentionText('Prepare room for sleep', 'bedroom_sleep')">🌙 Sleeping</button>
-            <button class="ios-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="applyIntentionText('Prepare room for presentation', 'classroom_av')">📽️ Presentation</button>
-            <button class="ios-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="applyIntentionText('Prepare room for movie night', 'bedroom_sleep')">🍿 Movie</button>
-          </div>
-        </div>
-
-        <!-- HACKATHON MASTER SHOWCASE CARD: College Departure (The 10 Standout Features) -->
-        <div class="ios-card showcase-master-card" style="padding: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 20px;">🏆</span>
-              <span style="font-size: 11px; font-weight: 800; color: #B45309; text-transform: uppercase; letter-spacing: 0.5px;">
-                Signature Hackathon Demo
-              </span>
-            </div>
-            <span class="ios-badge" style="background: #F59E0B; color: #FFF; font-weight: 700; font-size: 10px;">⭐ 10 Standout Features</span>
-          </div>
-
-          <div style="font-size: 16px; font-weight: 800; color: #78350F; line-height: 1.25; margin-bottom: 4px;">
-            “MIRROR, I'm leaving for college.”
-          </div>
-          <div style="font-size: 12px; color: #92400E; margin-bottom: 10px; line-height: 1.4;">
-            Experience the complete closed loop: World Model → Active Perception → IR Blaster Action → Physical Human Closure → Reality Verified.
-          </div>
-
-          <div style="display: flex; gap: 8px;">
-            <button class="ios-btn-primary" style="flex: 1; padding: 11px 12px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #F59E0B, #D97706); border: none; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);" onclick="startCollegeDepartureDemo()">
-              ▶️ Run Master Demo
-            </button>
-            <button class="ios-btn-secondary" style="width: auto; padding: 11px 12px; font-size: 12px; font-weight: 700;" onclick="openFeaturesTourModal()">
-              🔥 The 10 Features
-            </button>
-          </div>
-
-          <div style="display: flex; gap: 6px; margin-top: 8px;">
-            <button class="ios-btn-secondary" style="flex: 1; padding: 8px 6px; font-size: 11px; font-weight: 700; background: #EEF2FF; color: #4338CA; border: 1px solid #C7D2FE;" onclick="openMissionPlanModal()">
-              📋 Mission Planner
-            </button>
-            <button class="ios-btn-secondary" style="flex: 1; padding: 8px 6px; font-size: 11px; font-weight: 700; background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0;" onclick="openEpistemicModal()">
-              🧠 Epistemic Partition
-            </button>
-          </div>
-        </div>
-
-        <!-- AI OMNI-CONTROL COMMAND CARD -->
-        <div class="ios-card" style="padding: 14px; background: linear-gradient(135deg, #1E1B4B, #312E81); color: #FFFFFF; border: 1px solid #4338CA; box-shadow: 0 4px 16px rgba(49, 46, 129, 0.35); margin-bottom: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 20px;">⚡</span>
-              <span style="font-size: 11px; font-weight: 800; color: #A5B4FC; text-transform: uppercase; letter-spacing: 0.5px;">
-                AI Omni-Control Engine
-              </span>
-            </div>
-            <span class="ios-badge" style="background: #6366F1; color: #FFF; font-weight: 700; font-size: 10px;">Autonomy Mode</span>
-          </div>
-
-          <div style="font-size: 15px; font-weight: 800; color: #EEF2FF; margin-bottom: 4px;">
-            Autonomous Reality Alignment
-          </div>
-          <div style="font-size: 11px; color: #C7D2FE; margin-bottom: 10px; line-height: 1.4;">
-            One tap for MIRROR AI to sequence 38kHz IR pulses, command all active controllable devices (AC, TV, Lights, Fan), and align physical reality.
-          </div>
-
-          <div style="display: flex; gap: 8px;">
-            <button class="ios-btn-primary" style="flex: 1; padding: 11px 12px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #6366F1, #4F46E5); border: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);" onclick="triggerAiOmniControl()">
-              ⚡ Blast & Control All Devices
-            </button>
-            <button class="ios-btn-secondary" style="width: auto; padding: 11px 12px; font-size: 12px; font-weight: 700; background: rgba(255, 255, 255, 0.15); color: #FFF; border: 1px solid rgba(255, 255, 255, 0.25);" onclick="toggleSpeechRecognition()">
-              🎙️ Voice AI
-            </button>
-          </div>
-        </div>
-
-        <!-- Phone Installation & Direct APK Download Card -->
-        <div class="ios-card" style="padding: 12px; background: linear-gradient(135deg, #F0F9FF, #E0F2FE); border: 1px solid #BAE6FD;">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 26px;">📲</span>
-              <div>
-                <div style="font-size: 13px; font-weight: 700; color: #0369A1;">Install MIRROR on Phone</div>
-                <div style="font-size: 11px; color: #0284C7;">Native Android App • IR Remote • Vision</div>
-              </div>
-            </div>
-            <a href="mirror.apk" download="mirror.apk" style="text-decoration: none;">
-              <span class="ios-badge" style="background: #0284C7; color: #FFFFFF; font-weight: 700; padding: 6px 12px; font-size: 12px; border-radius: 12px; cursor: pointer;">⬇️ Get APK</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Signature Intention Presets -->
-        <div class="ios-card" style="padding: 12px;">
-          <div style="font-size: 12px; font-weight: 700; color: var(--ios-text-secondary); text-transform: uppercase; margin-bottom: 8px; padding-left: 4px;">
-            Signature Intention Modes
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-
-            <div class="ios-list-row" onclick="startCollegeDepartureDemo()" style="background: #FFFDF5; border-left: 4px solid #F59E0B;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">🎓</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700; color: #92400E;">"I'm leaving for college"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Master Demo: AC, Lights, Window, Active Perception</div>
-                </div>
-              </div>
-              <span class="ios-badge" style="background: #F59E0B; color: #FFF;">Signature Demo</span>
-            </div>
-
-            <div class="ios-list-row" onclick="selectPreset('leaving', 'I\'m leaving', 'bedroom_leaving')">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">🚪</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700;">"I'm leaving"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Departure Check: Windows, Doors, AC, Stove</div>
-                </div>
-              </div>
-              <span class="ios-badge badge-red">Security & Eco</span>
-            </div>
-
-            <div class="ios-list-row" onclick="selectPreset('sleeping', 'I\'m going to sleep', 'bedroom_sleep')">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">🌙</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700;">"I'm going to sleep"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Sleep Transition: TV off, Dim lights, 23°C AC</div>
-                </div>
-              </div>
-              <span class="ios-badge badge-purple">Circadian Rest</span>
-            </div>
-
-            <div class="ios-list-row" onclick="selectPreset('studying', 'I\'m going to study', 'study_desk')">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">📖</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700;">"I'm going to study"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Study Mode: Clear desk clutter, Task lamp on</div>
-                </div>
-              </div>
-              <span class="ios-badge badge-blue">Focus State</span>
-            </div>
-
-            <div class="ios-list-row" onclick="selectPreset('cooking', 'I\'m going to cook', 'kitchen_cooking')">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">🍳</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700;">"I'm going to cook"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Kitchen Proximity: Cable near stove hazard check</div>
-                </div>
-              </div>
-              <span class="ios-badge badge-orange">Proximity Risk</span>
-            </div>
-
-            <div class="ios-list-row" onclick="selectPreset('presentation', 'Prepare room for presentation', 'classroom_av')">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">📽️</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700;">"Prepare room for presentation"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Classroom Setup: Projector on, HDMI ready</div>
-                </div>
-              </div>
-              <span class="ios-badge badge-green">AV Mission</span>
-            </div>
-
-            <div class="ios-list-row" onclick="selectPreset('teach_room', 'Teach me this room', 'hotel_room')">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">🏨</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700;">"Teach me this room"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Hotel Room: Identify unknown switches & safe</div>
-                </div>
-              </div>
-              <span class="ios-badge badge-blue">Room Guide</span>
-            </div>
-
-            <div class="ios-list-row" onclick="navTo('diff')">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">⏱️</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700;">"What changed?"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Snapshot Diffing: Morning baseline vs current</div>
-                </div>
-              </div>
-              <span class="ios-badge badge-orange">Temporal Diff</span>
-            </div>
-
-            <div class="ios-list-row" onclick="selectPreset('something_wrong', 'Something is wrong', 'hazard_scene')">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 22px;">⚠️</span>
-                <div>
-                  <div style="font-size: 14px; font-weight: 700;">"Something is wrong"</div>
-                  <div style="font-size: 11px; color: var(--ios-text-secondary);">Physical Anomaly: Active heaters, open doors</div>
-                </div>
-              </div>
-              <span class="ios-badge badge-red">Anomaly Check</span>
-            </div>
-
-          </div>
-        </div>
+        <!-- Hidden compat anchors for scripts -->
+        <div id="cute-voice-bar" style="display:none;"><span id="voice-play-badge"></span><span id="voice-name-title"></span><span id="voice-status-sub"></span></div>
+        <div id="home-status-badge" style="display:none;"></div>
       </div>
 
       <!-- SCREEN 2: VISION & CAMERA OBSERVE -->
@@ -2044,21 +2207,39 @@ PHYSICAL WORLD MODEL
 
       const u = new SpeechSynthesisUtterance(text);
       if (cuteFemaleVoice) u.voice = cuteFemaleVoice;
-      u.pitch = 1.15; // Sweet, cute, warm pitch
-      u.rate = 0.98;  // Clear, articulate pacing
+      u.pitch = 1.12; // Natural sweet pitch
+      u.rate = 1.02;  // Articulate, fluent pacing
 
+      const orb = document.getElementById("aura-orb");
+      const bubble = document.getElementById("aura-status-speech");
       const bar = document.getElementById("cute-voice-bar");
+
       u.onstart = () => {
+        if (orb) orb.classList.add("speaking");
         if (bar) bar.classList.add("speaking");
+        if (bubble) bubble.innerText = `"${text}"`;
         const b = document.getElementById("voice-play-badge");
         if (b) b.innerText = "Speaking 🌸";
       };
       u.onend = () => {
+        if (orb) orb.classList.remove("speaking");
         if (bar) bar.classList.remove("speaking");
         const b = document.getElementById("voice-play-badge");
         if (b) b.innerText = "Tap to Hear";
       };
       window.speechSynthesis.speak(u);
+    }
+
+    
+    function handleAuraOrbTap() {
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        const orb = document.getElementById("aura-orb");
+        if (orb) orb.classList.remove("speaking");
+        return;
+      }
+      playAppleChime('listen');
+      toggleSpeechRecognition();
     }
 
     function playVoiceGreeting() {
@@ -2534,6 +2715,17 @@ PHYSICAL WORLD MODEL
             renderWorldModelTree(report.entities);
           }
           renderConsequenceMatrix(report);
+          const scoreRing = document.getElementById("space-ring-mini");
+          const scoreText = document.getElementById("space-score-mini");
+          const headlineText = document.getElementById("space-status-headline");
+          const subText = document.getElementById("space-status-sub");
+          if (headlineText) headlineText.innerText = report.headline;
+          if (subText) subText.innerText = `${report.items.length} conditions evaluated`;
+          if (scoreText) scoreText.innerText = `${Math.round(report.readiness_score * 100)}%`;
+          if (scoreRing) {
+            scoreRing.style.borderColor = report.readiness_score >= 0.8 ? "var(--ios-green)" : (report.readiness_score >= 0.5 ? "var(--ios-orange)" : "var(--ios-red)");
+            scoreRing.style.color = report.readiness_score >= 0.8 ? "var(--ios-green)" : (report.readiness_score >= 0.5 ? "var(--ios-orange)" : "var(--ios-red)");
+          }
           logAudit("intention_evaluated", report);
           navTo("matrix");
           updateIsland(`${report.headline} Evaluated`, report.is_ready);
@@ -2573,6 +2765,17 @@ PHYSICAL WORLD MODEL
       };
       appState.consequenceReport = report;
       renderConsequenceMatrix(report);
+          const scoreRing = document.getElementById("space-ring-mini");
+          const scoreText = document.getElementById("space-score-mini");
+          const headlineText = document.getElementById("space-status-headline");
+          const subText = document.getElementById("space-status-sub");
+          if (headlineText) headlineText.innerText = report.headline;
+          if (subText) subText.innerText = `${report.items.length} conditions evaluated`;
+          if (scoreText) scoreText.innerText = `${Math.round(report.readiness_score * 100)}%`;
+          if (scoreRing) {
+            scoreRing.style.borderColor = report.readiness_score >= 0.8 ? "var(--ios-green)" : (report.readiness_score >= 0.5 ? "var(--ios-orange)" : "var(--ios-red)");
+            scoreRing.style.color = report.readiness_score >= 0.8 ? "var(--ios-green)" : (report.readiness_score >= 0.5 ? "var(--ios-orange)" : "var(--ios-red)");
+          }
       navTo("matrix");
       speakCuteVoice(report.spoken_summary);
     }
@@ -2617,6 +2820,17 @@ PHYSICAL WORLD MODEL
       };
       appState.consequenceReport = report;
       renderConsequenceMatrix(report);
+          const scoreRing = document.getElementById("space-ring-mini");
+          const scoreText = document.getElementById("space-score-mini");
+          const headlineText = document.getElementById("space-status-headline");
+          const subText = document.getElementById("space-status-sub");
+          if (headlineText) headlineText.innerText = report.headline;
+          if (subText) subText.innerText = `${report.items.length} conditions evaluated`;
+          if (scoreText) scoreText.innerText = `${Math.round(report.readiness_score * 100)}%`;
+          if (scoreRing) {
+            scoreRing.style.borderColor = report.readiness_score >= 0.8 ? "var(--ios-green)" : (report.readiness_score >= 0.5 ? "var(--ios-orange)" : "var(--ios-red)");
+            scoreRing.style.color = report.readiness_score >= 0.8 ? "var(--ios-green)" : (report.readiness_score >= 0.5 ? "var(--ios-orange)" : "var(--ios-red)");
+          }
       navTo("matrix");
       speakCuteVoice(report.spoken_summary);
     }
@@ -3465,6 +3679,17 @@ PHYSICAL WORLD MODEL
             renderWorldModelTree(report.entities);
           }
           renderConsequenceMatrix(report);
+          const scoreRing = document.getElementById("space-ring-mini");
+          const scoreText = document.getElementById("space-score-mini");
+          const headlineText = document.getElementById("space-status-headline");
+          const subText = document.getElementById("space-status-sub");
+          if (headlineText) headlineText.innerText = report.headline;
+          if (subText) subText.innerText = `${report.items.length} conditions evaluated`;
+          if (scoreText) scoreText.innerText = `${Math.round(report.readiness_score * 100)}%`;
+          if (scoreRing) {
+            scoreRing.style.borderColor = report.readiness_score >= 0.8 ? "var(--ios-green)" : (report.readiness_score >= 0.5 ? "var(--ios-orange)" : "var(--ios-red)");
+            scoreRing.style.color = report.readiness_score >= 0.8 ? "var(--ios-green)" : (report.readiness_score >= 0.5 ? "var(--ios-orange)" : "var(--ios-red)");
+          }
           logAudit("camera_physical_evaluated", report);
           navTo("matrix");
           updateIsland(`${report.headline} Verified`, report.is_ready);
