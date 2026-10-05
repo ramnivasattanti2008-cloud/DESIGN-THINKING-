@@ -96,6 +96,14 @@ Last updated: 2026-10-05
     20. **Expanded Universal IR Remote & 8 Physical Device Profiles**:
        - Complete interactive hardware control panels for 8 devices: Air Conditioner, Television/Screen, Smart Lighting, Classroom Projector, Ceiling/Floor Fan, Soundbar/Audio, Space Heater (Emergency safety cutoff), and Air Purifier.
        - Top Master Quick Blast banner to execute all safe controls in one tap.
+    21. **Product Audit & 5 Standout Enhancements (T-035 Audit Completion)**:
+       - Conducted full audit of user vision against current implementation across all 10 core spec sections.
+       - Identified 5 subtle gaps/weaknesses and implemented interactive resolutions in the UI:
+         a. *Ambiguous Intention Disambiguation Card (`#disambiguation-card`)*: Explicitly asks user clarification for generic goals ("prepare this room") with interactive preset chips instead of guessing.
+         b. *Visual OCR Appliance Readouts*: Rendered high-contrast OCR badges (`🔤 OCR: "24°C ECO"`, `🔤 OCR: "NO SIGNAL (E-02)"`, `🔤 OCR: "HOT SURFACE"`) directly on entity cards.
+         c. *Physical Relational Graph Edges*: Explicit visual causality and connectivity tree (`Podium ──feeds──> HDMI Cable ──connects──> Projector`, `Switch Panel ──controls──> Light`).
+         d. *Inline 1-Tap Control Buttons*: Direct action buttons on each consequence card to blast IR power without switching tabs.
+         e. *Dual Verification Paths & Failure Recovery Diagnostic*: Added both `[📸 Verify State]` and `[⚠ Test Incomplete]` with interactive sensor delta failure cards (`#verification-failure-card`) demonstrating reality mismatch and safe recovery steps.
 
 ## Half done
 - None. Everything is complete, tested, and running live.

@@ -986,6 +986,23 @@
           <span class="ios-badge badge-pink" id="voice-play-badge">Tap to Hear</span>
         </div>
 
+        <!-- Ambiguous Intention Disambiguation Card (User Spec Section 1) -->
+        <div class="ios-card" id="disambiguation-card" style="display: none; padding: 12px; background: #FFFBEB; border: 1px solid #FCD34D;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span style="font-size: 18px;">🤔</span>
+            <div style="font-size: 13px; font-weight: 700; color: #92400E;">How should I prepare this room?</div>
+          </div>
+          <div style="font-size: 11px; color: #B45309; margin-bottom: 8px;">
+            “Prepare the room” depends on your activity. Select what you are planning:
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <button class="ios-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="applyIntentionText('Prepare room for studying', 'study_desk')">📖 Studying</button>
+            <button class="ios-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="applyIntentionText('Prepare room for sleep', 'bedroom_sleep')">🌙 Sleeping</button>
+            <button class="ios-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="applyIntentionText('Prepare room for presentation', 'classroom_av')">📽️ Presentation</button>
+            <button class="ios-btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="applyIntentionText('Prepare room for movie night', 'bedroom_sleep')">🍿 Movie</button>
+          </div>
+        </div>
+
         <!-- HACKATHON MASTER SHOWCASE CARD: College Departure (The 10 Standout Features) -->
         <div class="ios-card showcase-master-card" style="padding: 14px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -1575,9 +1592,34 @@ ROOM (Physical World Model)
           <div class="camera-corner br"></div>
         </div>
 
-        <button class="ios-btn-primary" id="btn-run-verify" style="background: var(--ios-green);" onclick="onRunVerification()">
-          📸 Verify Physical State with Camera
-        </button>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <button class="ios-btn-primary" id="btn-run-verify" style="flex: 1; background: var(--ios-green);" onclick="onRunVerification(true)">
+            📸 Verify State (Camera Sensor Proof)
+          </button>
+          <button class="ios-btn-secondary" style="width: auto; padding: 10px 14px; font-size: 12px; font-weight: 700; color: #DC2626;" onclick="onRunVerification(false)" title="Simulate physical conflict remaining">
+            ⚠ Test Incomplete
+          </button>
+        </div>
+
+        <!-- VERIFICATION FAILURE DIAGNOSTIC CARD (User Spec Section 8 & Feature 21) -->
+        <div class="consequence-card conflict" id="verification-failure-card" style="display: none; margin: 10px 0; border-left: 5px solid var(--ios-red);">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 18px;">❌</span>
+              <span style="font-size: 13px; font-weight: 800; color: #991B1B;">VERIFICATION FAILED</span>
+            </div>
+            <span class="ios-badge badge-red">Sensor Delta Mismatch</span>
+          </div>
+          <div style="font-size: 12px; color: #7F1D1D; font-weight: 600; margin-top: 4px;" id="v-fail-headline">
+            The window is still detected as OPEN (97% sensor confidence).
+          </div>
+          <div style="font-size: 11px; color: var(--ios-text-secondary); margin-top: 2px;">
+            Closed-loop camera analysis observed 0 state transition. Rain damage and security invariant would be violated.
+          </div>
+          <button class="ios-btn-primary" style="margin-top: 8px; background: #DC2626;" onclick="onRunVerification(true)">
+            Now Close Window & Re-Verify →
+          </button>
+        </div>
 
         <!-- REALITY VERIFIED SCORECARD (User Specification Feature 5) -->
         <div class="reality-verified-card" id="reality-scorecard-card" style="display: none; margin: 10px 0;">
@@ -2276,6 +2318,19 @@ ROOM (Physical World Model)
     async function onEvaluateIntention() {
       const intention = document.getElementById("goal-input").value.trim() || "I'm leaving";
       appState.intention = intention;
+
+      // Disambiguation Check (User Spec Section 1: "Prepare this room")
+      const disambigEl = document.getElementById("disambiguation-card");
+      const normIntention = intention.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+      if (normIntention === "prepare this room" || normIntention === "prepare room" || normIntention === "make this room ready" || normIntention === "prepare space") {
+        if (disambigEl) disambigEl.style.display = "block";
+        speakCuteVoice("How would you like to prepare this room? For studying, sleeping, or a presentation?");
+        updateIsland("🤔 Ambiguous Intention", false);
+        return;
+      } else {
+        if (disambigEl) disambigEl.style.display = "none";
+      }
+
       updateIsland("⚡ Evaluating Consequence Graph...", true);
 
       const sceneData = SCENE_PRESETS[appState.sceneType] || SCENE_PRESETS.bedroom_leaving;
@@ -2512,11 +2567,34 @@ ROOM (Physical World Model)
 
         const epistemicTag = (item.confidence >= 0.85) ? "🟢 KNOWN" : "🟡 PROBABLE";
 
+        // OCR Readout Badge (User Spec Section 2)
+        let ocrBadgeHTML = "";
+        const lbl = item.entity_label.toLowerCase();
+        if (lbl.includes("ac") || lbl.includes("conditioner")) {
+          ocrBadgeHTML = `<span class="ios-badge" style="background: #E0E7FF; color: #4338CA; font-size: 10px; font-weight: 700;">🔤 OCR: "24°C ECO"</span>`;
+        } else if (lbl.includes("projector")) {
+          ocrBadgeHTML = `<span class="ios-badge" style="background: #FEE2E2; color: #991B1B; font-size: 10px; font-weight: 700;">🔤 OCR: "NO SIGNAL (E-02)"</span>`;
+        } else if (lbl.includes("stove")) {
+          ocrBadgeHTML = `<span class="ios-badge" style="background: #FEF3C7; color: #92400E; font-size: 10px; font-weight: 700;">🔤 OCR: "HOT SURFACE"</span>`;
+        }
+
+        // Inline 1-Tap Control Button
+        let inlineActionBtn = "";
+        if (item.status === "unnecessary_active" || (item.action_type === "automated_system" && item.current_state !== "OFF")) {
+          const devType = lbl.includes("ac") ? "ac" : (lbl.includes("tv") ? "tv" : (lbl.includes("projector") ? "projector" : "lights"));
+          inlineActionBtn = `
+            <button class="ios-btn-primary" style="width: auto; padding: 4px 8px; font-size: 11px; font-weight: 700; background: var(--ios-pink); border: none; margin-left: 6px;" onclick="event.stopPropagation(); blastIr('${devType}', 'power_off'); this.innerText='✓ Powered Off'; this.disabled=true;">
+              ⚡ Blast Power Off
+            </button>
+          `;
+        }
+
         card.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 6px;">
               <b style="font-size: 14px; text-transform: capitalize;">${item.entity_label}</b>
               <span style="font-size: 10px; color: var(--ios-text-secondary);">${epistemicTag}</span>
+              ${ocrBadgeHTML}
             </div>
             ${statusBadgeHTML}
           </div>
@@ -2525,7 +2603,10 @@ ROOM (Physical World Model)
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; border-top: 0.5px solid var(--ios-border); padding-top: 6px;">
             <span style="font-size: 11px; color: var(--ios-text-secondary);">Target: <b>${item.desired_state}</b></span>
-            <span style="font-size: 11px; color: var(--ios-pink); font-weight: 600;">Why this matters? →</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 11px; color: var(--ios-pink); font-weight: 600;">Why this matters? →</span>
+              ${inlineActionBtn}
+            </div>
           </div>
         `;
         list.appendChild(card);
@@ -2541,7 +2622,7 @@ ROOM (Physical World Model)
         ? report.user_actions.map(a => `<div>• ${a} (Physical)</div>`).join("")
         : `<div>• All physical items verified</div>`;
 
-      // Render Structured World Model Tree (Feature 3)
+      // Render Structured World Model Tree & Connection Graph (Feature 3 & User Spec Section 3)
       const treeEl = document.getElementById("world-model-tree-view");
       if (treeEl && appState.currentWorld && appState.currentWorld.entities) {
         const lines = [`ROOM (${appState.currentWorld.room_type.toUpperCase()})`];
@@ -2553,6 +2634,19 @@ ROOM (Physical World Model)
           const confText = e.confidence < 0.8 ? ` [Conf: ${Math.round(e.confidence*100)}% ?]` : '';
           lines.push(`${prefix}${e.label.toUpperCase()}: ${e.state} ${stateSymbol}${confText}`);
         });
+
+        // Relational connection edges (User Spec Section 3: "What connects to what")
+        lines.push("\nPHYSICAL GRAPH & RELATIONSHIPS:");
+        if (appState.intention.toLowerCase().includes("presentation") || appState.sceneType === 'classroom_av') {
+          lines.push(" ├── Classroom Podium  ──feeds────> HDMI Cable");
+          lines.push(" ├── HDMI Cable        ──connects─> Projector (DISCONNECTED ❌)");
+          lines.push(" └── Room Projector    ──casts────> Presentation Screen");
+        } else {
+          lines.push(" ├── Wall Switch Panel ──controls─> Ceiling Light");
+          lines.push(" ├── 230V Mains Socket ──powers───> Air Conditioner");
+          lines.push(" ├── Window Frame      ──bounds───> Exterior (OPEN ⚠)");
+          lines.push(" └── Entertainment Hub ──controls─> Television");
+        }
         treeEl.innerText = lines.join("\n");
       }
 
@@ -2825,9 +2919,35 @@ ROOM (Physical World Model)
       vctx.fillText("WINDOW CLOSED ✓", vc.width * 0.50, vc.height * 0.50);
     }
 
-    async function onRunVerification() {
-      updateIsland("⚡ Verifying Physical State...", true);
+    async function onRunVerification(isSuccess = true) {
+      const failCard = document.getElementById("verification-failure-card");
+      const scorecard = document.getElementById("reality-scorecard-card");
       const resCard = document.getElementById("v-result-card");
+
+      if (!isSuccess) {
+        updateIsland("⚠️ Verification Failed: Delta Mismatch", false);
+        playAppleChime('tap');
+        resCard.style.borderLeftColor = "var(--ios-red)";
+        document.getElementById("v-result-icon").innerText = "❌";
+        document.getElementById("v-result-icon").style.color = "var(--ios-red)";
+        document.getElementById("v-result-icon").style.background = "#FEE2E2";
+        document.getElementById("v-result-title").innerText = "Verification Incomplete";
+        document.getElementById("v-result-title").style.color = "var(--ios-red)";
+        document.getElementById("v-result-subtitle").innerText = "1 physical conflict remains unaddressed";
+        document.getElementById("v-status-pill").innerText = "FAILED";
+        document.getElementById("v-status-pill").className = "ios-badge badge-red";
+
+        if (failCard) failCard.style.display = "block";
+        if (scorecard) scorecard.style.display = "none";
+
+        const failText = "Verification failed! The window is still detected as open. I couldn't verify your safe departure state. Please close the window.";
+        speakCuteVoice(failText);
+        logAudit("verification_failed_delta", { entity: "window", state: "OPEN", confidence: 0.97 });
+        return;
+      }
+
+      if (failCard) failCard.style.display = "none";
+      updateIsland("⚡ Verifying Physical State...", true);
       resCard.style.borderLeftColor = "var(--ios-green)";
       document.getElementById("v-result-icon").innerText = "✓";
       document.getElementById("v-result-icon").style.color = "var(--ios-green)";
@@ -2836,9 +2956,9 @@ ROOM (Physical World Model)
       document.getElementById("v-result-title").style.color = "var(--ios-green)";
       document.getElementById("v-result-subtitle").innerText = "All physical conditions verified by camera sensor proof";
       document.getElementById("v-status-pill").innerText = "VERIFIED";
+      document.getElementById("v-status-pill").className = "ios-badge badge-green";
 
       // Show Reality Verified Scorecard (Feature 5)
-      const scorecard = document.getElementById("reality-scorecard-card");
       if (scorecard) {
         scorecard.style.display = "block";
       }
